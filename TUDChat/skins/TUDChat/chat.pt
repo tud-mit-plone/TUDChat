@@ -1,0 +1,54 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
+  metal:use-macro="here/main_template/macros/master" i18n:domain="plone">
+<head>
+  <title>Chat</title>
+
+<metal:block metal:fill-slot="javascript_head_slot">
+    <script language="javascript" src="jquery-1.7.min.js"></script>
+    <script language="javascript" src="jquery.ba-dotimeout.min.js"></script>
+    <script language="javascript" src="hyperlink.js"></script>
+    <script language="javascript" src="jquery.notification.js"></script>
+    <script language="javascript" tal:condition="python:here.isAdmin(here.REQUEST) == True" src="tud_chat_admin.js"></script>
+    <script language="javascript" tal:condition="python:not here.isAdmin(here.REQUEST) == True" src="tud_chat_user.js"></script>    
+    <script language="javascript" src="tud_chat.js"></script>
+
+    <script type="text/javascript" tal:content="structure string:var refreshRate = ${here/refreshRate} * 1000; var blockTime = ${here/blockTime} * 1000; var ownUsername = '${request/SESSION/user_properties/name|nothing}';">    
+    </script>
+</metal:block>
+
+<metal:block metal:fill-slot="css_slot">
+    <link rel="stylesheet" type="text/css" href="tud_chat.css" />
+    <link rel="stylesheet" type="text/css" tal:condition="python:here.isAdmin(here.REQUEST) == True" href="tud_chat_admin.css" />
+</metal:block>
+
+</head>
+
+
+<body metal:fill-slot="main" i18n:domain="tudchat">
+    <div id="chat">
+        <div id="chatContent">
+            <ul id="chatContainer">
+            </ul>
+        </div>
+        <div id="chatUser">
+            <ul id="userContainer">
+            </ul>
+        </div>
+        <div class="clear"></div>
+        <div id="chatMsg">
+        <input type="text" name="msg" id="chatMsgValue">
+        <button id="chatMsgSubmit">Absenden</button>
+        </div>
+        <div class="clear"></div>
+        <br />
+        <div id="message_edit" tal:condition="python:here.isAdmin(here.REQUEST) == True" style="display:none;">
+            <input type="text" name="msg" id="chatMsgEdit">
+            <button id="chatMsgEditSave" data-mid="">Speichern</button>
+            <button id="chatMsgEditAbort">Abbrechen</button>
+        </div>
+        <div>
+            <button id="logout">Logout</button>
+        </div>        
+    </div>
+</body>
+</html>

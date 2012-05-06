@@ -1,0 +1,84 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
+  metal:use-macro="here/main_template/macros/master" i18n:domain="plone">
+<head>
+
+<metal:block metal:fill-slot="javascript_head_slot">
+
+    <script language="javascript" src="jquery-1.7.min.js"></script>    
+    <script language="javascript" src="jquery.notification.js"></script>
+    <script language="javascript">
+    $(document).ready(
+        function(){    
+            $('#login').submit(function() {              
+              $.getJSON("registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val() }, function(response) {                
+                if (response == true) { 
+                        if (document.location.href.substr(-1) == '/')
+                            document.location.href = document.location.href + "chat"; 
+                        else
+                            document.location.href = document.location.href + "/chat"; 
+                    } else {
+                        if (response.status.message != '')
+                            $.notification.error(response.status.message);
+                    }                    
+              });
+              
+              return false;
+            });
+            $.get("status", '', function(data) {
+                $('#status').val(data);
+            });
+            $('#logout').click(function(e) {
+                e.preventDefault();
+                $.get('logout', '', function(data) {
+                   $.get("status", '', function(data) {
+                    $('#status').val(data);
+                   });
+                });
+            });
+            $('#updateStatus').click(function() {
+                $.get("status", '', function(data) {
+                    $('#status').val(data);
+                });
+            });
+        }
+    );
+    </script>
+</metal:block>
+
+<metal:block metal:fill-slot="css_slot">
+    <link rel="stylesheet" type="text/css" href="tud_chat.css" />
+</metal:block>
+
+</head>
+
+<body metal:fill-slot="main" i18n:domain="tudchat">
+
+<h2>Willkommen zum Chat!</h2>
+
+<tal:block define="sessions python:here.getActiveChatSessions()" condition="python:here.getActiveChatSessions() is not None">
+    <form id="login" action="" tal:condition="python: len(sessions)>0">
+        <label for="">Raum</label>
+        <select name="chatroom">
+            <tal:block repeat="session sessions">
+                <option tal:attributes="value session/id" tal:content="session/name">Sins-Chat</option>
+            </tal:block>
+        </select>
+        <input type="text" name="username" />
+        <input type="submit" value="Anmelden" />
+        <button id='logout'>Logout (DEBUG)</button>
+    </form>
+    <tal:block condition="python: len(sessions)==0" define="session python:here.getNextChatSession()">
+        <p>Leider existiert zurzeit keine aktive Chat-Session.</p>
+        <p tal:condition="python: len(session)==0">Es befindet sich auch keine Chat-Session in Planung.</p>
+        <p tal:condition="python: len(session)==1">Die nächste Chat-Session startet am <tal:block replace="python: session[0]['start'].strftime('%d.%m.%y')" /> um <tal:block replace="python: session[0]['start'].strftime('%H:%M')" /> Uhr.</p>
+    </tal:block>
+</tal:block>
+<p tal:condition="python:here.getActiveChatSessions() is None">Es wurde noch keine Datenbank konfiguriert. Diese kann in den Chat-Einstellungen eingestellt werden.</p>
+
+<div><a href="chat">Chat direkt betreten</a> (falls bereits angemeldet)</div>
+<p>Status: (DEBUG)</p>
+<textarea style="width:900px;height:100px;" id='status'></textarea>
+<br/>
+<button id='updateStatus'>Update status (DEBUG)</button>
+</body>
+</html>

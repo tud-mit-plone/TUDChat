@@ -1,0 +1,93 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"
+      lang="en-US"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="contact">    
+            
+<body>
+<metal:javascriptslot fill-slot="javascript_head_slot">
+  <script type="text/javascript" src="jquery-1.7.min.js"></script>
+  <script type="text/javascript" src="jquery-ui-1.8.19.custom.min.js"></script>
+  <script type="text/javascript" src="jquery-ui-timepicker-addon.js"></script>
+  <script type="text/javascript" src="jquery.ui.datepicker-de.js"></script>  
+
+  <script language="javascript">
+
+    $(document).ready(
+        function(){    
+          $("#start_date, #end_date").datetimepicker({
+            timeFormat: 'hh:mm',
+            dateFormat: 'dd.mm.yy,',
+            hourGrid: 6,
+            minuteGrid: 30,
+            stepMinute: 5,
+            hour: 12,
+          });
+        }
+    );
+
+
+  </script>
+
+</metal:javascriptslot>
+
+<metal:cssslot fill-slot="css_slot">
+  <link rel="stylesheet" href="jquery-ui-timepicker-addon.css" type="text/css" media="screen" />
+  <link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.8.19.custom.css" type="text/css" media="screen" />
+
+</metal:cssslot>
+
+<metal:main fill-slot="main" tal:define="errors request/errors|python:{}">
+
+        <h1>Chat-Sitzung hinzufügen</h1>
+
+<form tal:attributes="action string:${here_url}/addSessionSubmit" name="form" method="post">
+
+  <div tal:define="error errors/title | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
+    <label for="title">Titel</label>
+    <span class="fieldRequired" title="Required"> (Required) </span>
+    <div class="formHelp">Bitte geben Sie ein Titel für die Chat-Sitzung an.</div>
+    <div class="error_message" tal:condition="error" tal:content="error"></div>
+    <input type="text" id="title" name="title" tal:attributes="value request/title|nothing"/>
+  </div>
+
+  <div tal:define="error errors/start_date | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
+    <label for="start_date">Beginn</label>
+    <span class="fieldRequired" title="Required"> (Required) </span>
+    <div class="formHelp">Bitte geben Sie den Beginn der Chat-Sitzung an.</div> 
+    <div class="error_message" tal:condition="error" tal:content="error"></div>
+    <input type="text" id="start_date" name="start_date" tal:attributes="value request/start_date|nothing"/>
+  </div>
+
+  <div tal:define="error errors/end_date | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
+    <label for="end_date">Ende</label>
+    <span class="fieldRequired" title="Required"> (Required) </span>
+    <div class="formHelp">Bitte geben Sie das Ende der Chat-Sitzung an.</div> 
+    <div class="error_message" tal:condition="error" tal:content="error"></div>
+    <input type="text" id="end_date" name="end_date" tal:attributes="value request/end_date|nothing"/>
+  </div>
+
+    
+  <div class="formControls">
+    <input type="hidden" name="form.submitted" value="1" />
+    <input class="context" type="submit" id="save" name="form.button.Create" value="Save" />
+    <input class="context" type="submit" id="cancel_button" name="form.button.Cancel" value="Cancel" />
+  </div>
+
+</form>
+    
+</metal:main>
+
+<metal:bottom fill-slot="bottom">
+  <div class="documentBottomLine"> 
+    <div metal:use-macro="here/document_byline/macros/byline">
+        Get the byline - contains details about author and modification date.
+    </div>
+    <div metal:use-macro="here/document_actions/macros/document_actions">
+        Document actions (print, sendto etc)
+    </div>
+    <br class="floatclearer" />
+  </div>
+</metal:bottom>
+
+</body>
+</html>

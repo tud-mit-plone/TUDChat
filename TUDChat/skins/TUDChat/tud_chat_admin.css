@@ -1,0 +1,61 @@
+div#message_edit{
+    float:left;
+    border:1px solid #acacac;
+    padding:5px 0 5px 0;
+}
+div#message_edit{
+    width:781px;
+    border-top-left-radius:5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding: 5px;
+}
+div#message_edit input[type="text"] {
+    border: 1px solid #ACACAC;
+    width: 590px;
+}
+
+div.adminActions{
+    float:right;    
+}
+    
+div.adminActions > a{
+    padding-left: 10px;
+    padding-right: 10px;
+    text-decoration: none;
+    opacity: 0.5;
+}    
+div.adminActions > a:hover{
+    opacity: 1.0;
+}    
+
+a.edit {
+    background-image: url('images/pen.png');
+    background-repeat:
+    no-repeat; background-position: center top;
+} 
+
+a.delete {
+    background-image: url('images/false.png');
+    background-repeat: no-repeat;
+    background-position: center top;
+}
+
+a.kick {
+    background-image: url('images/false_22.png');
+    background-repeat: no-repeat;
+    background-position: center top;
+}
+
+a.ban {
+    background-image: url('images/flag_red_22.png');
+    background-repeat: no-repeat;
+    background-position: center top;
+}
+
+a.warn {
+    background-image: url('images/warning.png');
+    background-repeat: no-repeat;
+    background-position: center top;
+}

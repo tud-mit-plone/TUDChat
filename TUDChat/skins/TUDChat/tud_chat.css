@@ -1,0 +1,248 @@
+div.clear{
+    clear:both;
+    width:0;
+    height:0;
+    padding:0;
+    margin:0;
+}
+div#chat{
+    width:800px;
+    padding:10px;
+}
+div#chatContent, div#chatUser, div#chatMsg{
+    float:left;
+    border:1px solid #acacac;
+    min-height:400px;
+    padding:5px 0 5px 0;
+}
+div#chatContent{
+    width:590px;
+    border-right:0;
+    border-top-left-radius:5px;
+    height:400px;
+    overflow:auto;    
+    word-wrap: break-word;
+}
+    div#chatContent ul{
+        list-style:none;
+        padding:0;
+        margin:0;
+
+    }
+    div#chatContent ul li{
+        border-bottom:1px solid #efeded;
+        padding:5px;
+    }
+
+   div#chat li.hovered{
+        background-color: #ddd;
+    }
+
+   div#chat li.selected{
+        background-color: #FFF18F !important;
+    }
+
+    div#chatContent li.ownMessage span.username {
+        text-decoration:underline;
+    }
+
+div#chatUser{
+    width:200px;
+    border-top-right-radius:5px;
+    word-wrap: break-word;
+}
+    div#chatUser ul{
+        list-style:none;
+        padding:0;
+        margin:0;
+    }
+    div#chatUser ul li{
+        border-bottom:1px solid #efeded;
+        padding:5px;
+    }
+
+    div#chatUser ul li.admin{
+        background-color:#acacac;
+        color:#fff;
+    }
+
+    div#chatUser ul li.ownUsername{
+        font-weight:bold;
+        text-decoration:underline;
+    }
+
+div#chatMsg{
+    width:781px;
+    min-height:0;
+    height:30px;
+    padding:5px;
+    border-top:0;
+    border-bottom-left-radius:5px;
+    border-bottom-right-radius:5px;
+}
+    div#chatMsg input[type="text"]{
+        width:684px;
+        border:1px solid #acacac;
+    }
+
+    div#chatMsg input[type="submit"]{
+        cursor:pointer;
+    }
+
+    div#chatMsg input[type="text"]:focus{
+        outline:none;
+    }
+
+div#chatContent span.username{
+    font-weight: bold;
+    font-style: italic;
+}
+
+div#chatContent li.admin_delete  span.additional_content{
+    color: darkred;
+}
+
+div#chatContent li.admin_delete  div.adminActions{
+    display: none !important;
+}
+div#chat div.adminActions a {
+    display:block;
+    float:right;
+    height:20px;
+    width:22px;
+    padding:0 4px 0 4px;
+}
+div#chat div.adminActions a:hover {
+    background-color:transparent;
+}
+
+
+div#chatContent li.admin_edit span.additional_content {
+    color: darkgreen;
+}
+
+.hidden{
+    display: none;
+}
+
+div#chatContent .admin_message .message_content {
+    font-weight: bold;
+}
+
+
+div#chatContent .message_content a {
+    color: #282C6A;
+}
+
+div#chatContent .message_content a:hover {
+    color: #58516C;
+}
+
+input, select, option{
+      padding:5px 2px;
+}
+
+select, option{
+  background-color:#fff;
+  border:1px solid #000;
+  font-size:10px;
+  margin:3px;
+}
+
+
+/* content from notification.css */
+
+#notification_overlay{
+    width            : 100%; /* will override by js */
+    height           : 100%; /* will override by js */
+    position         : fixed;
+    top              : 0;
+    left             : 0;
+    z-index          : 300000;
+    display          : none;
+}
+
+#notification_overlay .transparency{
+    background-color : #000;
+    width            : 100%; /* will override by js */
+    height           : 100%; /* will override by js */
+    position         : fixed;
+    top              : 0;
+    left             : 0;
+    z-index          : -1;
+    opacity          : 0.50;
+}
+
+#notification_container{
+    position        : relative;
+    width           : 500px;
+    opacity         : 1.0;
+    z-index          : 300001;
+}
+
+#notification_container hr {
+    margin-top: 10px;
+    padding-bottom: 10px;    
+}
+
+#notification_container tt {    
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #555;
+    padding: 0px 5px 0px 5px;
+}
+
+#notification_container em {    
+    font-size: 1.6em;
+    font-style:normal;
+    margin:10px;
+}
+
+#notification_container input[type=text] {    
+    width:380px;
+    border-radius: 3px;
+    margin-left:10px;
+}
+
+.notification{
+    width           : 500px;
+    padding         : 20px;
+    margin          : 5px 0 5px 0;
+    border-radius   : 5px;
+    border: 2px #555 solid;
+    font-weight     : bold;
+    background-color: #fff;
+    z-index          : 300001;
+}
+.notification_error {
+    color           : #800000;
+}
+.notification_success {
+    color           : #33CC33;
+}
+.notification_warn {
+    color           : #FF5D00;
+}
+.notification_general {
+    color           : #FFCC00;
+}
+.notification_button_container{ 
+    text-align: center;
+}
+.notification_button{
+    /* display         : block; */
+    cursor          : pointer;
+    min-width       : 212px;
+    border          : 3px solid #303030;
+    outline         : none;
+    /* float           : right; */
+    margin          : 2px 5px 2px 5px;
+    padding         : 2px 20px 2px 20px;
+    background-color: #555;
+    color           : #fff;
+}
+.notification_button:hover{
+    background-color: #666;    
+}
+
+/* content from notification.css */

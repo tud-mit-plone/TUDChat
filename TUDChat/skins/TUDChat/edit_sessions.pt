@@ -1,0 +1,93 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"
+      lang="en-US"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="contact">    
+            
+<body>
+<metal:javascriptslot fill-slot="javascript_head_slot">
+  <script type="text/javascript" src="jquery-1.7.min.js"></script>
+  <script type="text/javascript" src="jquery-ui-1.8.19.custom.min.js"></script>
+  <script type="text/javascript" src="jquery-ui-timepicker-addon.js"></script>
+  <script type="text/javascript" src="jquery.ui.datepicker-de.js"></script>  
+
+  <script language="javascript">
+
+    $(document).ready(
+        function(){    
+          $('#sessions tr:odd').css('background-color', '#eee');
+        }
+    );
+
+
+  </script>
+
+</metal:javascriptslot>
+
+<metal:cssslot fill-slot="css_slot">
+  <link rel="stylesheet" href="jquery-ui-timepicker-addon.css" type="text/css" media="screen" />
+  <link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.8.19.custom.css" type="text/css" media="screen" />
+
+  <style type="text/css">
+  <!--
+    #session th { text-align:center; }
+  -->
+  </style>
+
+
+</metal:cssslot>
+
+<metal:main fill-slot="main" tal:define="errors request/errors|python:{}">
+
+        <h1>Chat-Sitzungen verwalten</h1>
+
+<form tal:attributes="action string:${here_url}/editSessionsSubmit" name="form" method="post">
+
+  <div class="field">
+    <table width="100%" id='sessions'>
+      <tr>
+        <th>Löschen?</th>
+        <th>Titel</th>
+        <th>Start-Zeit</th>
+        <th>Ende-Zeit</th>
+      </tr>
+      <tr tal:repeat="session python: here.getChatSessions(context.REQUEST)">
+        <td>
+          <input type="checkbox" name="delete:list:int" tal:attributes="value session/id"/>
+        </td>
+        <td>
+          <span tal:replace="session/name"/>
+        </td>
+        <td>
+          <span tal:replace="python:str(session.get('start'))"/>
+        </td>
+        <td>
+          <span tal:replace="python:str(session.get('end'))"/>
+        </td>
+      </tr>
+    </table>
+  </div>
+    
+  <div class="formControls">
+    <input type="hidden" name="form.submitted" value="1" />
+    <input class="context" type="submit" id="save" name="form.button.Delete" value="Delete" />
+    <input class="context" type="submit" id="cancel_button" name="form.button.Cancel" value="Cancel" />
+  </div>
+
+</form>
+    
+</metal:main>
+
+<metal:bottom fill-slot="bottom">
+  <div class="documentBottomLine"> 
+    <div metal:use-macro="here/document_byline/macros/byline">
+        Get the byline - contains details about author and modification date.
+    </div>
+    <div metal:use-macro="here/document_actions/macros/document_actions">
+        Document actions (print, sendto etc)
+    </div>
+    <br class="floatclearer" />
+  </div>
+</metal:bottom>
+
+</body>
+</html>
