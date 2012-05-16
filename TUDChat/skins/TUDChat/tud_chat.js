@@ -61,7 +61,7 @@ var updateCheck = function(){
 			if (data.status.message != "") {
 				kickmessage = data.status.message;
 			}else{
-				kickmessage = "Sie wurden gekickt!";
+				kickmessage = "Sie wurden von einem Administrator des Chats verwiesen!";
 			}
 			$.notification.error(kickmessage, false, [{"name" :"Ok",
                                                                           "click":function(){                                                                          	
@@ -75,7 +75,7 @@ var updateCheck = function(){
 		if (data.status.code == 3) { // Banned
 			//$.doTimeout( 'updateCheck' ); // stop updateCheck
 			updateCheckBlock = true;
-			$.notification.error("Sie wurden gebannt! <br/><br/>Grund: " + data.status.message, false, [{"name" :"Ok",
+			$.notification.error("Sie wurden dauerhaft des Chats verwiesen! <br/><br/>Grund: " + data.status.message, false, [{"name" :"Ok",
                                                                           "click":function(){                                                                          	
                                                                               $.notification.clear();
                                                                               goHierarchieUp();

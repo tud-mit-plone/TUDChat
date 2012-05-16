@@ -503,7 +503,7 @@ class TUDChat(BaseContent):
         if not self.chat_storage.getChatSession(chatroom)['active']:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der gewählte Chat-Raum ist zurzeit nicht aktiv.'}})
         if self.chat_rooms.has_key(chatroom) and self.chat_rooms[chatroom]['chat_users'].has_key(user):
-            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der Benutzername ist bereits belegt.'}})
+            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Dieser Benutzername wird bereits verwendet.'}})
 
         session = REQUEST.SESSION
         start_action_id = self.chat_storage.getLastChatAction(chatroom)
