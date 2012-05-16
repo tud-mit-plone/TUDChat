@@ -103,6 +103,46 @@ var updateCheck = function(){
 		if (data.status.code != 0) // != OK
 			return;
 
+    if(typeof(data.users)!="undefined"){
+      if(typeof(data.users['new'])!="undefined"){
+        var user = data.users['new'].sort();        
+        for(var i in user) {
+          var added = false;
+          element = $(printNewUser(user[i])).attr("data-uname", user[i]);
+          $("#userContainer").children().each(function(){ // Enumerate all existing names and insert alphabetically
+              if ($(this).text() > user[i]) {
+                  $(element).insertBefore($(this));
+                  added = true;
+                  return false;
+              }
+              });
+          if (!added)
+            element.appendTo($("#userContainer"));
+          };
+          // Notification: User has entered the room
+          if (user.length == 1)            
+            $("#chatContainer").append("<li><span class='username'>"+user+"</span> hat den Raum betreten.</li>");
+          else if (user.length != 0) {
+            last_user = user.pop();
+            $("#chatContainer").append("<li><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum betreten.</li>");
+          }
+
+        }
+      }
+      if(typeof(data.users.to_delete)!="undefined"){
+        user = data.users.to_delete.sort();
+        for(var i in user)
+          $(".chatUser[data-uname='"+user[i]+"']").remove();        
+        // Notification: User has left the room
+        if (user.length == 1)            
+          $("#chatContainer").append("<li><span class='username'>"+user+"</span> hat den Raum verlassen.</li>");
+        else if (user.length != 0) {
+          last_user = user.pop();
+          $("#chatContainer").append("<li><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum verlassen.</li>");
+        }
+
+      }   
+
 		if(typeof(data.messages)!="undefined"){
 			if(typeof(data.messages['new'])!="undefined"){
 				message = data.messages['new'];
@@ -123,30 +163,8 @@ var updateCheck = function(){
 				}
 			}
 		}
-		if(typeof(data.users)!="undefined"){
-			if(typeof(data.users['new'])!="undefined"){
-				var user = data.users['new'];
-        var added = false;
-				for(var i in data.users['new']) {
-					element = $(printNewUser(user[i])).attr("data-uname", user[i]);
-          $("#userContainer").children().each(function(){ // Enumerate all existing names and insert alphabetically
-              if ($(this).text() > user[i]) {
-                  $(element).insertBefore($(this));
-                  added = true;
-                  return false;
-              }
-              });
-          if (!added)
-            element.appendTo($("#userContainer"));
-          };     
-				}
-			}
-			if(typeof(data.users.to_delete)!="undefined"){
-				user = data.users.to_delete;
-				for(var i in data.users.to_delete)
-					$(".chatUser[data-uname='"+user[i]+"']").remove();				
-			}		
-        performScrollMode();
+
+    performScrollMode();
 	});
 };
 

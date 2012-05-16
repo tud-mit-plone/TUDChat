@@ -6,16 +6,17 @@
 
     <script language="javascript" src="jquery-1.7.min.js"></script>    
     <script language="javascript" src="jquery.notification.js"></script>
+    <script type="text/javascript" tal:content="structure string:var base_url = '${here/absolute_url}';"></script>
     <script language="javascript">
     $(document).ready(
         function(){    
             $('#login').submit(function() {              
               $.getJSON("registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val() }, function(response) {                
                 if (response == true) { 
-                        if (document.location.href.substr(-1) == '/')
-                            document.location.href = document.location.href + "chat"; 
-                        else
-                            document.location.href = document.location.href + "/chat"; 
+                            if ($.browser.mozilla == true) // Workaround for Firefox 12
+                                window.location = base_url + "/chat?" + new Date().getTime();                            
+                            else
+                                window.location = base_url + "/chat";
                     } else {
                         if (response.status.message != '')
                             $.notification.error(response.status.message);

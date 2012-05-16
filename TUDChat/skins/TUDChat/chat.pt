@@ -1,5 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
   metal:use-macro="here/main_template/macros/master" i18n:domain="plone">
+
+
 <head>
   <title>Chat</title>
 
@@ -12,7 +14,7 @@
     <script language="javascript" tal:condition="python:not here.isAdmin(here.REQUEST) == True" src="tud_chat_user.js"></script>    
     <script language="javascript" src="tud_chat.js"></script>
 
-    <script type="text/javascript" tal:content="structure string:var refreshRate = ${here/refreshRate} * 1000; var blockTime = ${here/blockTime} * 1000; var ownUsername = '${request/SESSION/user_properties/name|nothing}';">    
+    <script type="text/javascript" tal:content="structure string:var refreshRate = ${here/refreshRate} * 1000; var blockTime = ${here/blockTime} * 1000; var ownUsername = '${request/SESSION/user_properties/name|nothing}'; var base_url = '${here/absolute_url}';">    
     </script>
 </metal:block>
 
