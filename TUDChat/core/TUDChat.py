@@ -45,6 +45,9 @@ logger = logging.getLogger('TUDChat')
 class UserStatus:
     OK, NOT_AUTHORIZED, KICKED, BANNED, LOGIN_ERROR, WARNED, CHAT_WARN = range(7)
 
+class BanStrategy:
+    COOKIE, IP, COOKIE_AND_IP = ('COOKIE', 'IP', 'COOKIE_AND_IP')
+
 
 class TUDChat(BaseContent):
     """TUDChat class"""
@@ -74,7 +77,7 @@ class TUDChat(BaseContent):
          'action'       : 'string:${object_url}/TUDChat_view',
          'permissions'  : (CMFCorePermissions.View, ),
          'category'     : 'object'
-         },
+         },     
         {'id'           : 'edit',
          'name'         : 'Chat-Einstellungen',
          'action'       : 'string:${object_url}/base_edit',
@@ -255,23 +258,24 @@ class TUDChat(BaseContent):
             chat_uid=None
 
         # Existing cookie
-        if REQUEST.get('tudchat_is_banned') == 'true':
+        if BanStrategy.COOKIE in self.banStrategy and REQUEST.get('tudchat_is_banned') == 'true':
             return True
 
         if not session.get('user_properties'):
             return False
 
         # Is in ban-list? Add cookie
-        if chat_uid and user_properties.get('name') in self.chat_rooms[chat_uid]['banned_chat_users'].keys():
+        if BanStrategy.COOKIE in self.banStrategy and chat_uid and user_properties.get('name') in self.chat_rooms[chat_uid]['banned_chat_users'].keys():
             REQUEST.RESPONSE.setCookie('tudchat_is_banned', 'true', expires=DateTime(int(DateTime()) + 365 * 24 * 60 * 60, 'US/Pacific').toZone('GMT').strftime('%A, %d-%b-%y %H:%M:%S ') + 'GMT' )        
             REQUEST.RESPONSE.setCookie('tudchat_ban_reason', self.chat_rooms[chat_uid]['banned_chat_users'][user_properties.get('name')].get('reason'), expires=DateTime(int(DateTime()) + 365 * 24 * 60 * 60, 'US/Pacific').toZone('GMT').strftime('%A, %d-%b-%y %H:%M:%S ') + 'GMT' )
             return True
 
         # Check by IP-Address in all chat rooms
-        for chat_uid in self.chat_rooms.keys():
-            banEntry = dict((user,baninfo) for user,baninfo in self.chat_rooms[chat_uid]['banned_chat_users'].iteritems() if baninfo.get('ip_address') == ip_address)
-            if len(banEntry) > 0:
-                return True
+        if BanStrategy.IP in self.banStrategy:
+            for chat_uid in self.chat_rooms.keys():
+                banEntry = dict((user,baninfo) for user,baninfo in self.chat_rooms[chat_uid]['banned_chat_users'].iteritems() if baninfo.get('ip_address') == ip_address)
+                if len(banEntry) > 0:
+                    return True
         return False      
 
     def getBanReason(self, REQUEST = None):
@@ -503,7 +507,9 @@ class TUDChat(BaseContent):
         if not self.chat_storage.getChatSession(chatroom)['active']:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der gewählte Chat-Raum ist zurzeit nicht aktiv.'}})
         if self.chat_rooms.has_key(chatroom) and self.chat_rooms[chatroom]['chat_users'].has_key(user):
-            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Dieser Benutzername wird bereits verwendet.'}})
+            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der Benutzername ist bereits belegt.'}})
+        if self.isBanned(REQUEST):
+            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Sie wurden dauerhaft des Chats verwiesen. <br/> <br/> Grund: ' + str(self.getBanReason(REQUEST))}})
 
         session = REQUEST.SESSION
         start_action_id = self.chat_storage.getLastChatAction(chatroom)
@@ -538,6 +544,8 @@ class TUDChat(BaseContent):
             user = session.get('user_properties').get('name')
             chat_uid = session.get('user_properties').get('chat_room')            
             session.set('user_properties', None)
+            session.invalidate()
+
             self.removeUser(user, chat_uid)
         return simplejson.dumps(True)
                 
@@ -673,7 +681,6 @@ class TUDChat(BaseContent):
         start_action = user_properties.get('start_action')
         last_action = user_properties.get('last_action')
         list_actions = self.chat_storage.getActions(chat_uid = chat_uid, last_action = last_action, start_action = start_action)
-        
         # build a list of extra attributes
         for i in range(len(list_actions)):
             list_actions[i]['attr'] = []
@@ -713,7 +720,7 @@ class TUDChat(BaseContent):
                       }
 
         # Update last action
-        if len(list_actions) > 1:
+        if len(list_actions) > 0:
             user_properties['last_action'] = list_actions[len(list_actions)-1].get('id')
         # Update persons        
         user_properties['user_list'] = self.getUsers(chat_uid)

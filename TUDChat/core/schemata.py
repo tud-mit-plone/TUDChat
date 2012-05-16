@@ -32,6 +32,12 @@ from Products.Archetypes.public import *
 from Products.validation.interfaces.IValidator import IValidator
 from Products.validation.validators.ExpressionValidator import ExpressionValidator
 
+BAN_STRATEGIES = DisplayList((    
+    ('COOKIE', 'Nur Cookie (empfohlen)'),
+    ('IP', 'Nur IP-Adresse'),
+    ('COOKIE_AND_IP', 'Cookie und IP-Adresse (restriktiv)'),
+    ))
+
 TUDChatSchema = BaseSchema.copy() + Schema((
     StringField(
         'connector_id',
@@ -112,5 +118,19 @@ TUDChatSchema = BaseSchema.copy() + Schema((
                 label_msgid             = "label_blockTime",
                 description_msgid       = "help_blockTime"
         )
-    ),    
+    ),
+    LinesField(
+        'banStrategy',
+        default         = 'COOKIE',
+        required        = True,
+        vocabulary      = BAN_STRATEGIES,
+        widget          = SelectionWidget(
+                label                   = "Ban-Strategie",
+                description             = "Bitte wählen Sie mit welchen Mitteln gebannte Benutzer markiert werden. ",
+                i18n_domain             = "tudchat",
+                label_msgid             = "label_banStrategy",
+                description_msgid       = "help_banStrategy",
+                format                  = "select",
+        )
+    ),
 ))
