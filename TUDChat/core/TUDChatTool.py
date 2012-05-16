@@ -52,6 +52,23 @@ class TUDChatTool(UniqueObject, SimpleItem):
     security.declareProtected(manage_properties, 'chat_list')
     chat_list = PageTemplateFile('../skins_tool/chat_list.pt', globals())
     
+    security.declarePrivate(TUDChat_moderatePermission, 'pathCleaner')
+    def pathCleaner(self, path):
+        """
+            This function remove slash groups and slashes at the beginning and at the end of the path.
+            This function also removes the Sites/TUD prefix if it exist.
+        """
+        #remove group of slashes and if exist first and last slash
+        path = re.sub(r"/+","/",path)
+        path = re.sub(r"^/","",path)
+        path = re.sub(r"/$","",path)
+        #remove prefix 'Sites', 'TUD' and 'Sites/TUD'
+        path = re.sub(r"^Sites/TUD[/]{0,1}","",path)
+        path = re.sub(r"^Sites[/]{0,1}","",path)
+        path = re.sub(r"^TUD[/]{0,1}","",path)
+        
+        return path
+    
     security.declareProtected(TUDChat_moderatePermission, 'getChatList')
     def getChatList(self):
         """
@@ -111,14 +128,7 @@ class TUDChatTool(UniqueObject, SimpleItem):
         """
         status = 1
         
-        #remove group of slashes and if exist first and last slash
-        path = re.sub(r"/+","/",path)
-        path = re.sub(r"^/","",path)
-        path = re.sub(r"/$","",path)
-        #remove prefix 'Sites', 'TUD' and 'Sites/TUD'
-        path = re.sub(r"^Sites/TUD[/]{0,1}","",path)
-        path = re.sub(r"^Sites[/]{0,1}","",path)
-        path = re.sub(r"^TUD[/]{0,1}","",path)
+        path = self.pathCleaner(path)
         
         db_id_list = self.getSQLConnectionIDs(path)
         if len(db_id_list)>0:
@@ -170,10 +180,7 @@ class TUDChatTool(UniqueObject, SimpleItem):
         """
             This function return a list of allowes database ids for the given path.
         """
-        #remove group of slashes and if exist first and last slash
-        path = re.sub(r"/+","/",path)
-        path = re.sub(r"^/","",path)
-        path = re.sub(r"/$","",path)
+        path = self.pathCleaner(path)
         
         #build a allowed path list with all sub paths
         path_parts = path.split('/')

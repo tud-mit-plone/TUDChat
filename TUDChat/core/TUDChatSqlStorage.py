@@ -184,7 +184,6 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             FROM `%s_action`
             WHERE chat_uid=<dtml-sqlvar chat_uid type="int">
             ORDER BY `ID` ASC
-            LIMIT 123
             """ % (prefix, prefix, prefix, prefix, prefix, prefix, prefix, prefix, prefix))
         self.getActions.max_rows_ = 0
         

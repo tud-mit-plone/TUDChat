@@ -673,6 +673,7 @@ class TUDChat(BaseContent):
         start_action = user_properties.get('start_action')
         last_action = user_properties.get('last_action')
         list_actions = self.chat_storage.getActions(chat_uid = chat_uid, last_action = last_action, start_action = start_action)
+        
         # build a list of extra attributes
         for i in range(len(list_actions)):
             list_actions[i]['attr'] = []
@@ -712,7 +713,7 @@ class TUDChat(BaseContent):
                       }
 
         # Update last action
-        if len(list_actions) > 0:
+        if len(list_actions) > 1:
             user_properties['last_action'] = list_actions[len(list_actions)-1].get('id')
         # Update persons        
         user_properties['user_list'] = self.getUsers(chat_uid)
