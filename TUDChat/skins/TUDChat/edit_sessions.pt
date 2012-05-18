@@ -47,6 +47,8 @@
       <tr>
         <th>Löschen?</th>
         <th>Titel</th>
+        <th>Passwort</th>
+        <th>maximale Benutzer</th>
         <th>Start-Zeit</th>
         <th>Ende-Zeit</th>
       </tr>
@@ -56,6 +58,12 @@
         </td>
         <td>
           <span tal:replace="session/name"/>
+        </td>
+        <td>
+          <span tal:replace="session/password"/>
+        </td>
+        <td>
+          <span tal:replace="session/max_users"/>
         </td>
         <td>
           <span tal:replace="python:str(session.get('start'))"/>

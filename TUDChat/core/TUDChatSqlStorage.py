@@ -43,8 +43,10 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             CREATE TABLE IF NOT EXISTS `%s_session` (
                 `id`         INT UNSIGNED         NOT NULL AUTO_INCREMENT,
                 `name`       VARCHAR( 255 )       NOT NULL,
-                `start`      DATETIME             NOT NULL,
-                `end`        DATETIME             NOT NULL,
+                `password`   VARCHAR( 30 )        DEFAULT NULL,
+                `max_users`  INT UNSIGNED         DEFAULT NULL,
+                `start`      DATETIME             DEFAULT NULL,
+                `end`        DATETIME             DEFAULT NULL,
             PRIMARY KEY (`id` )
             );
             """ % (prefix))
@@ -66,16 +68,20 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             """ % (prefix))
             
         self.createChatSession = SQL('createChatSession', 'Create chat session',
-            sql_connector_id, 'name starttime endtime',
+            sql_connector_id, 'name starttime endtime password max_users',
             """
             INSERT INTO `%s_session` (
                 `name`,
                 `start`,
-                `end` )
+                `end`,
+                `password`,
+                `max_users` )
             VALUES (
                 <dtml-sqlvar name type="string">,
                 <dtml-sqlvar starttime type="string">,
-                <dtml-sqlvar endtime type="string">
+                <dtml-sqlvar endtime type="string">,
+                <dtml-sqlvar password type="string">,
+                <dtml-sqlvar max_users type="string">
             );
             <dtml-var sql_delimiter>
             SELECT LAST_INSERT_ID() AS newid
@@ -233,8 +239,8 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
         else:
             return False
     
-    def createChatSession(self, name, start = "NOW()", end = "NULL"):
-        result = self.sql_methods.createChatSession(name =name, starttime = start, endtime = end)
+    def createChatSession(self, name, start = "NOW()", end = "NULL", password = None, max_users = "NULL"):
+        result = self.sql_methods.createChatSession(name =name, starttime = start, endtime = end, password = password, max_users = max_users)
         chat_uid = int(self.dictFromSql(result, names=('newid',))[0]['newid'])
         return chat_uid
     
@@ -244,7 +250,7 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
         
     def getChatSession(self, chat_uid):
         result = self.sql_methods.getChatSessionById(chat_uid = chat_uid)
-        session_dict = self.dictFromSql(result, names=('id','name','start','end','active',))[0]
+        session_dict = self.dictFromSql(result, names=('id','name','password','max_users','start','end','active',))[0]
         return session_dict
         
     def closeChatSession(self, chat_uid):
@@ -253,11 +259,11 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
     
     def getChatSessions(self):
         result = self.sql_methods.getChatSessions()
-        return self.dictFromSql(result, ('id','name','start','end',))
+        return self.dictFromSql(result, ('id','name','password','max_users','start','end',))
     
     def getActiveChatSessions(self):
         result = self.sql_methods.getActiveChatSessions()
-        return self.dictFromSql(result, ('id','name','start','end',))
+        return self.dictFromSql(result, ('id','name','password','max_users','start','end',))
     
     def getNextChatSession(self):
         result = self.sql_methods.getNextChatSession()

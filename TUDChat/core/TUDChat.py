@@ -298,11 +298,11 @@ class TUDChat(BaseContent):
     # Chat Session Management
     ##########################################################################
     
-    def createChatSession(self, name, start, end, REQUEST = None):       
+    def createChatSession(self, name, start, end, password = None, max_users = None, REQUEST = None):       
         """ Create a chat session """
         if not self.isAdmin(REQUEST):
             return
-        self.chat_storage.createChatSession(name, start, end)
+        self.chat_storage.createChatSession(name, start, end, password, max_users)
         return True
     
     def deleteChatSession(self, chat_uid, REQUEST = None):       
@@ -348,7 +348,7 @@ class TUDChat(BaseContent):
     # Form Handler
     ##########################################################################
 
-    def addSessionSubmit(self, title, start_date, end_date, REQUEST):
+    def addSessionSubmit(self, title, start_date, end_date, password, max_users, REQUEST):
         """ Form Handler for adding session """
 
         errors = {}
@@ -381,12 +381,24 @@ class TUDChat(BaseContent):
             errors['end_date'] = "Falsches Ende-Datum! Bitte korrigieren Sie Ihre Eingabe."
 
         if sd != None and ed != None and sd > ed:
-            errors['start_date'] = "Beginn-Datum ist nach Ende-Datum! Bitte korrigierne Sie Ihre Eingabe."        
-
+            errors['start_date'] = "Beginn-Datum ist nach Ende-Datum! Bitte korrigierne Sie Ihre Eingabe."
+        
+        if len(password)>30:
+            errors['password'] = "Das Passwort darf maximal 30 Zeichen lang sein."
+        
+        try:
+            if max_users:
+                int(max_users)
+        except:
+            errors['max_users'] = "Die maximale Benutzeranzahl darf nur Zahlen enthalten oder muss leer sein."
+        if int(max_users)<0:
+            errors['max_users'] = "Die maximale Benutzeranzahl darf nicht negativ sein."
+        
+        
         REQUEST['errors'] = errors
-
+        
         if not errors:
-            success = self.createChatSession(title, sd, ed, REQUEST)
+            success = self.createChatSession(title, sd, ed, password or None, max_users or None, REQUEST)
             if success == False:
                 errors['database'] = 'Fehler in der Datenbank.'
 
@@ -498,13 +510,20 @@ class TUDChat(BaseContent):
     ###################################    
         
     security.declareProtected(CMFCorePermissions.View, "registerMe")    
-    def registerMe(self, user, chatroom, REQUEST = None):
+    def registerMe(self, user, chatroom, password=None, REQUEST = None):
         """ Register yourself """
+        REQUEST.SESSION.set('user_properties', None)
+        chat_session = self.chat_storage.getChatSession(chatroom)
+        
+        if chat_session['password'] and chat_session['password'] != password:
+            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das eingegebene Passwort ist nicht korrekt.'}})
+        if chat_session['max_users'] and self.chat_rooms.get(chatroom) and chat_session['max_users'] <= len(self.chat_rooms[chatroom]['chat_users']):
+            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das Benutzerlimit für diese Chat-Session ist bereits erreicht.'}})
         if len(user) < 3:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu kurz. (Er muss mindestens 3 Zeichen lang sein.)'}})
         if len(user) > 20:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu lang. (Er darf maximal 20 Zeichen lang sein.)'}})
-        if not self.chat_storage.getChatSession(chatroom)['active']:
+        if not chat_session['active']:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der gewählte Chat-Raum ist zurzeit nicht aktiv.'}})
         if self.chat_rooms.has_key(chatroom) and self.chat_rooms[chatroom]['chat_users'].has_key(user):
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der Benutzername ist bereits belegt.'}})
@@ -539,7 +558,7 @@ class TUDChat(BaseContent):
     security.declareProtected(CMFCorePermissions.View, "logout")    
     def logout(self, REQUEST = None):
         """ Logout yourself """        
-        session=REQUEST.SESSION        
+        session=REQUEST.SESSION
         if session.get('user_properties'):
             user = session.get('user_properties').get('name')
             chat_uid = session.get('user_properties').get('chat_room')            
@@ -810,6 +829,20 @@ class TUDChat(BaseContent):
             user_properties['user_list'] = []
             session.set('user_properties', user_properties)
     
+    security.declareProtected(CMFCorePermissions.View, "addPrefix")
+    def addPrefix(self, db, prefix, REQUEST = None):
+        """ add the prefix to the list of own db prefixes """
+        if not self.isAdmin(REQUEST):
+            return
+        
+        already_exist = False
+        if self.own_database_prefixes.get(db):
+            already_exist = prefix in self.own_database_prefixes[db]
+            self.own_database_prefixes[db].add(prefix)
+        else:
+            self.own_database_prefixes[db] = set([prefix])
+        
+        return str(not already_exist)
         
     security.declareProtected(CMFCorePermissions.View, "myRequest")
     def myRequest(self, REQUEST = None):

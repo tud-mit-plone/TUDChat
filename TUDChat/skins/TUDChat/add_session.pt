@@ -65,6 +65,20 @@
     <div class="error_message" tal:condition="error" tal:content="error"></div>
     <input type="text" id="end_date" name="end_date" tal:attributes="value request/end_date|nothing"/>
   </div>
+  
+  <div tal:define="error errors/password | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
+    <label for="end_date">Passwort</label>
+    <div class="formHelp">Bitte geben Sie ein Passwort für die Chat-Session an, falls Sie den Zugang beschränken wollen.</div> 
+    <div class="error_message" tal:condition="error" tal:content="error"></div>
+    <input type="text" id="password" name="password" tal:attributes="value request/password|nothing"/>
+  </div>
+  
+  <div tal:define="error errors/max_users | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
+    <label for="end_date">maximale Benutzer</label>
+    <div class="formHelp">Bitte geben Sie die maximale Benutzerzahl ein, falls Sie die Anzahl der Chat-Benutzer limitieren möchten.</div> 
+    <div class="error_message" tal:condition="error" tal:content="error"></div>
+    <input type="text" id="max_users" name="max_users" tal:attributes="value request/max_users|nothing"/>
+  </div>
 
     
   <div class="formControls">

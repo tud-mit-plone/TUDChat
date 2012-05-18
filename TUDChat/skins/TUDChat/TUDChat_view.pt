@@ -11,8 +11,9 @@
     $(document).ready(
         function(){    
             $('#login').submit(function() {              
-              $.getJSON("registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val() }, function(response) {                
-                if (response == true) { 
+              if (jQuery.inArray(Number($('[name=chatroom]').val()), password_channels) == -1){
+                  $.getJSON("registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val() }, function(response) {                
+                    if (response == true) { 
                             if ($.browser.mozilla == true) // Workaround for Firefox 12
                                 window.location = base_url + "/chat?" + new Date().getTime();                            
                             else
@@ -20,8 +21,27 @@
                     } else {
                         if (response.status.message != '')
                             $.notification.error(response.status.message);
-                    }                    
-              });
+                    }
+                   });
+              }else{
+                  $.notification.general("Diese Chat-Session ist durch ein Passwort geschützt. <br/> <br/><label for='password'>Passwort:<"+"/label> <input type='password' id='password'/>", false,
+                                                                        [{"name" :"Ok",
+                                                                            "click":function(){
+                                                                              $.getJSON("registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val(), password: $("#password").val() }, function(response) {                
+                                                                                  if (response == true) { 
+                                                                                      if (document.location.href.substr(-1) == '/')
+                                                                                          document.location.href = document.location.href + "chat"; 
+                                                                                      else
+                                                                                          document.location.href = document.location.href + "/chat"; 
+                                                                                  } else {
+                                                                                      if (response.status.message != '')
+                                                                                          $.notification.error(response.status.message);
+                                                                                  }
+                                                                              });
+                                                                            }},
+                                                                        {"name" :"Abbrechen", "click": $.notification.clear },
+                                                                         ]);
+              }
               
               return false;
             });
@@ -58,6 +78,7 @@
 
 <tal:block define="sessions python:here.getActiveChatSessions()" condition="python:here.getActiveChatSessions() is not None">
     <form id="login" action="" tal:condition="python: len(sessions)>0">
+        <script language="javascript" tal:content="python: 'var password_channels = ['+','.join([str(session['id']) for session in sessions if session['password'] != None])+'];'"></script>
         <label for="">Raum</label>
         <select name="chatroom">
             <tal:block repeat="session sessions">
