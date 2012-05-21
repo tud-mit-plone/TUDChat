@@ -42,12 +42,6 @@
         <button id="chatMsgSubmit">Absenden</button>
         </div>
         <div class="clear"></div>
-        <br />
-        <div id="message_edit" tal:condition="python:here.isAdmin(here.REQUEST) == True" style="display:none;">
-            <input type="text" name="msg" id="chatMsgEdit">
-            <button id="chatMsgEditSave" data-mid="">Speichern</button>
-            <button id="chatMsgEditAbort">Abbrechen</button>
-        </div>
         <div>
             <button id="logout">Logout</button>
         </div>        

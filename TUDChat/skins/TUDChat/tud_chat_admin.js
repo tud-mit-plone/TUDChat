@@ -18,16 +18,28 @@ function printNewUser(user) {
 
 $(document).ready(
 	function(){
+
         $("body").delegate("a.edit", "click", function(e) {
-            $("#chatMsgEdit").val($("#chatEntry"+$(e.target).attr("data-mid")).children("span.message_content").text());
-            $("#chatMsgEditSave").attr("data-mid", $(e.target).attr("data-mid"));
-            $("#message_edit").fadeIn();
+            var oldMsg = $("#chatEntry"+$(e.target).attr("data-mid")).children("span.message_content").text();
+            var mId = $(e.target).attr("data-mid");            
             // Deselect all messages
             $("li.selected").removeClass("selected");            
             // Select current message
-            $("#chatEntry"+$(e.target).attr("data-mid")).addClass("selected");            
+            $("#chatEntry"+mId).addClass("selected");                        
+            $.notification.warn("Nachricht bearbeiten <br/> <br/><label for='newMsg'>Neue Nachricht:</label><br/><br/> <input type='text' id='newMsg' value='"+oldMsg+"' class='editBox'/>", false,
+                                                                        [{"name" :"Speichern",
+                                                                            "click":function(){                                                                              
+                                                                              $.post("editMessage", { 'message_id' :mId, 'message': $("#newMsg").val() } , function(data) { updateCheck(); });
+                                                                              $("#chatEntry"+mId).removeClass("selected");
+                                                                              $.notification.clear();
+                                                                            }},
+                                                                        {"name" :"Abbrechen", "click": function() { $.notification.clear(); $("#chatEntry"+mId).removeClass("selected");} },
+                                                                         ]);
             e.preventDefault();
         });
+
+
+
         $("body").delegate("a.delete", "click", function(e) {
             $.notification.warn("Wollen Sie wirklich diese Nachricht löschen? <br/><br/>" + $("#chatEntry"+$(e.target).attr("data-mid")).children("span.username").text() + " " + $("#chatEntry"+$(e.target).attr("data-mid")).children("span.message_content").text(), false,                
                                                                         [{"name" :"Ok",
@@ -88,17 +100,6 @@ $(document).ready(
                 $(this).children(".adminActions").addClass("hidden");
             }
         });
-        
-        $("#chatMsgEditSave").click(function(e){
-            $.post("editMessage", { 'message_id' : $(e.target).attr("data-mid"), 'message': $("#chatMsgEdit").val() } , function(data) { updateCheck(); });
-            $("#message_edit").fadeOut();
-            $("#chatMsgEdit").val("");
-            $("#chatEntry"+$(e.target).attr("data-mid")).removeClass("selected");
-        });
-        $("#chatMsgEditAbort").click(function(e){            
-            $("#message_edit").fadeOut();
-            $("#chatMsgEdit").val("");
-            $("#chatEntry"+$("#chatMsgEditSave").attr("data-mid")).removeClass("selected");     
-        });
+
 	}
 );

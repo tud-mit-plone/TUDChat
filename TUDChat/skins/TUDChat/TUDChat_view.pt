@@ -78,7 +78,7 @@
 
 <tal:block define="sessions python:here.getActiveChatSessions()" condition="python:here.getActiveChatSessions() is not None">
     <form id="login" action="" tal:condition="python: len(sessions)>0">
-        <script language="javascript" tal:content="python: 'var password_channels = ['+','.join([str(session['id']) for session in sessions if session['password'] != None])+'];'"></script>
+        <script language="javascript" tal:content="python: 'var password_channels = ['+','.join([str(session['id']) for session in sessions if session.get('password') != None])+'];'"></script>
         <label for="">Raum</label>
         <select name="chatroom">
             <tal:block repeat="session sessions">
