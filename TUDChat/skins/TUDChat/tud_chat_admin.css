@@ -31,31 +31,31 @@ div.adminActions > a:hover{
 }    
 
 a.edit {
-    background-image: url('images/pen.png');
+    background-image: url('tud_chat_images/pen.png');
     background-repeat:
     no-repeat; background-position: center top;
 } 
 
 a.delete {
-    background-image: url('images/false.png');
+    background-image: url('tud_chat_images/false.png');
     background-repeat: no-repeat;
     background-position: center top;
 }
 
 a.kick {
-    background-image: url('images/false_22.png');
+    background-image: url('tud_chat_images/false_22.png');
     background-repeat: no-repeat;
     background-position: center top;
 }
 
 a.ban {
-    background-image: url('images/flag_red_22.png');
+    background-image: url('tud_chat_images/flag_red_22.png');
     background-repeat: no-repeat;
     background-position: center top;
 }
 
 a.warn {
-    background-image: url('images/warning.png');
+    background-image: url('tud_chat_images/warning.png');
     background-repeat: no-repeat;
     background-position: center top;
 }
