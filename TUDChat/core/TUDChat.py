@@ -261,6 +261,13 @@ class TUDChat(BaseContent):
         if BanStrategy.COOKIE in self.banStrategy and REQUEST.get('tudchat_is_banned') == 'true':
             return True
 
+        # Check by IP-Address in all chat rooms
+        if BanStrategy.IP in self.banStrategy:
+            for chat_uid in self.chat_rooms.keys():
+                banEntry = dict((user,baninfo) for user,baninfo in self.chat_rooms[chat_uid]['banned_chat_users'].iteritems() if baninfo.get('ip_address') == ip_address)
+                if len(banEntry) > 0:
+                    return True
+
         if not session.get('user_properties'):
             return False
 
@@ -268,30 +275,32 @@ class TUDChat(BaseContent):
         if BanStrategy.COOKIE in self.banStrategy and chat_uid and user_properties.get('name') in self.chat_rooms[chat_uid]['banned_chat_users'].keys():
             REQUEST.RESPONSE.setCookie('tudchat_is_banned', 'true', expires=DateTime(int(DateTime()) + 365 * 24 * 60 * 60, 'US/Pacific').toZone('GMT').strftime('%A, %d-%b-%y %H:%M:%S ') + 'GMT' )        
             REQUEST.RESPONSE.setCookie('tudchat_ban_reason', self.chat_rooms[chat_uid]['banned_chat_users'][user_properties.get('name')].get('reason'), expires=DateTime(int(DateTime()) + 365 * 24 * 60 * 60, 'US/Pacific').toZone('GMT').strftime('%A, %d-%b-%y %H:%M:%S ') + 'GMT' )
+            # Free that username to be used by others
+            if not BanStrategy.IP in self.banStrategy:
+                del self.chat_rooms[chat_uid]['banned_chat_users'][user_properties.get('name')]
             return True
 
-        # Check by IP-Address in all chat rooms
-        if BanStrategy.IP in self.banStrategy:
-            for chat_uid in self.chat_rooms.keys():
-                banEntry = dict((user,baninfo) for user,baninfo in self.chat_rooms[chat_uid]['banned_chat_users'].iteritems() if baninfo.get('ip_address') == ip_address)
-                if len(banEntry) > 0:
-                    return True
-        return False      
-
+        return False    
+        
     def getBanReason(self, REQUEST = None):
         """ Helper method to get ban reason """
         ip_address = self.getIp(REQUEST)
-        
-        if REQUEST.get('tudchat_is_banned') == 'true':
-            return REQUEST.get('tudchat_ban_reason')
-        #in welchem Chat-Raum soll nach dem Nutzer gesucht werden?
-        #
-        #banEntry = dict((user,baninfo) for user,baninfo in self.banned_chat_users.iteritems() if baninfo.get('ip_address') == ip_address)
-        #
-        #if len(banEntry) > 0:
-        #    return banEntry[banEntry.keys()[0]].get('reason')
-        #else:
-        #    return 'Not banned'
+
+        if BanStrategy.COOKIE in self.banStrategy:
+            # Retrieve information from given cookies or just recently set cookies
+            tudchat_is_banned = REQUEST.get('tudchat_is_banned') or (REQUEST.RESPONSE.cookies.get('tudchat_is_banned') and REQUEST.RESPONSE.cookies.get('tudchat_is_banned')['value'])
+            tudchat_ban_reason = REQUEST.get('tudchat_ban_reason') or (REQUEST.RESPONSE.cookies.get('tudchat_ban_reason') and REQUEST.RESPONSE.cookies.get('tudchat_ban_reason')['value'])
+
+            if tudchat_is_banned == 'true':
+                return tudchat_ban_reason
+
+        if BanStrategy.IP in self.banStrategy:           
+            # Check by IP-Address in all chat rooms
+            for chat_uid in self.chat_rooms.keys():
+                banEntry = dict((user,baninfo) for user,baninfo in self.chat_rooms[chat_uid]['banned_chat_users'].iteritems() if baninfo.get('ip_address') == ip_address)            
+                if len(banEntry) > 0:
+                    return banEntry[banEntry.keys()[0]].get('reason')
+            return 'Not banned'
         return
     
     ##########################################################################

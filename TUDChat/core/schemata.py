@@ -119,7 +119,7 @@ TUDChatSchema = BaseSchema.copy() + Schema((
                 description_msgid       = "help_blockTime"
         )
     ),
-    LinesField(
+    StringField(
         'banStrategy',
         default         = 'COOKIE',
         required        = True,
