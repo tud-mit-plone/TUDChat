@@ -1,6 +1,7 @@
 var knownIds = {};
 var sendMessageBlock = false;
 var updateCheckBlock = false;
+var firstGetActions = true;
 
 var sendMessage = function(){
 	message = $("#chatMsgValue").val();
@@ -40,13 +41,13 @@ var updateCheck = function(){
 	
 	if (updateCheckBlock) // temporary workaround
 		return;
+	updateCheckBlock = true;
 
 	$.getJSON("getActions", function(data){
 		// Status
 
 		if (data.status.code == 1) { // Not authorized
-			// $.doTimeout( 'updateCheck'); // stop updateCheck
-			updateCheckBlock = true;			
+			// $.doTimeout( 'updateCheck'); // stop updateCheck			
 			$.notification.error("Sie sind nicht authorisiert! Bitte loggen Sie sich ein.", false, [{"name" :"Ok",
                                                                           "click":function(){                                                                          	
                                                                               $.notification.clear();
@@ -57,7 +58,6 @@ var updateCheck = function(){
 		}
 		if (data.status.code == 2) { // Kicked			
 			//$.doTimeout( 'updateCheck' ); // stop updateCheck
-			updateCheckBlock = true;
 			if (data.status.message != "") {
 				kickmessage = data.status.message;
 			}else{
@@ -74,7 +74,6 @@ var updateCheck = function(){
 
 		if (data.status.code == 3) { // Banned
 			//$.doTimeout( 'updateCheck' ); // stop updateCheck
-			updateCheckBlock = true;
 			$.notification.error("Sie wurden dauerhaft des Chats verwiesen! <br/><br/>Grund: " + data.status.message, false, [{"name" :"Ok",
                                                                           "click":function(){                                                                          	
                                                                               $.notification.clear();
@@ -120,11 +119,13 @@ var updateCheck = function(){
             element.appendTo($("#userContainer"));
           };
           // Notification: User has entered the room
-          if (user.length == 1)            
-            $("#chatContainer").append("<li><span class='username'>"+user+"</span> hat den Raum betreten.</li>");
-          else if (user.length != 0) {
-            last_user = user.pop();
-            $("#chatContainer").append("<li><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum betreten.</li>");
+          if (!firstGetActions){
+            if (user.length == 1)            
+              $("#chatContainer").append("<li><span class='username'>"+user+"</span> hat den Raum betreten.</li>");
+            else if (user.length != 0) {
+              last_user = user.pop();
+              $("#chatContainer").append("<li><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum betreten.</li>");
+            }
           }
 
         }
@@ -134,11 +135,13 @@ var updateCheck = function(){
         for(var i in user)
           $(".chatUser[data-uname='"+user[i]+"']").remove();        
         // Notification: User has left the room
-        if (user.length == 1)            
-          $("#chatContainer").append("<li><span class='username'>"+user+"</span> hat den Raum verlassen.</li>");
-        else if (user.length != 0) {
-          last_user = user.pop();
-          $("#chatContainer").append("<li><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum verlassen.</li>");
+        if (!firstGetActions){
+          if (user.length == 1)            
+            $("#chatContainer").append("<li><span class='username'>"+user+"</span> hat den Raum verlassen.</li>");
+          else if (user.length != 0) {
+            last_user = user.pop();
+            $("#chatContainer").append("<li><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum verlassen.</li>");
+          }
         }
 
       }   
@@ -164,6 +167,8 @@ var updateCheck = function(){
 			}
 		}
 
+    firstGetActions = false;
+    updateCheckBlock = false;
     performScrollMode();
 	});
 };

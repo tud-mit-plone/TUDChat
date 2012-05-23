@@ -400,7 +400,7 @@ class TUDChat(BaseContent):
                 int(max_users)
         except:
             errors['max_users'] = "Die maximale Benutzeranzahl darf nur Zahlen enthalten oder muss leer sein."
-        if int(max_users)<0:
+        if max_users and int(max_users)<0:
             errors['max_users'] = "Die maximale Benutzeranzahl darf nicht negativ sein."
         
         
@@ -534,7 +534,7 @@ class TUDChat(BaseContent):
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu lang. (Er darf maximal 20 Zeichen lang sein.)'}})
         if not chat_session['active']:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der gewählte Chat-Raum ist zurzeit nicht aktiv.'}})
-        if self.chat_rooms.has_key(chatroom) and self.chat_rooms[chatroom]['chat_users'].has_key(user):
+        if self.chat_rooms.has_key(chatroom) and user.lower() in [chat_user.lower() for chat_user in self.chat_rooms[chatroom]['chat_users'].keys()]:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der Benutzername ist bereits belegt.'}})
         if self.isBanned(REQUEST):
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Sie wurden dauerhaft des Chats verwiesen. <br/> <br/> Grund: ' + str(self.getBanReason(REQUEST))}})
@@ -599,7 +599,7 @@ class TUDChat(BaseContent):
                 for user in self.chat_rooms[chat_uid]['chat_users'].keys():
                     if now - self.chat_rooms[chat_uid]['chat_users'][user].get('date') > self.timeout: # timeout
                         self.removeUser(user, chat_uid)        
-        self.timestamps['userHeartbeat'] = now
+            self.timestamps['userHeartbeat'] = now
 
     ##########################################################################
     # Public Message / Action methods
@@ -714,7 +714,7 @@ class TUDChat(BaseContent):
             list_actions[i]['attr'] = []
             if list_actions[i]['a_action'] != '':
                 list_actions[i]['attr'].append({'a_action':list_actions[i]['a_action'], 'a_name':list_actions[i]['a_name']})
-            if list_actions[i]['id'] in self.admin_messages or list_actions[i]['target'] in self.admin_messages:
+            if list_actions[i]['id'] in self.admin_messages or (list_actions[i]['target'] and int(list_actions[i]['target']) in self.admin_messages):
                 list_actions[i]['attr'].append({'admin_message':True})
 
         return_dict = {
@@ -748,7 +748,7 @@ class TUDChat(BaseContent):
                       }
 
         # Update last action
-        if len(list_actions) > 0:
+        if len(list_actions) > 1:
             user_properties['last_action'] = list_actions[len(list_actions)-1].get('id')
         # Update persons        
         user_properties['user_list'] = self.getUsers(chat_uid)
