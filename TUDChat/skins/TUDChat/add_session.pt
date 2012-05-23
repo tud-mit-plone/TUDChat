@@ -40,6 +40,10 @@
 
         <h1>Chat-Sitzung hinzufügen</h1>
 
+<p tal:condition="python:here.getActiveChatSessions() is None">Es wurde noch keine Datenbank konfiguriert. Diese kann in den Chat-Einstellungen eingestellt werden.</p>
+
+<div tal:condition="python:here.getActiveChatSessions()">
+
 <form tal:attributes="action string:${here_url}/addSessionSubmit" name="form" method="post">
 
   <div tal:define="error errors/title | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
@@ -89,6 +93,8 @@
 
 </form>
     
+</div>
+
 </metal:main>
 
 <metal:bottom fill-slot="bottom">
