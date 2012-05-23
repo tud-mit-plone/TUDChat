@@ -14,6 +14,7 @@ var sendMessage = function(){
 
 	sendMessageBlock = true;
   $("#chatMsgSubmit").attr("disabled", "disabled");
+  $("#logout").attr("disabled", "disabled");
   $("#chatMsgValue").val("");
 
 	$.post("sendMessage", { 'message': message },
@@ -23,6 +24,7 @@ var sendMessage = function(){
         );
   $.doTimeout( 'remove_sendMessageBlock', blockTime, function(){
       $("#chatMsgSubmit").removeAttr("disabled");    	
+      $("#logout").removeAttr("disabled");      
     	$("#chatMsgValue").focus();
     	sendMessageBlock = false;  
   });

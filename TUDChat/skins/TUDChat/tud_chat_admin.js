@@ -41,7 +41,9 @@ $(document).ready(
 
 
         $("body").delegate("a.delete", "click", function(e) {
-            $.notification.warn("Wollen Sie wirklich diese Nachricht löschen? <br/><br/>" + $("#chatEntry"+$(e.target).attr("data-mid")).children("span.username").text() + " " + $("#chatEntry"+$(e.target).attr("data-mid")).children("span.message_content").text(), false,                
+            var message = $("#chatEntry"+$(e.target).attr("data-mid")).children("span.message_content").text();
+            message = ((message.length > 150) ? message.substr(0, 150) + "..." : message);
+            $.notification.warn("Wollen Sie wirklich diese Nachricht löschen? <br/><br/>" + $("#chatEntry"+$(e.target).attr("data-mid")).children("span.username").text() + " " + message, false,                
                                                                         [{"name" :"Ok",
                                                                             "click":function(){                                                                           
                                                                               $.get("deleteMessage", { 'message_id': $(e.target).attr("data-mid") }, function(data) { updateCheck(); });
