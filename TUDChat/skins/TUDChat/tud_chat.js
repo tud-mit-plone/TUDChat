@@ -174,7 +174,7 @@ var updateCheckTimeout = function(){
 };
 
 /* Automatic scrollbar behaviour 
-   Source kindly taken from: http://www.yelotofu.com/2008/10/jquery-how-to-tell-if-youre-scroll-to-bottom */
+   */
    
 var scrollMode = { 'normal': 0, 'alwaysBottom': 1 },
     currentScrollMode = scrollMode.alwaysBottom;
@@ -183,8 +183,9 @@ var checkScrollMode = function() {
     var elem = $('#chatContent');
     var inner = $('#chatContainer');
 
-    if ( (Math.abs(inner.offset().top) + elem.height() + elem.offset().top + 10) >= inner.outerHeight() ) { 
-      currentScrollMode = scrollMode.alwaysBottom;      
+    if ( elem.scrollTop() + elem.innerHeight() >= elem[0].scrollHeight ) { 
+      currentScrollMode = scrollMode.alwaysBottom;
+    
     } else { 
       currentScrollMode = scrollMode.normal;
     }
@@ -192,11 +193,16 @@ var checkScrollMode = function() {
 
 var performScrollMode = function() {    
     var elem = $('#chatContent');
-    var inner = $('#chatContainer');
-    if (currentScrollMode == scrollMode.alwaysBottom && !((Math.abs(inner.offset().top) + elem.height() + elem.offset().top + 10) >= inner.outerHeight()))
+    var inner = $('#chatContainer');    
+    if (currentScrollMode == scrollMode.alwaysBottom && !( elem.scrollTop() + elem.innerHeight() >= elem[0].scrollHeight ))
       elem.scrollTop(inner.outerHeight());
-};   
- 
+}; 
+
+var fillChat = function(i) {
+    for (var i=0; i<10;i++)    
+      $("#chatContainer").append(printMessage({'message':'Nachricht ' + i, 'attributes': [], 'name': 'Bot'}));
+
+};
     
 /* This function returns the changes of a message-entry based upon its message's attributes.
    Output will be an object with properties:
@@ -210,7 +216,7 @@ var applyAttributes = function (message, attributes) {
     entry_classes = ''
     
     if(typeof(attributes)!="undefined"){
-        for (i = 0; i < attributes.length; i++) {
+        for (var i = 0; i < attributes.length; i++) {
             if (attributes[i].a_action == 'edit_message') {
                 additional_content += " (bearbeitet durch "+ attributes[i].a_name +")";
                 entry_classes += " admin_edit";                
