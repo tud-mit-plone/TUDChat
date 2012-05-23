@@ -6,18 +6,23 @@
 
     <script language="javascript" src="jquery-1.7.min.js"></script>    
     <script language="javascript" src="jquery.notification.js"></script>
+    <script language="javascript" src="jquery.ba-dotimeout.min.js"></script>
     <script type="text/javascript" tal:content="structure string:var base_url = '${here/absolute_url}';"></script>
     <script language="javascript">
     $(document).ready(
         function(){    
-            $('#login').submit(function() {              
+            $('#login').submit(function() {
+              $("input[type='submit']").attr("disabled", "disabled");
+              
               if (jQuery.inArray(Number($('[name=chatroom]').val()), password_channels) == -1){
-                  $.getJSON("registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val() }, function(response) {                
+                  $.getJSON("registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val() }, function(response) {
+
+                    $.doTimeout( 'enableSubmitButton', 2000, function(){
+                        $("input[type='submit']").removeAttr("disabled");
+                    });
+
                     if (response == true) { 
-                            if ($.browser.mozilla == true) // Workaround for Firefox 12
-                                window.location = base_url + "/chat?" + new Date().getTime();                            
-                            else
-                                window.location = base_url + "/chat";
+                        window.location = base_url + "/chat?" + new Date().getTime();                            
                     } else {
                         if (response.status.message != '')
                             $.notification.error(response.status.message);
