@@ -32,6 +32,7 @@ div#chatContent{
     div#chatContent ul li{
         border-bottom:1px solid #efeded;
         padding:5px;
+        position:relative;
     }
 
    div#chat li.hovered{
@@ -56,9 +57,12 @@ div#chatUser{
         padding:0;
         margin:0;
     }
+
     div#chatUser ul li{
         border-bottom:1px solid #efeded;
         padding:5px;
+        height:20px;
+        position:relative;
     }
 
     div#chatUser ul li.admin{
@@ -105,17 +109,6 @@ div#chatContent li.admin_delete  span.additional_content{
 div#chatContent li.admin_delete  div.adminActions{
     display: none !important;
 }
-div#chat div.adminActions a {
-    display:block;
-    float:right;
-    height:20px;
-    width:22px;
-    padding:0 4px 0 4px;
-}
-div#chat div.adminActions a:hover {
-    background-color:transparent;
-}
-
 
 div#chatContent li.admin_edit span.additional_content {
     color: darkgreen;
@@ -244,5 +237,6 @@ select, option{
 .notification_button:hover{
     background-color: #666;    
 }
+
 
 /* content from notification.css */

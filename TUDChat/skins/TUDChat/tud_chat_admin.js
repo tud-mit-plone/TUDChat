@@ -96,10 +96,10 @@ $(document).ready(
         $("body").delegate("li", "mouseover mouseout", function(event) {
             if (event.type == 'mouseover') { 
                 $(this).addClass("hovered");
-                $(this).children(".adminActions").removeClass("hidden");
+                $(this).find(".adminActions").removeClass("hidden");
             } else if (event.type == 'mouseout') { 
                 $(this).removeClass("hovered");
-                $(this).children(".adminActions").addClass("hidden");
+                $(this).find(".adminActions").addClass("hidden");
             }
         });
 

@@ -3,18 +3,27 @@
     width: 475px !important;
 }
 
-
-
 div.adminActions{
-    float:right;    
+    bottom:0px;
+    right:0px;
+    position: absolute;
 }
     
 div.adminActions > a{
-    padding-left: 10px;
-    padding-right: 10px;
     text-decoration: none;
     opacity: 0.5;
+    border-bottom:none;
+    height:20px;
+    width:22px;
+    padding:0px 4px 4px 4px;
+    display:block;
+    float:right;
 }    
+
+div.adminActions a:hover {
+    background-color:transparent;
+}
+
 div.adminActions > a:hover{
     opacity: 1.0;
 }    
