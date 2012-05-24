@@ -1,6 +1,7 @@
 var knownIds = {};
 var sendMessageBlock = false;
 var updateCheckBlock = false;
+var scrollBlock      = false;
 var firstGetActions = true;
 
 var sendMessage = function(){
@@ -170,7 +171,9 @@ var updateCheck = function(){
 
     firstGetActions = false;
     updateCheckBlock = false;
-    performScrollMode();
+
+    if (!scrollBlock)
+      performScrollMode();
 	});
 };
 
@@ -269,12 +272,8 @@ $(document).ready(
                 }    
               });            
           });
-        // Scrollbar mode change
-		$('#chatContent').scroll(function(){           
-            // See: http://benalman.com/projects/jquery-dotimeout-plugin/
-            $.doTimeout( 'checkScrollMode', 250, checkScrollMode);
-        });
-        // security information for user links
+        
+       // security information for user links
         $("#chatContent").delegate(".message_content a", "click", function(e) {
             if(!$(e.target.parentNode.parentNode).hasClass('admin_message')){
                 $.notification.warn("Dieser Link wurde von einem Chat-Nutzer geschrieben. Die TU-Dresden möchte sich an dieser Stelle ausdrücklich von dem Inhalt dieses Links distanzieren. <br/><br/> Soll der Link <tt>" + e.target.href + "</tt> wirklich geöffnet werden?", false,                
@@ -290,6 +289,17 @@ $(document).ready(
             
             
         });
+
+    // Scrollbar movement
+    $('#chatContent').bind('scrollstart',function(){
+      scrollBlock = true;
+    });
+
+    $('#chatContent').bind('scrollstop',function(){
+      scrollBlock = false;
+      checkScrollMode();
+    });
+
 	}
 );
 

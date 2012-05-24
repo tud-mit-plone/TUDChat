@@ -171,6 +171,7 @@ select, option{
     width           : 500px;
     opacity         : 1.0;
     z-index          : 300001;
+    word-wrap: break-word;
 }
 
 #notification_container hr {
