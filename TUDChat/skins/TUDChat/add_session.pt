@@ -40,9 +40,9 @@
 
         <h1>Chat-Sitzung hinzufügen</h1>
 
-<p tal:condition="python:here.getActiveChatSessions() is None">Es wurde noch keine Datenbank konfiguriert. Diese kann in den Chat-Einstellungen eingestellt werden.</p>
+<p tal:condition="python:not here.chat_storage">Es wurde noch keine Datenbank konfiguriert. Diese kann in den Chat-Einstellungen eingestellt werden.</p>
 
-<div tal:condition="python:here.getActiveChatSessions()">
+<div tal:condition="python:here.chat_storage">
 
 <form tal:attributes="action string:${here_url}/addSessionSubmit" name="form" method="post">
 

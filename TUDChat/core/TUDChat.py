@@ -532,6 +532,8 @@ class TUDChat(BaseContent):
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu kurz. (Er muss mindestens 3 Zeichen lang sein.)'}})
         if len(user) > 20:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu lang. (Er darf maximal 20 Zeichen lang sein.)'}})
+        if re.findall(r"[a-zA-Z]äöüÄÖÜ+",user):
+            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername muss mindestens einen Buchstaben enthalten.'}})
         if not chat_session['active']:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der gewählte Chat-Raum ist zurzeit nicht aktiv.'}})
         if self.chat_rooms.has_key(chatroom) and user.lower() in [chat_user.lower() for chat_user in self.chat_rooms[chatroom]['chat_users'].keys()]:
@@ -625,6 +627,8 @@ class TUDChat(BaseContent):
         else:
             self.chat_rooms[chat_uid]['chat_users'][user]['last_message_sent'] = now
 
+        if self.maxMessageLength:
+            message = message[:self.maxMessageLength]
         msgid = self.chat_storage.sendAction(chat_uid = chat_uid,
                             user = user,
                             action = 'add_message',

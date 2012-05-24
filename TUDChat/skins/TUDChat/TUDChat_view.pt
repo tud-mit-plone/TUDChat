@@ -22,7 +22,7 @@
                     });
 
                     if (response == true) { 
-                        window.location = base_url + "/chat?" + new Date().getTime();                            
+                        window.location = base_url + "/chat?" + new Date().getTime();
                     } else {
                         if (response.status.message != '')
                             $.notification.error(response.status.message);
@@ -34,10 +34,7 @@
                                                                             "click":function(){
                                                                               $.getJSON("registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val(), password: $("#password").val() }, function(response) {                
                                                                                   if (response == true) { 
-                                                                                      if (document.location.href.substr(-1) == '/')
-                                                                                          document.location.href = document.location.href + "chat"; 
-                                                                                      else
-                                                                                          document.location.href = document.location.href + "/chat"; 
+                                                                                      window.location = base_url + "/chat?" + new Date().getTime();
                                                                                   } else {
                                                                                       if (response.status.message != '')
                                                                                           $.notification.error(response.status.message);

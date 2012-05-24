@@ -108,12 +108,24 @@ TUDChatSchema = BaseSchema.copy() + Schema((
         )
     ),
     IntegerField(
+        'maxMessageLength',
+        default         = 0,
+        required        = True,
+        widget          = IntegerWidget(
+                label                   = "maximale Nachrichtenlänge",
+                description             = "Bitte geben Sie die maximale Anzahl von Zeichen an, aus der eine einzelne Chat-Nachricht bestehen darf. (0 bedeutet, dass keine Begrenzung aktiv ist)",
+                i18n_domain             = "tudchat",
+                label_msgid             = "label_maxMessageLength",
+                description_msgid       = "help_maxMessageLength"
+        )
+    ),
+    IntegerField(
         'blockTime',
         default         = 1,
         required        = True,
         widget          = IntegerWidget(
                 label                   = "Abstand zwischen Nachrichten (in Sekunden)",
-                description             = "Bitte geben Sie die Wartezeit an, bis der Benutzer wieder erneut eine Nachricht schicken kann. ",
+                description             = "Bitte geben Sie die Wartezeit an, bis der Benutzer wieder erneut eine Nachricht schicken kann.",
                 i18n_domain             = "tudchat",
                 label_msgid             = "label_blockTime",
                 description_msgid       = "help_blockTime"

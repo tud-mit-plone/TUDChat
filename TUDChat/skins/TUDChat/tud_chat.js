@@ -91,17 +91,15 @@ var updateCheck = function(){
                                                                           "click":function(){  
                                                                             $.notification.close($(this).closest(".notification").attr("id"));
                                                                           }},
-                                                                         ]);      
-      return;
+                                                                         ]);
     }
       if (data.status.code == 6) { // Warned (to show in chat)
         //$.doTimeout( 'updateCheck' ); // stop updateCheck
         $("#chatContainer").append("<li>"+data.status.message+"</li>");
-        return;
       }
        
 
-		if (data.status.code != 0) // != OK
+		if (data.status.code > 6) // != OK
 			return;
 
     if(typeof(data.users)!="undefined"){
@@ -122,7 +120,7 @@ var updateCheck = function(){
           };
           // Notification: User has entered the room
           if (!firstGetActions){
-            if (user.length == 1)            
+            if (user.length == 1)
               $("#chatContainer").append("<li><span class='username'>"+user+"</span> hat den Raum betreten.</li>");
             else if (user.length != 0) {
               last_user = user.pop();
@@ -131,22 +129,23 @@ var updateCheck = function(){
           }
 
         }
-      }
-      if(typeof(data.users.to_delete)!="undefined"){
-        user = data.users.to_delete.sort();
-        for(var i in user)
-          $(".chatUser[data-uname='"+user[i]+"']").remove();        
-        // Notification: User has left the room
-        if (!firstGetActions){
-          if (user.length == 1)            
-            $("#chatContainer").append("<li><span class='username'>"+user+"</span> hat den Raum verlassen.</li>");
-          else if (user.length != 0) {
-            last_user = user.pop();
-            $("#chatContainer").append("<li><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum verlassen.</li>");
+      
+          if(typeof(data.users['to_delete'])!="undefined"){
+            user = data.users.to_delete.sort();
+            for(var i in user)
+              $(".chatUser[data-uname='"+user[i]+"']").remove();        
+            // Notification: User has left the room
+            if (!firstGetActions){
+              if (user.length == 1)            
+                $("#chatContainer").append("<li><span class='username'>"+user+"</span> hat den Raum verlassen.</li>");
+              else if (user.length != 0) {
+                last_user = user.pop();
+                $("#chatContainer").append("<li><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum verlassen.</li>");
+              }
+            }
+    
           }
-        }
-
-      }   
+      }
 
 		if(typeof(data.messages)!="undefined"){
 			if(typeof(data.messages['new'])!="undefined"){
