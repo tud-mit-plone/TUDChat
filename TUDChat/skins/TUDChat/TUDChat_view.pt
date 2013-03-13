@@ -4,16 +4,16 @@
 
 <metal:block metal:fill-slot="javascript_head_slot">
 
-    <script language="javascript" src="jquery-1.7.min.js"></script>    
+    <script language="javascript" src="jquery-1.7.min.js"></script>
     <script language="javascript" src="jquery.notification.js"></script>
     <script language="javascript" src="jquery.ba-dotimeout.min.js"></script>
     <script type="text/javascript" tal:content="structure string:var base_url = '${here/absolute_url}';"></script>
     <script language="javascript">
     $(document).ready(
-        function(){    
+        function(){
             $('#login').submit(function() {
               $("input[type='submit']").attr("disabled", "disabled");
-              
+
               if (jQuery.inArray(Number($('[name=chatroom]').val()), password_channels) == -1){
                   $.getJSON("registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val() }, function(response) {
 
@@ -21,7 +21,7 @@
                         $("input[type='submit']").removeAttr("disabled");
                     });
 
-                    if (response == true) { 
+                    if (response == true) {
                         window.location = base_url + "/chat?" + new Date().getTime();
                     } else {
                         if (response.status.message != '')
@@ -32,8 +32,8 @@
                   $.notification.general("Diese Chat-Session ist durch ein Passwort geschützt. <br/> <br/><label for='password'>Passwort:<"+"/label> <input type='password' id='password'/>", false,
                                                                         [{"name" :"Ok",
                                                                             "click":function(){
-                                                                              $.getJSON("registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val(), password: $("#password").val() }, function(response) {                
-                                                                                  if (response == true) { 
+                                                                              $.getJSON("registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val(), password: $("#password").val() }, function(response) {
+                                                                                  if (response == true) {
                                                                                       window.location = base_url + "/chat?" + new Date().getTime();
                                                                                   } else {
                                                                                       if (response.status.message != '')
@@ -44,7 +44,7 @@
                                                                         {"name" :"Abbrechen", "click": $.notification.clear },
                                                                          ]);
               }
-              
+
               return false;
             });
             $.get("status", '', function(data) {
@@ -87,7 +87,7 @@
                 <option tal:attributes="value session/id" tal:content="session/name">Sins-Chat</option>
             </tal:block>
         </select>
-        <input type="text" name="username" />
+        <input type="text" name="username" maxlength="20"/>
         <input type="submit" value="Anmelden" />
         <button id='logout'>Logout (DEBUG)</button>
     </form>
