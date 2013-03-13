@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-## 
+##
 ## Copyright (C)2005 Ingeniweb
 
 ## This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ from Products.Archetypes.public import *
 from Products.validation.interfaces.IValidator import IValidator
 from Products.validation.validators.ExpressionValidator import ExpressionValidator
 
-BAN_STRATEGIES = DisplayList((    
+BAN_STRATEGIES = DisplayList((
     ('COOKIE', 'Nur Cookie (empfohlen)'),
     ('IP', 'Nur IP-Adresse'),
     ('COOKIE_AND_IP', 'Cookie und IP-Adresse (restriktiv)'),
@@ -60,7 +60,7 @@ TUDChatSchema = BaseSchema.copy() + Schema((
                 i18n_domain             = "tudchat",
                 label_msgid             = "label_database_prefix",
                 description_msgid       = "help_database_prefix")
-    ),    
+    ),
     BooleanField(
         'showDate',
         default        = False,
@@ -71,7 +71,7 @@ TUDChatSchema = BaseSchema.copy() + Schema((
                 i18n_domain             = "tudchat",
                 label_msgid             = "label_show_date",
                 description_msgid       = "help_show_date")
-    ),        
+    ),
     StringField(
         'chatDateFormat',
         default         = '%Y/%m/%d %H:%M:%S',
@@ -88,15 +88,15 @@ TUDChatSchema = BaseSchema.copy() + Schema((
         default         = 15,
         required        = True,
         widget          = IntegerWidget(
-                label                   = "Timeout für den Chatuser (in Sekunden)",
-                description             = "Bitte geben Sie die Zeit an, die der Benutzer ohne Rückmeldung im Chat verbleiben kann. Nach dieser Zeit wird dieser automatisch aus dem Chat entfernt.",
+                label                   = "Socket-Timeout (in Sekunden)",
+                description             = "Bitte geben Sie den Socket-Timeout für den Chatuser an. Nach dieser Zeit wird dieser automatisch aus dem Chat entfernt.",
                 i18n_domain             = "tudchat",
                 label_msgid             = "label_timeout",
                 description_msgid       = "help_timeout"
         )
     ),
     IntegerField(
-        'refreshRate',               
+        'refreshRate',
         default         = 5,
         required        = True,
         widget          = IntegerWidget(
