@@ -343,9 +343,12 @@ class TUDChat(BaseContent):
         else:
             return None
     
-    def getNextChatSession(self, REQUEST = None):    
+    def getNextChatSessions(self, REQUEST = None):    
         """ get the next chat session, which will start """
-        return self.chat_storage.getNextChatSession()
+        if self.chat_storage:
+            return self.chat_storage.getNextChatSessions()
+        else:
+            return None
 
     def getLogs(self):
         """ Retrieve the whole and fully parsed chat log """
@@ -565,8 +568,8 @@ class TUDChat(BaseContent):
                                             })
             return simplejson.dumps(True)
         return simplejson.dumps(False)
-
-    security.declareProtected(CMFCorePermissions.View, "logout")    
+    
+    security.declareProtected(CMFCorePermissions.View, "logout")
     def logout(self, REQUEST = None):
         """ Logout yourself """        
         session=REQUEST.SESSION

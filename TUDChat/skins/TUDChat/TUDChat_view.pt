@@ -78,7 +78,9 @@
 
 <h2>Willkommen zum Chat!</h2>
 
-<tal:block define="sessions python:here.getActiveChatSessions()" condition="python:here.getActiveChatSessions() is not None">
+<tal:block define="sessions python:here.getActiveChatSessions();
+                   next_sessions python:here.getNextChatSessions()"
+           condition="python:here.getActiveChatSessions() is not None">
     <form id="login" action="" tal:condition="python: len(sessions)>0">
         <script language="javascript" tal:content="python: 'var password_channels = ['+','.join([str(session['id']) for session in sessions if session.get('password') != None])+'];'"></script>
         <label for="">Raum</label>
@@ -89,20 +91,38 @@
         </select>
         <input type="text" name="username" maxlength="20"/>
         <input type="submit" value="Anmelden" />
-        <button id='logout'>Logout (DEBUG)</button>
+        <button id='logout' tal:condition="python:here.isAdmin(here.REQUEST) == True">Logout (DEBUG)</button>
     </form>
-    <tal:block condition="python: len(sessions)==0" define="session python:here.getNextChatSession()">
-        <p>Leider existiert zurzeit keine aktive Chat-Session.</p>
-        <p tal:condition="python: len(session)==0">Es befindet sich auch keine Chat-Session in Planung.</p>
-        <p tal:condition="python: len(session)==1">Die nächste Chat-Session startet am <tal:block replace="python: session[0]['start'].strftime('%d.%m.%y')" /> um <tal:block replace="python: session[0]['start'].strftime('%H:%M')" /> Uhr.</p>
+    <p tal:condition="python: len(sessions)==0">Leider existiert zurzeit keine aktive Chat-Session.</p>
+    <p tal:condition="python: len(sessions)==0 and len(next_sessions)==0">Es befindet sich auch keine Chat-Session in Planung.</p>
+    <tal:block condition="python: len(next_sessions)>0">
+        <br />
+        Folgende Chat-Sessions finden zukünftig statt:
+        <table>
+            <thead>
+                <tr>
+                    <th>Titel</th>
+                    <th>Startzeit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr tal:repeat="session next_sessions">
+                    <td tal:content="session/name"></td>
+                    <td tal:content="python: session['start'].strftime('%d.%m.%y')+' '+session['start'].strftime('%H:%M')+' Uhr'"></td>
+                </tr>
+            </tbody>
+        </table>
     </tal:block>
 </tal:block>
 <p tal:condition="python:here.getActiveChatSessions() is None">Es wurde noch keine Datenbank konfiguriert. Diese kann in den Chat-Einstellungen eingestellt werden.</p>
 
-<div><a href="chat">Chat direkt betreten</a> (falls bereits angemeldet)</div>
-<p>Status: (DEBUG)</p>
-<textarea style="width:900px;height:100px;" id='status'></textarea>
-<br/>
-<button id='updateStatus'>Update status (DEBUG)</button>
+<tal:block condition="python:here.isAdmin(here.REQUEST) == True">
+  <br />
+  <div><a href="chat">Chat direkt betreten</a> (falls bereits angemeldet)</div>
+  <p>Status: (DEBUG)</p>
+  <textarea style="width:900px;height:100px;" id='status'></textarea>
+  <br/>
+  <button id='updateStatus'>Update status (DEBUG)</button>
+</tal:block>
 </body>
 </html>

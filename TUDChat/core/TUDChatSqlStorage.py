@@ -31,11 +31,13 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
         #Create tables
         create_table_query = ()
         
-        self.tableCheck = SQL('tableCheck', 'Check for the existence of tables with a given prefix',
+        self.tableCheck = SQL('tableCheck', 'Check for the existence of the action und session table with a given prefix',
             sql_connector_id, '',
             """
-            SHOW TABLES LIKE '"""+prefix+"""%'
-            """)
+            SELECT table_name
+            FROM INFORMATION_SCHEMA.TABLES
+            WHERE table_name='%s_action' OR table_name='%s_session'
+            """ % (prefix, prefix))
         
         self.createTableChatSession = SQL('createTableChatSession', 'Create session table',
             sql_connector_id, '',
@@ -122,16 +124,15 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             AND         start < NOW()
             """ % (prefix))
         
-        self.getNextChatSession = SQL('getNextChatSession', 'get next chat session',
+        self.getNextChatSessions = SQL('getNextChatSessions', 'get next chat session',
             sql_connector_id, '', 
             """
             SELECT      *
             FROM        `%s_session`
             WHERE       start > NOW()
             ORDER BY    start, id
-            LIMIT       1
             """ % (prefix))
-        self.getNextChatSession.max_rows_ = 0
+        self.getNextChatSessions.max_rows_ = 0
         
         self.getLastChatAction = SQL('getLastChatAction', 'get the last action from an active chat by chat_uid',
             sql_connector_id, 'chat_uid',
@@ -265,8 +266,8 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
         result = self.sql_methods.getActiveChatSessions()
         return self.dictFromSql(result, ('id','name','password','max_users','start','end',))
     
-    def getNextChatSession(self):
-        result = self.sql_methods.getNextChatSession()
+    def getNextChatSessions(self):
+        result = self.sql_methods.getNextChatSessions()
         return self.dictFromSql(result, ('id','name','start','end',))
     
     def getLastChatAction(self, chat_uid):
