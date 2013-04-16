@@ -32,6 +32,13 @@ from Products.Archetypes.public import *
 from Products.validation.interfaces.IValidator import IValidator
 from Products.validation.validators.ExpressionValidator import ExpressionValidator
 
+TIME_FORMATS = DisplayList((
+    ('%H:%M:%S', 'Uhrzeit'),
+    ('%H:%M', 'Uhrzeit (ohne Sekunden)'),
+    ('%d.%m.%Y %H:%M:%S', 'Datum und Uhrzeit'),
+    ('%d.%m.%Y %H:%M', 'Datum und Uhrzeit (ohne Sekunden)'),
+    ))
+
 BAN_STRATEGIES = DisplayList((
     ('COOKIE', 'Nur Cookie (empfohlen)'),
     ('IP', 'Nur IP-Adresse'),
@@ -63,7 +70,7 @@ TUDChatSchema = BaseSchema.copy() + Schema((
     ),
     BooleanField(
         'showDate',
-        default        = False,
+        default        = True,
         required       = True,
         widget         = BooleanWidget(
                 label                   = "Zeitstempel an Chatnachrichten?",
@@ -74,14 +81,17 @@ TUDChatSchema = BaseSchema.copy() + Schema((
     ),
     StringField(
         'chatDateFormat',
-        default         = '%Y/%m/%d %H:%M:%S',
+        default         = '%H:%M:%S',
         required        = False,
-        widget          = StringWidget(
-                label                   = "Datumsformat des Zeitstempels",
-                description             = "Bitte geben Sie das Datumsformat des Zeitstempels an.",
+        vocabulary      = TIME_FORMATS,
+        widget          = SelectionWidget(
+                label                   = "Format des Zeitstempels",
+                description             = "Bitte geben Sie das Format des Zeitstempels an.",
                 i18n_domain             = "tudchat",
                 label_msgid             = "label_chat_date_format",
-                description_msgid       = "help_chat_date_format")
+                description_msgid       = "help_chat_date_format",
+                format                  = "select",
+        )
     ),
     IntegerField(
         'timeout',

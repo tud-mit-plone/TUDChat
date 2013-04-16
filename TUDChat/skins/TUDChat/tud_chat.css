@@ -102,6 +102,11 @@ div#chatContent span.username{
     font-style: italic;
 }
 
+div#chatContent span.chatdate{
+    color: #555;
+    font-size: 10px;
+}
+
 div#chatContent li.admin_delete  span.additional_content{
     color: darkred;
 }

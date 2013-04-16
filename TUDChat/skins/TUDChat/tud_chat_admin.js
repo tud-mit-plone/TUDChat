@@ -5,7 +5,7 @@ function printMessage(message) {
     entry_classes = changes.entry_classes + ((message.name == ownUsername) ? ' ownMessage' : '');
     additional_content = changes.additional_content;
 
-    return "<li id=chatEntry"+message.id+" class='admin "+entry_classes+"'><span class='username'>"+message.name+":</span> <span class='message_content'>"+parsed_message+"</span> "+(additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"<div class='adminActions hidden'><a href='#' class='edit' data-mid="+message.id+" title='Nachricht bearbeiten'>&nbsp;</a> <a href='#' class='delete' data-mid="+message.id+" title='Nachricht l&ouml;schen'>&nbsp;</a></div></li>";    
+    return "<li id=chatEntry"+message.id+" class='admin "+entry_classes+"'><span class='chatdate'>"+message.date+"</span><span class='username'>"+message.name+":</span> <span class='message_content'>"+parsed_message+"</span> "+(additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"<div class='adminActions hidden'><a href='#' class='edit' data-mid="+message.id+" title='Nachricht bearbeiten'>&nbsp;</a> <a href='#' class='delete' data-mid="+message.id+" title='Nachricht l&ouml;schen'>&nbsp;</a></div></li>";    
 }
 
 function printNewUser(user) {
@@ -69,7 +69,7 @@ $(document).ready(
 
         $("body").delegate("a.ban", "click", function(e) {
             user = $(e.target).attr("data-uname");
-            $.notification.warn("Wollen Sie wirklich den Benutzer \"" + user + "\" aus dem Chat verbannen? <br/> <br/><label for='ban_reason'>Bangrund:</label> <input type='text' id='ban_reason'/>", false,
+            $.notification.warn("Wollen Sie wirklich den Benutzer \"" + user + "\" aus dem Chat verbannen? <br/> <br/><label for='ban_reason'>Banngrund:</label> <input type='text' id='ban_reason'/>", false,
                                                                         [{"name" :"Ok",
                                                                             "click":function(){
                                                                               $.get("banUser", { "user": $(e.target).attr("data-uname"), "reason": $("#ban_reason").val() }, function(data) { updateCheck(); });

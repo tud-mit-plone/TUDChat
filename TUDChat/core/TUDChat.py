@@ -303,15 +303,18 @@ class TUDChat(BaseContent):
             return 'Not banned'
         return
     
+    def getChatInfo(self, id):
+        return id
+    
     ##########################################################################
     # Chat Session Management
     ##########################################################################
     
-    def createChatSession(self, name, start, end, password = None, max_users = None, REQUEST = None):       
+    def createChatSession(self, name, description, start, end, password = None, max_users = None, REQUEST = None):       
         """ Create a chat session """
         if not self.isAdmin(REQUEST):
             return
-        self.chat_storage.createChatSession(name, start, end, password, max_users)
+        self.chat_storage.createChatSession(name, description, start, end, password, max_users)
         return True
     
     def deleteChatSession(self, chat_uid, REQUEST = None):       
@@ -360,7 +363,7 @@ class TUDChat(BaseContent):
     # Form Handler
     ##########################################################################
 
-    def addSessionSubmit(self, title, start_date, end_date, password, max_users, REQUEST):
+    def addSessionSubmit(self, title, description, start_date, end_date, password, max_users, REQUEST):
         """ Form Handler for adding session """
 
         errors = {}
@@ -410,7 +413,7 @@ class TUDChat(BaseContent):
         REQUEST['errors'] = errors
         
         if not errors:
-            success = self.createChatSession(title, sd, ed, password or None, max_users or None, REQUEST)
+            success = self.createChatSession(title, description, sd, ed, password or None, max_users or None, REQUEST)
             if success == False:
                 errors['database'] = 'Fehler in der Datenbank.'
 
@@ -728,16 +731,16 @@ class TUDChat(BaseContent):
                         'messages': 
                             {   
                                 'new': [ {  'id': action['id'],
-                                            'date': action['date'].strftime("%H:%M"),
+                                            'date': self.showDate and action['date'].strftime(self.chatDateFormat) or "",
                                             'name': action['user'],
                                             'message': action['message'],
                                             'attributes': action['attr'] } for action in list_actions if action['action'] == "add_message"],
                                 'to_delete': [ { 'id': action['target'],
-                                                  'date': action['date'].strftime("%H:%M"),
+                                                  'date': self.showDate and action['date'].strftime(self.chatDateFormat) or "",
                                                   'name': action['user'],
                                                   'attributes': action['attr'] } for action in list_actions if action['action'] == "delete_message" ],
                                 'to_edit': [ {  'id': action['target'],
-                                                'date': action['date'].strftime("%H:%M"),
+                                                'date': self.showDate and action['date'].strftime(self.chatDateFormat) or "",
                                                 'name': action['user'],
                                                 'message': action['message'],
                                                 'attributes': action['attr'] } for action in list_actions if action['action'] == "edit_message" ],

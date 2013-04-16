@@ -53,6 +53,13 @@
     <div class="error_message" tal:condition="error" tal:content="error"></div>
     <input type="text" id="title" name="title" tal:attributes="value request/title|nothing"/>
   </div>
+  
+  <div tal:define="error errors/title | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
+    <label for="description">Beschreibung</label>
+    <div class="formHelp">Bitte geben Sie eine Beschreibung für die Chat-Sitzung an.</div>
+    <div class="error_message" tal:condition="error" tal:content="error"></div>
+    <textarea id="description" name="description" tal:attributes="value request/description|nothing"></textarea>
+  </div>
 
   <div tal:define="error errors/start_date | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
     <label for="start_date">Beginn</label>

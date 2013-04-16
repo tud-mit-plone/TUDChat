@@ -29,6 +29,7 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS `TUDChat_session` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(60) COLLATE utf8_unicode_ci NOT NULL,
+  `description` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `password` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
   `max_user` int(11) DEFAULT NULL,
   `start` datetime DEFAULT NULL,

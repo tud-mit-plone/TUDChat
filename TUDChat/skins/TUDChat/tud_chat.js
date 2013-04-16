@@ -152,18 +152,24 @@ var updateCheck = function(){
 			if(typeof(data.messages['new'])!="undefined"){
 				message = data.messages['new'];
 				for(var i in data.messages['new']) {          
+					if(message[i].date != "")
+						message[i].date = message[i].date+" ";
 					$("#chatContainer").append(printMessage(message[i]));
 				}
 			}
 			if(typeof(data.messages.to_edit)!="undefined"){
 				message = data.messages.to_edit;                
 				for(var i in data.messages.to_edit){                    
+					if(message[i].date != "")
+						message[i].date = message[i].date+" ";
 					$("#chatEntry"+message[i].id).replaceWith(printMessage(message[i]));
 				}
 			}
 			if(typeof(data.messages.to_delete)!="undefined"){
                 message = data.messages.to_delete;                
 				for(var i in data.messages.to_delete){
+					if(message[i].date != "")
+						message[i].date = message[i].date+" ";
 					$("#chatEntry"+message[i].id).replaceWith(printMessage(message[i]));
 				}
 			}
