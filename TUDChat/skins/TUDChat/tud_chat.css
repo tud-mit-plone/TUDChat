@@ -6,8 +6,12 @@ div.clear{
     margin:0;
 }
 div#chat{
-    width:800px;
-    padding:10px;
+    width: 100%;
+    min-width: 450px;
+    padding: 0;
+    margin: 0 5px 20px 5px;
+    border: 1px solid #acacac;
+    border-radius:5px;
 }
 div#chatContent, div#chatUser, div#chatMsg{
     float:left;
@@ -16,11 +20,9 @@ div#chatContent, div#chatUser, div#chatMsg{
     padding:5px 0 5px 0;
 }
 div#chatContent{
-    width:590px;
-    border-right:0;
-    border-top-left-radius:5px;
+    width: 80%;
     height:400px;
-    overflow:auto;    
+    overflow:auto;
     word-wrap: break-word;
 }
     div#chatContent ul{
@@ -48,8 +50,8 @@ div#chatContent{
     }
 
 div#chatUser{
-    width:200px;
-    border-top-right-radius:5px;
+    width: 19%;
+    border-left: 1px solid #acacac;
     word-wrap: break-word;
 }
     div#chatUser ul{
@@ -76,16 +78,17 @@ div#chatUser{
     }
 
 div#chatMsg{
-    width:781px;
     min-height:0;
     height:30px;
-    padding:5px;
-    border-top:0;
-    border-bottom-left-radius:5px;
-    border-bottom-right-radius:5px;
+    width: 99%;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-top: 1px solid #acacac;
 }
     div#chatMsg input[type="text"]{
-        width:684px;
+        width: 80%;
+        margin: 0;
         border:1px solid #acacac;
     }
 
@@ -181,23 +184,23 @@ select, option{
 
 #notification_container hr {
     margin-top: 10px;
-    padding-bottom: 10px;    
+    padding-bottom: 10px;
 }
 
-#notification_container tt {    
+#notification_container tt {
     font-weight: bold;
     font-size: 1.2em;
     color: #555;
     padding: 0px 5px 0px 5px;
 }
 
-#notification_container em {    
+#notification_container em {
     font-size: 1.6em;
     font-style:normal;
     margin:10px;
 }
 
-#notification_container input[type=text] {    
+#notification_container input[type=text] {
     width:380px;
     border-radius: 3px;
     margin-left:10px;
@@ -225,7 +228,7 @@ select, option{
 .notification_general {
     color           : #FFCC00;
 }
-.notification_button_container{ 
+.notification_button_container{
     text-align: center;
 }
 .notification_button{
@@ -241,8 +244,6 @@ select, option{
     color           : #fff;
 }
 .notification_button:hover{
-    background-color: #666;    
+    background-color: #666;
 }
-
-
 /* content from notification.css */
