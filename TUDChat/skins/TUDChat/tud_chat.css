@@ -15,7 +15,6 @@ div#chat{
 }
 div#chatContent, div#chatUser, div#chatMsg{
     float:left;
-    border:1px solid #acacac;
     min-height:400px;
     padding:5px 0 5px 0;
 }
