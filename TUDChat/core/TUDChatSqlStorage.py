@@ -109,6 +109,14 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
                     id         = <dtml-sqlvar chat_uid type="int">
             """ % (prefix))
         
+        self.getAllChatSessions = SQL('getAllChatSessions', 'get all planned, active and closed chat sessions',
+            sql_connector_id, '', 
+            """
+            SELECT      *
+            FROM        `%s_session`
+            ORDER BY    id DESC
+            """ % (prefix))
+        
         self.getChatSessions = SQL('getChatSessions', 'get all planned and active chat sessions',
             sql_connector_id, '', 
             """
@@ -260,6 +268,10 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
     def closeChatSession(self, chat_uid):
         self.sql_methods.closeChatSession(chat_uid = chat_uid)
         return True
+    
+    def getAllChatSessions(self):
+        result = self.sql_methods.getAllChatSessions()
+        return self.dictFromSql(result, ('id','name','description','password','max_users','start','end',))
     
     def getChatSessions(self):
         result = self.sql_methods.getChatSessions()

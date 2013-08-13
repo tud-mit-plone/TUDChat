@@ -303,8 +303,15 @@ class TUDChat(BaseContent):
             return 'Not banned'
         return
     
-    def getChatInfo(self, id):
-        return id
+    def getChatInfo(self, REQUEST = None):
+        """ Return all information about requesting users chat session """
+        if REQUEST:
+            session=REQUEST.SESSION
+            user_properties=session.get('user_properties')
+            if user_properties:
+                chat_uid=user_properties.get('chat_room')
+                return self.chat_storage.getChatSession(chat_uid)
+        return None
     
     ##########################################################################
     # Chat Session Management
@@ -332,6 +339,18 @@ class TUDChat(BaseContent):
         self.sendAction(chat_uid = session.get('user_properties').get('chat_room'),
                                     user = session.get('user_properties').get('name'),
                                     action = "close_chat")
+    
+    def getAllChatSessions(self, REQUEST = None):    
+        """ get a list of all active, planned and closed chat sessions with there current state """
+        if not self.isAdmin(REQUEST):
+            return
+        
+        result = []
+        for x in self.chat_storage.getAllChatSessions():
+            x['status'] = (x['start'] > DateTime().timeTime() and 'geplant') or (x['end'] < DateTime().timeTime() and 'abgelaufen') or 'aktiv'
+            result.append(x)
+        
+        return result
     
     def getChatSessions(self, REQUEST = None):    
         """ get a list of all active and planned chat sessions """
@@ -518,7 +537,7 @@ class TUDChat(BaseContent):
         """ Clear the banned user list """
         for chat_uid in self.chat_rooms.keys():
             self.chat_rooms[chat_uid]['banned_chat_users'].clear()
-        self._p_changed = 1        
+        self._p_changed = 1
         
     ###################################
     # Exposed methods
@@ -860,6 +879,8 @@ class TUDChat(BaseContent):
             self.own_database_prefixes[db].add(prefix)
         else:
             self.own_database_prefixes[db] = set([prefix])
+        
+        self._p_changed = 1
         
         return str(not already_exist)
         

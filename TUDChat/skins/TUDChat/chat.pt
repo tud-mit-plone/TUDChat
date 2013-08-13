@@ -15,7 +15,7 @@
     <script language="javascript" tal:condition="python:not here.isAdmin(here.REQUEST) == True" src="tud_chat_user.js"></script>    
     <script language="javascript" src="tud_chat.js"></script>
 
-    <script type="text/javascript" tal:content="structure string:var refreshRate = ${here/refreshRate} * 1000; var blockTime = ${here/blockTime} * 1000; var ownUsername = '${request/SESSION/user_properties/name|nothing}'; var base_url = '${here/absolute_url}';">    
+    <script type="text/javascript" tal:content="structure string:var refreshRate = ${here/refreshRate} * 1000; var blockTime = ${here/blockTime} * 1000; var ownUsername = '${request/SESSION/user_properties/name|nothing}'; var base_url = '${here/absolute_url}'; var maxMessageLength = ${here/maxMessageLength}">    
     </script>
 </metal:block>
 
@@ -27,7 +27,8 @@
 </head>
 
 
-<body metal:fill-slot="main" i18n:domain="tudchat">
+<body metal:fill-slot="main" i18n:domain="tudchat" tal:define="chatinfo python: here.getChatInfo(here.REQUEST)">
+    <h2 tal:content="chatinfo/name"></h2>
     <div id="chat">
         <div id="chatContent">
             <ul id="chatContainer">
@@ -39,13 +40,27 @@
         </div>
         <div class="clear"></div>
         <div id="chatMsg">
-        <input type="text" name="msg" id="chatMsgValue">
-        <button id="chatMsgSubmit">Absenden</button>
+        <input type="text" name="msg" id="chatMsgValue" tal:attributes="maxlength python: here.maxMessageLength>0 and here.maxMessageLength or None">
+        <tal:block condition="python: here.maxMessageLength > 0">
+          <span id="counter"></span><span tal:content="python: '/'+str(here.maxMessageLength)"></span>
+        </tal:block>
+        <button id="chatMsgSubmit" style="float: right;">Absenden</button>
         </div>
         <div class="clear"></div>
         <div>
             <button id="logout">Logout</button>
         </div>        
     </div>
+    <tal:block condition="python: chatinfo['description']">
+        <tal:block define="lines python:chatinfo['description'].split('\n')">
+            <h3>Beschreibung</h3>
+            <p>
+                <tal:block repeat="line lines">
+                    <tal:block replace="line"></tal:block>
+                    <br tal:condition="python: not repeat['line'].end">
+                </tal:block>
+            </p>
+        </tal:block>
+    </tal:block>
 </body>
 </html>

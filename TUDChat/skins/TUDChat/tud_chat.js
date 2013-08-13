@@ -212,12 +212,6 @@ var performScrollMode = function() {
     if (currentScrollMode == scrollMode.alwaysBottom && !( elem.scrollTop() + elem.innerHeight() >= elem[0].scrollHeight ))
       elem.scrollTop(inner.outerHeight());
 }; 
-
-var fillChat = function(i) {
-    for (var i=0; i<10;i++)    
-      $("#chatContainer").append(printMessage({'message':'Nachricht ' + i, 'attributes': [], 'name': 'Bot'}));
-
-};
     
 /* This function returns the changes of a message-entry based upon its message's attributes.
    Output will be an object with properties:
@@ -305,6 +299,15 @@ $(document).ready(
       scrollBlock = false;
       checkScrollMode();
     });
+    
+    //counter
+    if(maxMessageLength>0){
+      $('#chatMsgValue').keyup(function(event){
+        $('#counter').text(maxMessageLength-$('#chatMsgValue').val().length);
+      });
+      
+      $('#chatMsgValue').keyup();
+    }
 
 	}
 );
