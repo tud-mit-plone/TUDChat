@@ -52,6 +52,7 @@
         <th>Start-Zeit</th>
         <th>Ende-Zeit</th>
         <th>Protokoll</th>
+        <th>Bearbeiten</th>
         <th>Löschen?</th>
       </tr>
       <tr tal:repeat="session python: here.getAllChatSessions(context.REQUEST)">
@@ -75,6 +76,9 @@
         </td>
         <td>
           <a tal:attributes="href python:'TUDChat_log?chat_uid='+str(session.get('id'))">Log</a>
+        </td>
+        <td>
+          <a tal:attributes="href python:'edit_session?chat_uid='+str(session.get('id'))">Bearbeiten</a>
         </td>
         <td>
           <input type="checkbox" name="delete:list:int" tal:attributes="value session/id"/>

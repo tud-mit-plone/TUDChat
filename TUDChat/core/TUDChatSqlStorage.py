@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-
 # Zope imports
 import Acquisition
 import Globals
 from AccessControl import ClassSecurityInfo
 from Interface import Interface
+from DateTime import DateTime
 
 # Products imports
 from Products.ZSQLMethods.SQL import SQL as ZSQL
@@ -90,6 +89,19 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             );
             <dtml-var sql_delimiter>
             SELECT LAST_INSERT_ID() AS newid
+            """ % (prefix))
+        
+        self.editChatSession = SQL('editChatSession', 'Edit chat session',
+            sql_connector_id, 'chat_uid name description starttime endtime password max_users',
+            """
+            UPDATE `%s_session` SET
+                `name` = <dtml-sqlvar name type="string">,
+                `description` = <dtml-sqlvar description type="string">,
+                `start` = <dtml-sqlvar starttime type="string">,
+                `end` = <dtml-sqlvar endtime type="string">,
+                `password` = <dtml-sqlvar password type="string">,
+                `max_users` = <dtml-sqlvar max_users type="string">
+            WHERE id = <dtml-sqlvar chat_uid type="string">
             """ % (prefix))
         
         self.deleteChatSession = SQL('deleteChatSession', 'Delete chat session',
@@ -256,6 +268,10 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
         chat_uid = int(self.dictFromSql(result, names=('newid',))[0]['newid'])
         return chat_uid
     
+    def editChatSession(self, chat_uid, name, description = "NULL", start = "NOW()", end = "NULL", password = None, max_users = "NULL"):
+        self.sql_methods.editChatSession(chat_uid = chat_uid, name =name, description=description, starttime = start, endtime = end, password = password, max_users = max_users)
+        return True
+    
     def deleteChatSession(self, id):
         result = self.sql_methods.deleteChatSession(chat_uid = id)
         return True
@@ -319,6 +335,11 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
         for sql_row in results.dictionaries():
             mapping = {}
             for col_name in names:
-                mapping[col_name] = sql_row.get(col_name)
+                if isinstance(sql_row.get(col_name), DateTime):
+                    #fix to get DateTime objects in corret timezone
+                    dobj = sql_row.get(col_name).toZone('UTC')
+                    mapping[col_name] = DateTime(dobj.Date()+' '+dobj.Time())
+                else:
+                    mapping[col_name] = sql_row.get(col_name)
             rows.append(mapping)
         return rows

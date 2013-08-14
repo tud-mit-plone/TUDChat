@@ -1,0 +1,62 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
+  metal:use-macro="here/main_template/macros/master" i18n:domain="plone">
+<head>
+
+<metal:javascriptslot fill-slot="javascript_head_slot">
+
+  <script language="javascript">
+
+    $(document).ready(
+        function(){    
+          $('#logtable tr:odd').css('background-color', '#eee');
+        }
+    );
+
+
+  </script>
+
+</metal:javascriptslot>
+
+<metal:block metal:fill-slot="css_slot">   
+  <style type="text/css">
+  <!--
+    #logtable th { text-align:center; }
+  -->
+  </style>
+</metal:block>
+
+</head>
+
+<body metal:fill-slot="main" i18n:domain="tudchat"
+      tal:define="chat_uid python: request.get('chat_uid');
+                  session_info python: here.getChatSessionInfo(chat_uid);
+                  log python: here.getLogs(chat_uid)">
+
+<h2>Chat-Log</h2>
+<span tal:content="python: 'Chat-ID: '+str(session_info['id'])"></span><br />
+<span tal:content="python: 'Name: '+session_info['name']"></span><br />
+<span tal:content="python: 'Beschreibung: '+session_info['description']"></span><br />
+<span tal:content="python: 'Passwort: '+(session_info.get('password') or '')"></span><br />
+<span tal:content="python: 'maximale Benutzer: '+(session_info.get('max_users') and str(session_info.get('max_users')) or 'keine Begrenzung')"></span><br />
+<span tal:content="python: 'Startzeit: '+str(session_info['start'])"></span><br />
+<span tal:content="python: 'Endzeit: '+str(session_info['end'])"></span>
+
+<table id="logtable">
+  <thead>
+    <th>ID</th>
+    <th>Zeit</th>
+    <th>Name</th>
+    <th>Nachricht</th>
+  </thead>
+  <tbody>
+    <tr tal:repeat="message log">
+      <td tal:content="message/id"></td>
+      <td tal:content="message/date"></td>
+      <td tal:content="message/user"></td>
+      <td tal:content="message/message"></td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>

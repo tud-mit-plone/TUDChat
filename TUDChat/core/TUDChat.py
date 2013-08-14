@@ -65,7 +65,7 @@ class TUDChat(BaseContent):
     # Data
     timestamps               = {} # collection of timestamps to call methods in certain intervalls
     chat_rooms               = {} # chatroom container with userlist, kicked_users, banned_users and timestamps
-    admin_roles              = ['Admin','SInSAuthor', 'SInSReviewer']
+    admin_roles              = ['Admin','ChatModerator']
     admin_messages           = [] # list of message ids sended from admins
     own_database_prefixes    = {} # for each connector_id the own prefixes in this database
     htmlspecialchars         = {'"':'&quot;', '\'':'&#039;', '<':'&lt;', '>':'&gt;'} # char "&" is in function included    
@@ -324,6 +324,13 @@ class TUDChat(BaseContent):
         self.chat_storage.createChatSession(name, description, start, end, password, max_users)
         return True
     
+    def editChatSession(self, chat_uid, name, description, start, end, password = None, max_users = None, REQUEST = None):       
+        """ Create a chat session """
+        if not self.isAdmin(REQUEST):
+            return
+        self.chat_storage.editChatSession(chat_uid, name, description, start, end, password, max_users)
+        return True
+    
     def deleteChatSession(self, chat_uid, REQUEST = None):       
         """ Delete a chat session """
         if not self.isAdmin(REQUEST):
@@ -371,19 +378,28 @@ class TUDChat(BaseContent):
             return self.chat_storage.getNextChatSessions()
         else:
             return None
+    
+    def getChatSessionInfo(self, chat_uid, REQUEST = None):
+        """ get all information about a specific chat_session"""
+        if not self.isAdmin(REQUEST):
+            return
+        session_info = self.chat_storage.getChatSession(chat_uid)
+        session_info['start'] = session_info['start'].strftime('%d.%m.%Y, %H:%M Uhr')
+        session_info['end'] = session_info['end'].strftime('%d.%m.%Y, %H:%M Uhr')
+        return session_info
 
-    def getLogs(self):
+    def getLogs(self, chat_uid, REQUEST = None):
         """ Retrieve the whole and fully parsed chat log """
         if not self.isAdmin(REQUEST):
             return
-        return self.chat_storage.getLogs(self)
+        return self.chat_storage.getActions(chat_uid, 0, 0)[:-1]
 
     ##########################################################################
     # Form Handler
     ##########################################################################
 
-    def addSessionSubmit(self, title, description, start_date, end_date, password, max_users, REQUEST):
-        """ Form Handler for adding session """
+    def addSessionSubmit(self, title, description, start_date, end_date, password, max_users, chat_uid = None, REQUEST = None):
+        """ Form Handler for adding or edit a session """
 
         errors = {}
 
@@ -432,7 +448,10 @@ class TUDChat(BaseContent):
         REQUEST['errors'] = errors
         
         if not errors:
-            success = self.createChatSession(title, description, sd, ed, password or None, max_users or None, REQUEST)
+            if chat_uid:
+                success = self.editChatSession(chat_uid, title, description, sd, ed, password or None, max_users or None, REQUEST)
+            else:
+                success = self.createChatSession(title, description, sd, ed, password or None, max_users or None, REQUEST)
             if success == False:
                 errors['database'] = 'Fehler in der Datenbank.'
 
@@ -441,7 +460,10 @@ class TUDChat(BaseContent):
         else:
             REQUEST['portal_status_message'] = 'Bitte korrigieren Sie die angezeigten Fehler.'
 
-        return self.add_session(request=REQUEST)
+        if chat_uid:
+            return self.edit_session(request=REQUEST)
+        else:
+            return self.add_session(request=REQUEST)
 
     def editSessionsSubmit(self, REQUEST):
         """ Form Handler for editing sessions """
