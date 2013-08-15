@@ -1,19 +1,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"
       lang="en-US"
       metal:use-macro="here/main_template/macros/master"
-      i18n:domain="contact">    
-            
+      i18n:domain="contact">
+
 <body>
 <metal:javascriptslot fill-slot="javascript_head_slot">
   <script type="text/javascript" src="jquery-1.7.min.js"></script>
   <script type="text/javascript" src="jquery-ui-1.8.19.custom.min.js"></script>
   <script type="text/javascript" src="jquery-ui-timepicker-addon.js"></script>
-  <script type="text/javascript" src="jquery.ui.datepicker-de.js"></script>  
+  <script type="text/javascript" src="jquery.ui.datepicker-de.js"></script>
 
   <script language="javascript">
 
     $(document).ready(
-        function(){    
+        function(){
           $('#sessions tr:odd').css('background-color', '#eee');
         }
     );
@@ -75,10 +75,10 @@
           <span tal:replace="python:str(session.get('end'))"/>
         </td>
         <td>
-          <a tal:attributes="href python:'TUDChat_log?chat_uid='+str(session.get('id'))">Log</a>
+          <a tal:attributes="href python:context.id + '/TUDChat_log?chat_uid='+str(session.get('id'))">Log</a>
         </td>
         <td>
-          <a tal:attributes="href python:'edit_session?chat_uid='+str(session.get('id'))">Bearbeiten</a>
+          <a tal:attributes="href python:context.id + '/edit_session?chat_uid='+str(session.get('id'))">Bearbeiten</a>
         </td>
         <td>
           <input type="checkbox" name="delete:list:int" tal:attributes="value session/id"/>
@@ -86,7 +86,7 @@
       </tr>
     </table>
   </div>
-    
+
   <div class="formControls">
     <input type="hidden" name="form.submitted" value="1" />
     <input class="context" type="submit" id="save" name="form.button.Delete" value="Delete" />
@@ -94,11 +94,11 @@
   </div>
 
 </form>
-    
+
 </metal:main>
 
 <metal:bottom fill-slot="bottom">
-  <div class="documentBottomLine"> 
+  <div class="documentBottomLine">
     <div metal:use-macro="here/document_byline/macros/byline">
         Get the byline - contains details about author and modification date.
     </div>

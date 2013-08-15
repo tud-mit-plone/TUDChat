@@ -15,7 +15,7 @@
               $("input[type='submit']").attr("disabled", "disabled");
 
               if (jQuery.inArray(Number($('[name=chatroom]').val()), password_channels) == -1){
-                  $.getJSON("registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val() }, function(response) {
+                  $.getJSON(base_url + "/registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val() }, function(response) {
 
                     $.doTimeout( 'enableSubmitButton', 2000, function(){
                         $("input[type='submit']").removeAttr("disabled");
@@ -32,7 +32,7 @@
                   $.notification.general("Diese Chat-Session ist durch ein Passwort geschützt. <br/> <br/><label for='password'>Passwort:<"+"/label> <input type='password' id='password'/>", false,
                                                                         [{"name" :"Ok",
                                                                             "click":function(){
-                                                                              $.getJSON("registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val(), password: $("#password").val() }, function(response) {
+                                                                              $.getJSON(base_url + "/registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val(), password: $("#password").val() }, function(response) {
                                                                                   if (response == true) {
                                                                                       window.location = base_url + "/chat?" + new Date().getTime();
                                                                                   } else {
@@ -47,19 +47,19 @@
 
               return false;
             });
-            $.get("status", '', function(data) {
+            $.get(base_url + "/status", '', function(data) {
                 $('#status').val(data);
             });
             $('#logout').click(function(e) {
                 e.preventDefault();
-                $.get('logout', '', function(data) {
-                   $.get("status", '', function(data) {
+                $.get(base_url + '/logout', '', function(data) {
+                   $.get(base_url + "/status", '', function(data) {
                     $('#status').val(data);
                    });
                 });
             });
             $('#updateStatus').click(function() {
-                $.get("status", '', function(data) {
+                $.get(base_url + "/status", '', function(data) {
                     $('#status').val(data);
                 });
             });
