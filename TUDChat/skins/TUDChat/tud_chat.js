@@ -17,6 +17,7 @@ var sendMessage = function(){
   $("#chatMsgSubmit").attr("disabled", "disabled");
   $("#logout").attr("disabled", "disabled");
   $("#chatMsgValue").val("");
+  $('#chatMsgValue').keyup();
 
 	$.post(base_url + "/sendMessage", { 'message': message },
         function(data) {                // Immediately update the chat, after sending the message
@@ -107,10 +108,11 @@ var updateCheck = function(){
       if(typeof(data.users['new'])!="undefined"){
         var user = data.users['new'].sort();
         for(var i in user) {
+          username = user[i]['name'];
           var added = false;
-          element = $(printNewUser(user[i])).attr("data-uname", user[i]);
+          element = $(printNewUser(username)).attr("data-uname", username);
           $("#userContainer").children().each(function(){ // Enumerate all existing names and insert alphabetically
-              if ($(this).text() > user[i]) {
+              if ($(this).text() > username) {
                   $(element).insertBefore($(this));
                   added = true;
                   return false;

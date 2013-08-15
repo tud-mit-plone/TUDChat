@@ -485,10 +485,10 @@ class TUDChat(BaseContent):
     ##########################################################################
 
     security.declarePrivate('addUser')
-    def addUser(self, user, ip, chat_uid):
+    def addUser(self, user, ip, chat_uid, is_admin):
         """ Add yourself to the userlist """
         if not self.chat_rooms[chat_uid]['chat_users'].has_key(user):
-            self.chat_rooms[chat_uid]['chat_users'][user] = {'ip_address': ip, 'date': DateTime().timeTime(), 'last_message_sent' : 0 }
+            self.chat_rooms[chat_uid]['chat_users'][user] = {'ip_address': ip, 'date': DateTime().timeTime(), 'last_message_sent' : 0, 'is_admin' : is_admin }
             self._p_changed = 1
             return True
         return False
@@ -602,7 +602,7 @@ class TUDChat(BaseContent):
                                     'banned_chat_users' : {}
                                     }
 
-        if not self.isBanned(REQUEST) and user and self.addUser(user, self.getIp(REQUEST), chatroom):
+        if not self.isBanned(REQUEST) and user and self.addUser(user, self.getIp(REQUEST), chatroom, self.isAdmin(REQUEST)):
             session.set('user_properties', {'name': user,
                                             'start_action' : start_action_id,
                                             'last_action': start_action_id,
@@ -788,7 +788,8 @@ class TUDChat(BaseContent):
                             },
                         'users':
                             {
-                                'new':       [ person for person in self.getUsers(chat_uid) if person not in session.get('user_properties').get('user_list') ],
+                                'new':       [ { 'name' : person,
+                                                 'is_admin' :  self.chat_rooms[chat_uid]['chat_users'][person]['is_admin']} for person in self.getUsers(chat_uid) if person not in session.get('user_properties').get('user_list')],
                                 'to_delete': [ person for person in session.get('user_properties').get('user_list') if person not in self.getUsers(chat_uid) ]
                             },
                         'status':
