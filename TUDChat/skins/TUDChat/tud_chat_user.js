@@ -8,9 +8,10 @@ function printMessage(message) {
     return "<li id=chatEntry"+message.id+" class='"+entry_classes+"'><span class='chatdate'>"+message.date+"</span><span class='username'>"+message.name+":</span> <span class='message_content'>"+parsed_message+"</span> "+(additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"</li>";
 }
 
-function printNewUser(user) {
+function printNewUser(user, role) {
     entry_classes = '';
     if (user == ownUsername)
         entry_classes += ' ownUsername';
-    return "<li class='chatUser "+entry_classes+"'>"+user+"</li>";
+    entry_classes += ' ' + role + 'role';
+    return "<li class='chatUser"+entry_classes+"'>"+user+"</li>";
 }

@@ -66,15 +66,15 @@ div#chatUser{
         position:relative;
     }
 
-    div#chatUser ul li.admin{
-        background-color:#acacac;
-        color:#fff;
+    div#chatUser ul li.adminrole{
+        font-style: italic;
     }
 
     div#chatUser ul li.ownUsername{
         font-weight:bold;
         text-decoration:underline;
     }
+
 
 div#chatMsg{
     min-height:0;
@@ -104,39 +104,41 @@ div#chatContent span.username{
     font-style: italic;
 }
 
-div#chatContent span.chatdate{
-    color: #555;
-    font-size: 10px;
-}
+    div#chatContent span.chatdate{
+        color: #555;
+        font-size: 10px;
+    }
 
-div#chatContent li.admin_delete  span.additional_content{
-    color: darkred;
-}
+    div#chatContent li.admin_delete  span.additional_content{
+        color: darkred;
+    }
 
-div#chatContent li.admin_delete  div.adminActions{
-    display: none !important;
-}
+    div#chatContent li.admin_delete  div.adminActions{
+        display: none !important;
+    }
 
-div#chatContent li.admin_edit span.additional_content {
-    color: darkgreen;
-}
+    div#chatContent li.admin_edit span.additional_content {
+        color: darkgreen;
+    }
 
-.hidden{
-    display: none;
-}
+    .hidden{
+        display: none;
+    }
 
-div#chatContent .admin_message .message_content {
-    font-weight: bold;
-}
+    div#chatContent .admin_message .message_content {
+        font-weight: bold;
+    }
 
 
-div#chatContent .message_content a {
-    color: #282C6A;
-}
+    div#chatContent .message_content a {
+        color: #282C6A;
+    }
 
-div#chatContent .message_content a:hover {
-    color: #58516C;
-}
+    div#chatContent .message_content a:hover {
+        color: #58516C;
+    }
+
+/* UI */
 
 input, select, option{
       padding:5px 2px;

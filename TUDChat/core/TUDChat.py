@@ -66,7 +66,7 @@ class TUDChat(BaseContent):
     timestamps               = {} # collection of timestamps to call methods in certain intervalls
     chat_rooms               = {} # chatroom container with userlist, kicked_users, banned_users and timestamps
     admin_roles              = ['Admin','ChatModerator']
-    admin_messages           = [] # list of message ids sended from admins
+    admin_messages           = [] # list of message ids sent from admins
     own_database_prefixes    = {} # for each connector_id the own prefixes in this database
     htmlspecialchars         = {'"':'&quot;', '\'':'&#039;', '<':'&lt;', '>':'&gt;'} # char "&" is in function included
 

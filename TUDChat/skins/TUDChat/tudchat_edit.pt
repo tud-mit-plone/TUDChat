@@ -1,30 +1,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
-
       xml:lang="en"
-
       lang="en"
-
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-
       xmlns:metal="http://xml.zope.org/namespaces/metal"
-
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-
       i18n:domain="plone">
-
-
 
   <metal:head define-macro="topslot">
 
   </metal:head>
 
-  
+
 
   <metal:head define-macro="javascript_head">
 
   </metal:head>
-
-
 
   <body>
 
@@ -36,21 +26,19 @@
 
         </metal:header>
 
-        
-
         <!-- typedesription, typeDescription from the content type -->
 
         <metal:typedescription define-macro="typedescription">
-          
+
+
+
         </metal:typedescription>
 
-
-
-        <!-- body, editform , fields, buttons, the default macro 
+        <!-- body, editform , fields, buttons, the default macro
 
              contains a number of slots which usually provide enough
 
-             ways to customise so often I use that macro and just 
+             ways to customise so often I use that macro and just
 
              fill the slots
 
@@ -63,10 +51,23 @@
               <!-- inside the fieldset but above all the fields -->
 
               <metal:block fill-slot="extra_top">
-                
+
+                <script type="text/javascript" src="jquery-1.7.min.js"></script>
+                <script type="text/javascript" src="jquery-ui-1.8.19.custom.min.js"></script>
+                <link rel="stylesheet" href="tud_chat_css/ui-lightness/jquery-ui-1.8.19.custom.css" type="text/css" media="screen" />
+
+                  <script language="javascript">
+
+                    $(document).ready(function(){
+                          console.log("hello world"); // TODO: add color selector
+                        });
+
+
+                  </script>
+
               </metal:block>
 
-              
+
 
               <!-- listing of the fields, usually I won't customise this
 
@@ -76,23 +77,21 @@
 
               -->
 
-
-
               <!-- below the fields above the formControls (hidden fields for refernce stuff is above buttons) -->
 
               <metal:block fill-slot="extra_bottom">
 
               </metal:block>
 
-
-
               <!-- within the formControls these are the default previous, next, save, cancel buttons -->
+
               <!--
+
               <metal:block fill-slot="buttons">
 
               </metal:block>
-              -->
 
+              -->
 
               <!-- within the formControls a slot for extra buttons -->
 
@@ -100,28 +99,20 @@
 
               </metal:block>
 
-
-
             </metal:default_body>
 
         </metal:body>
 
 
 
-        
-
         <!-- footer, by line created date etc. -->
 
         <metal:footer define-macro="footer">
 
-        
+
 
         </metal:footer>
 
-
-
   </body>
-
-
 
 </html>

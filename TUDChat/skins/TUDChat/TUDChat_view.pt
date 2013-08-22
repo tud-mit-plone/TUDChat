@@ -7,7 +7,7 @@
     <script language="javascript" src="jquery-1.7.min.js"></script>
     <script language="javascript" src="jquery.notification.js"></script>
     <script language="javascript" src="jquery.ba-dotimeout.min.js"></script>
-    <script type="text/javascript" tal:content="structure string:var base_url = '${here/absolute_url}';"></script>
+    <script type="text/javascript" tal:content="string:var base_url = '${here/absolute_url}';"></script>
     <script language="javascript">
     $(document).ready(
         function(){
@@ -70,6 +70,7 @@
 
 <metal:block metal:fill-slot="css_slot">
     <link rel="stylesheet" type="text/css" href="tud_chat.css" />
+    <link rel="stylesheet" type="text/css" tal:attributes="href string:${here/absolute_url}/tud_chat_additional.css" />
 </metal:block>
 
 </head>

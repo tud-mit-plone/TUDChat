@@ -8,11 +8,16 @@ function printMessage(message) {
     return "<li id=chatEntry"+message.id+" class='admin "+entry_classes+"'><span class='chatdate'>"+message.date+"</span><span class='username'>"+message.name+":</span> <span class='message_content'>"+parsed_message+"</span> "+(additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"<div class='adminActions hidden'><a href='#' class='edit' data-mid="+message.id+" title='Nachricht bearbeiten'>&nbsp;</a> <a href='#' class='delete' data-mid="+message.id+" title='Nachricht l&ouml;schen'>&nbsp;</a></div></li>";
 }
 
-function printNewUser(user) {
+function printNewUser(user, role) {
+    entry_classes = '';
     if (user == ownUsername)
-        return "<li class='chatUser ownUsername'>"+user+"</li>";
+        entry_classes += ' ownUsername';
+    entry_classes += ' ' + role + 'role';
+
+    if (user == ownUsername || role == 'admin')
+        return "<li class='chatUser"+entry_classes+"'>"+user+"</li>";
     else
-        return "<li class='chatUser'>"+user+"<div class='adminActions hidden'><a href='#' data-uname='"+user+"' class='ban' title='Benutzer aus Chat verbannen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='kick' title='Benutzer aus Chat entfernen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='warn' title='Benutzer verwarnen'>&nbsp;</a></div></li>";
+        return "<li class='chatUser"+entry_classes+"'>"+user+"<div class='adminActions hidden'><a href='#' data-uname='"+user+"' class='ban' title='Benutzer aus Chat verbannen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='kick' title='Benutzer aus Chat entfernen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='warn' title='Benutzer verwarnen'>&nbsp;</a></div></li>";
 }
 
 

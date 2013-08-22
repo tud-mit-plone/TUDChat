@@ -63,7 +63,7 @@ TUDChatSchema = BaseSchema.copy() + Schema((
         required        = False,
         widget          = StringWidget(
                 label                   = "Datenbank-Präfix",
-                description             = "Bitte geben Sie einen Präfix für Tabellen in der Datebank an; z.B.: 'institutionsname')",
+                description             = "Bitte geben Sie einen Präfix für Tabellen in der Datebank an; z.B.: 'institutionsname'",
                 i18n_domain             = "tudchat",
                 label_msgid             = "label_database_prefix",
                 description_msgid       = "help_database_prefix")
@@ -92,6 +92,17 @@ TUDChatSchema = BaseSchema.copy() + Schema((
                 description_msgid       = "help_chat_date_format",
                 format                  = "select",
         )
+    ),
+    StringField(
+        'adminColor',
+        default         = '#000000',
+        required        = True,
+        widget          = StringWidget(
+                label                   = "Textfarbe für Chatmoderator",
+                description             = "Bitte geben Sie die Textfarbe als HTML-Farbcode für die Chatmoderatoren an.",
+                i18n_domain             = "tudchat",
+                label_msgid             = "label_admin_color",
+                description_msgid       = "help_admin_color")
     ),
     IntegerField(
         'timeout',
@@ -134,7 +145,7 @@ TUDChatSchema = BaseSchema.copy() + Schema((
         default         = 1,
         required        = True,
         widget          = IntegerWidget(
-                label                   = "Abstand zwischen Nachrichten (in Sekunden)",
+                label                   = "Wartezeit zwischen Nachrichten (in Sekunden)",
                 description             = "Bitte geben Sie die Wartezeit an, bis der Benutzer wieder erneut eine Nachricht schicken kann.",
                 i18n_domain             = "tudchat",
                 label_msgid             = "label_blockTime",

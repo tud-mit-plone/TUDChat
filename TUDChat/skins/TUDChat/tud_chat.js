@@ -41,6 +41,11 @@ var goHierarchieUp = function(){
 	window.location = url.join('/');
 }
 
+var sortByName = function(object1, object2){
+  // Compare two objects by their 'name' properties
+  return object1.name > object2.name ? 1 : -1;
+}
+
 var updateCheck = function(){
 
 	if (updateCheckBlock) // temporary workaround
@@ -106,48 +111,54 @@ var updateCheck = function(){
 
     if(typeof(data.users)!="undefined"){
       if(typeof(data.users['new'])!="undefined"){
-        var user = data.users['new'].sort();
-        for(var i in user) {
-          username = user[i]['name'];
+        var users = data.users['new'].sort(sortByName);
+        // Get list of usernames
+        var usernames = $(users).map(function(){ return $(this).attr("name"); }).get();
+
+        for(var i in users) {
+          var username = usernames[i];
+          var role = users[i]['is_admin'] ? 'admin' : 'user';
           var added = false;
-          element = $(printNewUser(username)).attr("data-uname", username);
+          element = $(printNewUser(username, role)).attr("data-uname", username);
+
           $("#userContainer").children().each(function(){ // Enumerate all existing names and insert alphabetically
-              if ($(this).text() > username) {
-                  $(element).insertBefore($(this));
-                  added = true;
-                  return false;
-              }
-              });
+            if ($(this).text() > username) {
+                $(element).insertBefore($(this));
+                added = true;
+                return false;
+            }
+            });
+
           if (!added)
             element.appendTo($("#userContainer"));
-          };
+
+        };
           // Notification: User has entered the room
           if (!firstGetActions){
-            if (user.length == 1)
-              $("#chatContainer").append("<li><span class='username'>"+user+"</span> hat den Raum betreten.</li>");
-            else if (user.length != 0) {
-              last_user = user.pop();
-              $("#chatContainer").append("<li><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum betreten.</li>");
+            if (usernames.length == 1)
+              $("#chatContainer").append("<li><span class='username'>"+usernames+"</span> hat den Raum betreten.</li>");
+            else if (usernames.length != 0) {
+              last_user = usernames.pop();
+              $("#chatContainer").append("<li><span class='username'>"+usernames.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum betreten.</li>");
             }
           }
-
         }
 
-          if(typeof(data.users['to_delete'])!="undefined"){
-            user = data.users.to_delete.sort();
-            for(var i in user)
-              $(".chatUser[data-uname='"+user[i]+"']").remove();
-            // Notification: User has left the room
-            if (!firstGetActions){
-              if (user.length == 1)
-                $("#chatContainer").append("<li><span class='username'>"+user+"</span> hat den Raum verlassen.</li>");
-              else if (user.length != 0) {
-                last_user = user.pop();
-                $("#chatContainer").append("<li><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum verlassen.</li>");
-              }
+        if(typeof(data.users['to_delete'])!="undefined"){
+          user = data.users.to_delete.sort();
+          for(var i in user)
+            $(".chatUser[data-uname='"+user[i]+"']").remove();
+          // Notification: User has left the room
+          if (!firstGetActions){
+            if (user.length == 1)
+              $("#chatContainer").append("<li><span class='username'>"+user+"</span> hat den Raum verlassen.</li>");
+            else if (user.length != 0) {
+              last_user = user.pop();
+              $("#chatContainer").append("<li><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum verlassen.</li>");
             }
-
           }
+        }
+
       }
 
 		if(typeof(data.messages)!="undefined"){
