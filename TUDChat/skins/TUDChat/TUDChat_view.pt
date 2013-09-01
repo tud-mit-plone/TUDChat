@@ -10,12 +10,12 @@
     <script type="text/javascript" tal:content="string:var base_url = '${here/absolute_url}';"></script>
     <script language="javascript">
     $(document).ready(
-        function(){
+        function() {
             $('#login').submit(function() {
               $("input[type='submit']").attr("disabled", "disabled");
 
-              if (jQuery.inArray(Number($('[name=chatroom]').val()), password_channels) == -1){
-                  $.getJSON(base_url + "/registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val() }, function(response) {
+              if (jQuery.inArray(Number($('[name=chatroom]').val()), password_channels) == -1) {
+                  $.getJSON(base_url + "/registerMe", { user: $("input[name='username']").val(), chatroom: $("[name='chatroom']").val() }, function(response) {
 
                     $.doTimeout( 'enableSubmitButton', 2000, function(){
                         $("input[type='submit']").removeAttr("disabled");
@@ -28,40 +28,24 @@
                             $.notification.error(response.status.message);
                     }
                    });
-              }else{
+              } else {
                   $.notification.general("Diese Chat-Session ist durch ein Passwort geschützt. <br/> <br/><label for='password'>Passwort:<"+"/label> <input type='password' id='password'/>", false,
-                                                                        [{"name" :"Ok",
-                                                                            "click":function(){
-                                                                              $.getJSON(base_url + "/registerMe", { user: $("input[name='username']").val(), chatroom: $("select[name='chatroom']").val(), password: $("#password").val() }, function(response) {
-                                                                                  if (response == true) {
-                                                                                      window.location = base_url + "/chat?" + new Date().getTime();
-                                                                                  } else {
-                                                                                      if (response.status.message != '')
-                                                                                          $.notification.error(response.status.message);
-                                                                                  }
-                                                                              });
-                                                                            }},
-                                                                        {"name" :"Abbrechen", "click": $.notification.clear },
-                                                                         ]);
-              }
+                  [{"name" :"Ok",
+                     "click": function() {
+                       $.getJSON(base_url + "/registerMe", { user: $("input[name='username']").val(), chatroom: $("[name='chatroom']").val(), password: $("#password").val() }, function(response) {
+                           if (response == true) {
+                               window.location = base_url + "/chat?" + new Date().getTime();
+                           } else {
+                               if (response.status.message != '')
+                                   $.notification.error(response.status.message);
+                           }
+                       });
+                     }},
+                  {"name" :"Abbrechen", "click": $.notification.clear },
+                  ]);
 
+              }
               return false;
-            });
-            $.get(base_url + "/status", '', function(data) {
-                $('#status').val(data);
-            });
-            $('#logout').click(function(e) {
-                e.preventDefault();
-                $.get(base_url + '/logout', '', function(data) {
-                   $.get(base_url + "/status", '', function(data) {
-                    $('#status').val(data);
-                   });
-                });
-            });
-            $('#updateStatus').click(function() {
-                $.get(base_url + "/status", '', function(data) {
-                    $('#status').val(data);
-                });
             });
         }
     );
@@ -77,33 +61,60 @@
 
 <body metal:fill-slot="main" i18n:domain="tudchat">
 
-<h2>Willkommen zum Chat!</h2>
+<h2 tal:content="here/title"> Title of chat </h2>
+
+<div class="chat_introduction" tal:content="here/introduction"> Introduction </div>
 
 <tal:block define="sessions python:here.getActiveChatSessions();
                    next_sessions python:here.getNextChatSessions()"
            condition="python:here.getActiveChatSessions() is not None">
-    <form id="login" action="" tal:condition="python: len(sessions)>0">
-        <script language="javascript" tal:content="python: 'var password_channels = ['+','.join([str(session['id']) for session in sessions if session.get('password') != None])+'];'"></script>
-        <label for="">Raum</label>
-        <select name="chatroom">
-            <tal:block repeat="session sessions">
-                <option tal:attributes="value session/id" tal:content="session/name">Sins-Chat</option>
-            </tal:block>
-        </select>
-        <input type="text" name="username" maxlength="20"/>
-        <input type="submit" value="Anmelden" />
-        <button id='logout' tal:condition="python:here.isAdmin(here.REQUEST) == True">Logout (DEBUG)</button>
+
+
+    <form id="login" class="chat_login" action="" tal:condition="sessions">
+        <script language="javascript" tal:content="python: 'var password_channels = [' + ','.join([str(session['id']) for session in sessions if session.get('password') != None]) + '];'"></script>
+        <div class="chat_explanation"><span class="introduction">Hinweis zur Benutzung:</span>Bitte wählen Sie einen Raum und einen Benutzernamen aus. Bitte beachten Sie, dass ein Raum zeitlich geöffnet ist und der Benutzername den formalen Ansprüchen genügen muss (3 bis 20 Zeichen, davon mindestens ein Buchstabe). Die Chaträume werden <em>moderiert</em> und es können bei Fehlverhalten Konsequenzen in Form von einer Verwarnung und permanenter Verweisung des Chatraums folgen.</div>
+
+        <div>
+          <label for="chatroom">Raum</label>
+          <tal:block condition="python: len(sessions) > 1">
+            <select name="chatroom">
+                <tal:block repeat="session sessions">
+                    <option tal:attributes="value session/id" class="chat_option" tal:content="session/name"> Chat session name </option>
+                </tal:block>
+            </select>
+          </tal:block>
+          <tal:block condition="python: len(sessions) == 1" tal:define="session python:sessions[0]">
+            <input type="hidden" name="chatroom" tal:attributes="value session/id" /> <span class="chat_option" tal:content="session/name" />
+          </tal:block>
+        </div>
+
+        <div>
+          <label for="username">Benutzername</label>
+          <input type="text" name="username" id="username" maxlength="20"/>
+        </div>
+
+        <div>
+          <label for="submit">&nbsp;</label>
+          <input type="submit" name="submit" value="Anmelden"/>
+        </div>
     </form>
-    <p tal:condition="python: len(sessions)==0">Leider existiert zurzeit keine aktive Chat-Session.</p>
-    <p tal:condition="python: len(sessions)==0 and len(next_sessions)==0">Es befindet sich auch keine Chat-Session in Planung.</p>
-    <tal:block condition="python: len(next_sessions)>0">
-        <br />
-        Folgende Chat-Sessions finden zukünftig statt:
-        <table>
+
+    <tal:block condition="python: not sessions">
+      <div class="chat_nosession">
+        Leider existiert derzeit keine aktive Chatsitzung.
+        <span tal:condition="python: next_sessions">Es werden allerdings welche stattfinden.</span>
+        <span tal:condition="python: not next_sessions">Es befindet sich auch keine Chatsitzung in Planung.</span>
+      </div>
+    </tal:block>
+
+
+    <tal:block condition="python: next_sessions">
+        <h3>Folgende Chatsitzungen werden zukünftig stattfinden:</h3>
+        <table class="future_sessions">
             <thead>
                 <tr>
                     <th>Titel</th>
-                    <th>Startzeit</th>
+                    <th>Beginn</th>
                 </tr>
             </thead>
             <tbody>
@@ -116,14 +127,5 @@
     </tal:block>
 </tal:block>
 <p tal:condition="python:here.getActiveChatSessions() is None">Es wurde noch keine Datenbank konfiguriert. Diese kann in den Chat-Einstellungen eingestellt werden.</p>
-
-<tal:block condition="python:here.isAdmin(here.REQUEST) == True">
-  <br />
-  <div><a href="chat">Chat direkt betreten</a> (falls bereits angemeldet)</div>
-  <p>Status: (DEBUG)</p>
-  <textarea style="width:900px;height:100px;" id='status'></textarea>
-  <br/>
-  <button id='updateStatus'>Update status (DEBUG)</button>
-</tal:block>
 </body>
 </html>

@@ -46,6 +46,17 @@ BAN_STRATEGIES = DisplayList((
     ))
 
 TUDChatSchema = BaseSchema.copy() + Schema((
+    TextField(
+        'introduction',
+        default         = '',
+        required        = False,
+        widget          = TextAreaWidget(
+                label                   = "Begrüßungstext",
+                description             = "Bitte geben Sie den Text an, der bei der Raumauswahl angezeigt werden soll.",
+                i18n_domain             = "tudchat",
+                label_msgid             = "label_introduction",
+                description_msgid       = "help_introduction")
+    ),
     StringField(
         'connector_id',
         required        = True,

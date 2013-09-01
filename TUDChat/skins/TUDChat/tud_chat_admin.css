@@ -8,7 +8,7 @@ div.adminActions{
     right:0px;
     position: absolute;
 }
-    
+
 div.adminActions > a{
     text-decoration: none;
     opacity: 0.5;
@@ -18,7 +18,7 @@ div.adminActions > a{
     padding:0px 4px 3px 4px;
     display:block;
     float:right;
-}    
+}
 
 div.adminActions a:hover {
     background-color:transparent;
@@ -26,18 +26,18 @@ div.adminActions a:hover {
 
 div.adminActions > a:hover{
     opacity: 1.0;
-}    
+}
 
 a.edit {
     background-image: url('tud_chat_images/pen.png');
     background-repeat:
-    no-repeat; background-position: center top;
-} 
+    no-repeat; background-position: center center;
+}
 
 a.delete {
     background-image: url('tud_chat_images/false.png');
     background-repeat: no-repeat;
-    background-position: center top;
+    background-position: center center;
 }
 
 a.kick {

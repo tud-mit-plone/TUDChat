@@ -31,10 +31,12 @@ $(document).ready(
             $("li.selected").removeClass("selected");
             // Select current message
             $("#chatEntry"+mId).addClass("selected");
-            $.notification.warn("Nachricht bearbeiten <br/> <br/><label for='newMsg'>Neue Nachricht:</label><br/><br/> <input type='text' id='newMsg' value='"+oldMsg+"' class='editBox'/>", false,
-                                                                        [{"name" :"Speichern",
+            $.notification.warn("Nachricht bearbeiten <br/> <br/><form id='editMsgForm'><label for='newMsg'>Neue Nachricht:</label><br/><br/> <input type='text' id='newMsg' value='"+oldMsg+"' class='editBox'/></form>", false,
+                                                                        [{"name" :"Bearbeiten",
                                                                             "click":function(){
-                                                                              $.post(base_url + "/editMessage", { 'message_id' :mId, 'message': $("#newMsg").val() } , function(data) { updateCheck(); });
+                                                                              if (oldMsg != $("#newMsg").val()) {
+                                                                                $.post(base_url + "/editMessage", { 'message_id' :mId, 'message': $("#newMsg").val() } , function(data) { updateCheck(); });
+                                                                              }
                                                                               $("#chatEntry"+mId).removeClass("selected");
                                                                               $.notification.clear();
                                                                             }},
@@ -74,7 +76,7 @@ $(document).ready(
 
         $("body").delegate("a.ban", "click", function(e) {
             user = $(e.target).attr("data-uname");
-            $.notification.warn("Wollen Sie wirklich den Benutzer \"" + user + "\" aus dem Chat verbannen? <br/> <br/><label for='ban_reason'>Banngrund:</label> <input type='text' id='ban_reason'/>", false,
+            $.notification.warn("Wollen Sie wirklich den Benutzer \"" + user + "\" aus dem Chat verbannen? <br/> <br/><form id='banUserForm'><label for='ban_reason'>Banngrund:</label> <input type='text' id='ban_reason'/></form>", false,
                                                                         [{"name" :"Ok",
                                                                             "click":function(){
                                                                               $.get(base_url + "/banUser", { "user": $(e.target).attr("data-uname"), "reason": $("#ban_reason").val() }, function(data) { updateCheck(); });
@@ -87,7 +89,7 @@ $(document).ready(
 
         $("body").delegate("a.warn", "click", function(e) {
             user = $(e.target).attr("data-uname");
-            $.notification.warn("Welche Verwarnung wollen Sie dem Benutzer \"" + user + "\" aussprechen? <br/> <br/><label for='warning'>Warnung:</label> <input type='text' id='warning'/>", false,
+            $.notification.warn("Welche Verwarnung wollen Sie dem Benutzer \"" + user + "\" aussprechen? <br/> <br/><form id='warnUserForm'><label for='warning'>Warnung:</label> <input type='text' id='warning'/></form>", false,
                                                                         [{"name" :"Ok",
                                                                             "click":function(){
                                                                               $.get(base_url + "/warnUser", { "user": $(e.target).attr("data-uname"), "warning": $("#warning").val() }, function(data) { updateCheck(); });

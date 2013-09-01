@@ -310,7 +310,10 @@ class TUDChat(BaseContent):
             user_properties=session.get('user_properties')
             if user_properties:
                 chat_uid=user_properties.get('chat_room')
-                return self.chat_storage.getChatSession(chat_uid)
+                session_info = self.chat_storage.getChatSession(chat_uid)
+                session_info['start'] = session_info['start'].strftime('%d.%m.%Y, %H:%M Uhr')
+                session_info['end'] = session_info['end'].strftime('%d.%m.%Y, %H:%M Uhr')
+                return session_info
         return None
 
     ##########################################################################
@@ -722,6 +725,7 @@ class TUDChat(BaseContent):
 
         if not self.isRegistered(REQUEST):
             return simplejson.dumps({'status': {'code': UserStatus.NOT_AUTHORIZED, 'message': 'NOT AUTHORIZED'}})
+
 
         user_properties = session.get('user_properties')
         old_user_properties = user_properties.copy()

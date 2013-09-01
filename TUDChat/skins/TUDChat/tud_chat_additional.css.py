@@ -19,8 +19,11 @@ div#chatUser ul li.adminrole {
     color: %s;
 }
 #chatContent li.admin_message {
-    color: %s
+    color: %s;
 }
-""" % (context.adminColor, context.adminColor)
+#chatAppendix .admin {
+    color: %s;
+}
+""" % (context.adminColor, context.adminColor, context.adminColor)
 
 return css

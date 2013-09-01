@@ -1,19 +1,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"
       lang="en-US"
       metal:use-macro="here/main_template/macros/master"
-      i18n:domain="contact">    
-            
+      i18n:domain="contact">
+
 <body>
 <metal:javascriptslot fill-slot="javascript_head_slot">
   <script type="text/javascript" src="jquery-1.7.min.js"></script>
   <script type="text/javascript" src="jquery-ui-1.8.19.custom.min.js"></script>
   <script type="text/javascript" src="jquery-ui-timepicker-addon.js"></script>
-  <script type="text/javascript" src="jquery.ui.datepicker-de.js"></script>  
+  <script type="text/javascript" src="jquery.ui.datepicker-de.js"></script>
 
   <script language="javascript">
 
     $(document).ready(
-        function(){    
+        function(){
           $("#start_date, #end_date").datetimepicker({
             timeFormat: 'hh:mm',
             dateFormat: 'dd.mm.yy,',
@@ -55,7 +55,7 @@
     <div class="error_message" tal:condition="error" tal:content="error"></div>
     <input type="text" id="title" name="title" tal:attributes="value session_info/name|nothing"/>
   </div>
-  
+
   <div tal:define="error errors/title | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
     <label for="description">Beschreibung</label>
     <div class="formHelp">Bitte geben Sie eine Beschreibung für die Chat-Sitzung an.</div>
@@ -66,7 +66,7 @@
   <div tal:define="error errors/start_date | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
     <label for="start_date">Beginn</label>
     <span class="fieldRequired" title="Required"> (Required) </span>
-    <div class="formHelp">Bitte geben Sie den Beginn der Chat-Sitzung an.</div> 
+    <div class="formHelp">Bitte geben Sie den Beginn der Chat-Sitzung an.</div>
     <div class="error_message" tal:condition="error" tal:content="error"></div>
     <input type="text" id="start_date" name="start_date" tal:attributes="value session_info/start|nothing"/>
   </div>
@@ -74,26 +74,26 @@
   <div tal:define="error errors/end_date | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
     <label for="end_date">Ende</label>
     <span class="fieldRequired" title="Required"> (Required) </span>
-    <div class="formHelp">Bitte geben Sie das Ende der Chat-Sitzung an.</div> 
+    <div class="formHelp">Bitte geben Sie das Ende der Chat-Sitzung an.</div>
     <div class="error_message" tal:condition="error" tal:content="error"></div>
     <input type="text" id="end_date" name="end_date" tal:attributes="value session_info/end|nothing"/>
   </div>
-  
+
   <div tal:define="error errors/password | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
     <label for="end_date">Passwort</label>
-    <div class="formHelp">Bitte geben Sie ein Passwort für die Chat-Session an, falls Sie den Zugang beschränken wollen.</div> 
+    <div class="formHelp">Bitte geben Sie ein Passwort für die Chat-Sitzun an, falls Sie den Zugang beschränken wollen.</div>
     <div class="error_message" tal:condition="error" tal:content="error"></div>
     <input type="text" id="password" name="password" tal:attributes="value session_info/password|nothing"/>
   </div>
-  
+
   <div tal:define="error errors/max_users | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
     <label for="end_date">maximale Benutzer</label>
-    <div class="formHelp">Bitte geben Sie die maximale Benutzerzahl ein, falls Sie die Anzahl der Chat-Benutzer limitieren möchten.</div> 
+    <div class="formHelp">Bitte geben Sie die maximale Benutzerzahl ein, falls Sie die Anzahl der Chat-Benutzer limitieren möchten.</div>
     <div class="error_message" tal:condition="error" tal:content="error"></div>
     <input type="text" id="max_users" name="max_users" tal:attributes="value session_info/max_users|nothing"/>
   </div>
 
-    
+
   <div class="formControls">
     <input type="hidden" name="chat_uid" id="chat_uid" tal:attributes="value session_info/id" />
     <input type="hidden" name="form.submitted" value="1" />
@@ -102,13 +102,13 @@
   </div>
 
 </form>
-    
+
 </div>
 
 </metal:main>
 
 <metal:bottom fill-slot="bottom">
-  <div class="documentBottomLine"> 
+  <div class="documentBottomLine">
     <div metal:use-macro="here/document_byline/macros/byline">
         Get the byline - contains details about author and modification date.
     </div>

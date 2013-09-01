@@ -22,7 +22,7 @@
 
         <metal:header define-macro="header">
 
-            <h1>Config</h1>
+            <h1>Chat-Einstellungen</h1>
 
         </metal:header>
 

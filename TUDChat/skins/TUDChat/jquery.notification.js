@@ -210,7 +210,7 @@
                 item.css("cursor","pointer");
                 item.click(function(){
                     $.notification.close(id);
-                });                
+                });
             }
             messages.append(item);
 
@@ -227,6 +227,21 @@
                 item.children("input").focus();
               else
                 item.find("button:first-child").focus();
+              // Have a form element? Delegate submit handler to first button
+              if (item.children("form").length) {
+                item.children("form").submit(function(event){
+                  item.find("button:first-child").click();
+                  return false;
+                });
+              }
+            });
+
+            // Hook disable, press last button (abort) or at least close the window
+            $(document).on("keyup.notification", function(event) {
+                  if(event.keyCode == 27) {
+                    $(document).unbind('keyup.notification');
+                    item.find("button:last-child").click();
+                  }
             });
 
             open_messages.push(item);

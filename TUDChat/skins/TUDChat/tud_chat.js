@@ -15,7 +15,6 @@ var sendMessage = function(){
 
 	sendMessageBlock = true;
   $("#chatMsgSubmit").attr("disabled", "disabled");
-  $("#logout").attr("disabled", "disabled");
   $("#chatMsgValue").val("");
   $('#chatMsgValue').keyup();
 
@@ -26,10 +25,10 @@ var sendMessage = function(){
         );
   $.doTimeout( 'remove_sendMessageBlock', blockTime, function(){
       $("#chatMsgSubmit").removeAttr("disabled");
-      $("#logout").removeAttr("disabled");
     	$("#chatMsgValue").focus();
     	sendMessageBlock = false;
   });
+  return false;
 };
 
 var goHierarchieUp = function(){
@@ -70,7 +69,7 @@ var updateCheck = function(){
 			if (data.status.message != "") {
 				kickmessage = data.status.message;
 			}else{
-				kickmessage = "Sie wurden von einem Administrator des Chats verwiesen!";
+				kickmessage = "Sie wurden von einem Moderator des Chats verwiesen!";
 			}
 			$.notification.error(kickmessage, false, [{"name" :"Ok",
                                                                           "click":function(){
@@ -119,7 +118,7 @@ var updateCheck = function(){
           var username = usernames[i];
           var role = users[i]['is_admin'] ? 'admin' : 'user';
           var added = false;
-          element = $(printNewUser(username, role)).attr("data-uname", username);
+          element = $(printNewUser(username, role)).attr({"data-uname": username, "title": role == 'admin' ? username + " ist Moderator." : ""});
 
           $("#userContainer").children().each(function(){ // Enumerate all existing names and insert alphabetically
             if ($(this).text() > username) {
@@ -259,14 +258,9 @@ var applyAttributes = function (message, attributes) {
 $(document).ready(
 	function(){
 		jQuery.ajaxSetup({'cache':false});
-		$("#chatMsgSubmit").click(sendMessage);
-		$("#chatMsgValue").keypress(
-			function(event){
-				if(event.keyCode == 13) {
-					sendMessage();
-        }
-			}
-		);
+
+    $("#chatMsgForm").submit(sendMessage);
+
 		$.get(base_url + "/resetLastAction", function(data){
 		updateCheckTimeout();
 		});
@@ -315,11 +309,11 @@ $(document).ready(
 
     //counter
     if(maxMessageLength>0){
-      $('#chatMsgValue').keyup(function(event){
-        $('#counter').text(maxMessageLength-$('#chatMsgValue').val().length);
+      $('#chatMsgValue').bind("keypress keyup", function(event){
+        $('#counter').text((maxMessageLength-$('#chatMsgValue').val().length) + " / " + maxMessageLength);
       });
 
-      $('#chatMsgValue').keyup();
+      $('#chatMsgValue').keypress();
     }
 
 	}
