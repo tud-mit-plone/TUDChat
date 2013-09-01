@@ -81,7 +81,7 @@
 
   <div tal:define="error errors/password | python:{};" tal:attributes="class python: 'field' + (error and ' error' or '')">
     <label for="end_date">Passwort</label>
-    <div class="formHelp">Bitte geben Sie ein Passwort für die Chat-Sitzun an, falls Sie den Zugang beschränken wollen.</div>
+    <div class="formHelp">Bitte geben Sie ein Passwort für die Chat-Sitzung an, falls Sie den Zugang beschränken wollen.</div>
     <div class="error_message" tal:condition="error" tal:content="error"></div>
     <input type="text" id="password" name="password" tal:attributes="value session_info/password|nothing"/>
   </div>
