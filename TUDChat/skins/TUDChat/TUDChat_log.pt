@@ -51,7 +51,7 @@
   <tbody>
     <tr tal:repeat="message log">
       <td tal:content="message/id"></td>
-      <td tal:content="message/date"></td>
+      <td tal:content="python: message['date'].strftime('%d.%m.%Y %H:%M:%S')"></td>
       <td tal:content="message/user"></td>
       <td tal:content="message/message"></td>
     </tr>
