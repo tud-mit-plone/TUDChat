@@ -29,19 +29,25 @@
                     }
                    });
               } else {
-                  $.notification.general("Diese Chat-Session ist durch ein Passwort geschützt. <br/> <br/><label for='password'>Passwort:<"+"/label> <input type='password' id='password'/>", false,
+                  $.notification.warn("Diese Chat-Session ist durch ein Passwort geschützt. <br/> <br/><form id='passwordForm'><label for='password'>Passwort:<"+"/label> <input type='password' id='password'/><"+"/form>", false,
                   [{"name" :"Ok",
                      "click": function() {
                        $.getJSON(base_url + "/registerMe", { user: $("input[name='username']").val(), chatroom: $("[name='chatroom']").val(), password: $("#password").val() }, function(response) {
+
                            if (response == true) {
                                window.location = base_url + "/chat?" + new Date().getTime();
                            } else {
                                if (response.status.message != '')
                                    $.notification.error(response.status.message);
+                                   $("input[type='submit']").removeAttr("disabled");
                            }
                        });
                      }},
-                  {"name" :"Abbrechen", "click": $.notification.clear },
+                  {"name" :"Abbrechen", "click": function() {
+                    $.notification.clear();
+                    $("input[type='submit']").removeAttr("disabled");
+                    }
+                  },
                   ]);
 
               }
@@ -90,7 +96,7 @@
 
         <div>
           <label for="username">Benutzername</label>
-          <input type="text" name="username" id="username" maxlength="20"/>
+          <input type="text" name="username" id="username" maxlength="20" />
         </div>
 
         <div>

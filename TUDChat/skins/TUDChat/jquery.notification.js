@@ -223,8 +223,8 @@
             }
             item.fadeIn($.notification.options.fadeInSpeed, function() {
               // Focus input field or if non-given first button
-              if (item.children("input").length)
-                item.children("input").focus();
+              if (item.find("input").length)
+                item.find("input").focus();
               else
                 item.find("button:first-child").focus();
               // Have a form element? Delegate submit handler to first button
