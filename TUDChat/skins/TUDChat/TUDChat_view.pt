@@ -14,45 +14,34 @@
             $('#login').submit(function() {
               $("input[type='submit']").attr("disabled", "disabled");
 
-              if (jQuery.inArray(Number($('[name=chatroom]').val()), password_channels) == -1) {
-                  $.getJSON(base_url + "/registerMe", { user: $("input[name='username']").val(), chatroom: $("[name='chatroom']").val() }, function(response) {
+              $.getJSON(base_url + "/registerMe", { user: $("input[name='username']").val(), chatroom: $("[name='chatroom']").val(), password: $("#password").val() }, function(response) {
 
-                    $.doTimeout( 'enableSubmitButton', 2000, function(){
-                        $("input[type='submit']").removeAttr("disabled");
-                    });
-
-                    if (response == true) {
-                        window.location = base_url + "/chat?" + new Date().getTime();
-                    } else {
-                        if (response.status.message != '')
-                            $.notification.error(response.status.message);
-                    }
-                   });
-              } else {
-                  $.notification.warn("Diese Chat-Session ist durch ein Passwort geschützt. <br/> <br/><form id='passwordForm'><label for='password'>Passwort:<"+"/label> <input type='password' id='password'/><"+"/form>", false,
-                  [{"name" :"Ok",
-                     "click": function() {
-                       $.getJSON(base_url + "/registerMe", { user: $("input[name='username']").val(), chatroom: $("[name='chatroom']").val(), password: $("#password").val() }, function(response) {
-
-                           if (response == true) {
-                               window.location = base_url + "/chat?" + new Date().getTime();
-                           } else {
-                               if (response.status.message != '')
-                                   $.notification.error(response.status.message);
-                                   $("input[type='submit']").removeAttr("disabled");
-                           }
-                       });
-                     }},
-                  {"name" :"Abbrechen", "click": function() {
-                    $.notification.clear();
+                $.doTimeout( 'enableSubmitButton', 2000, function(){
                     $("input[type='submit']").removeAttr("disabled");
-                    }
-                  },
-                  ]);
+                });
 
-              }
+                if (response == true) {
+                    window.location = base_url + "/chat?" + new Date().getTime();
+                } else {
+                    if (response.status.message != '')
+                        $.notification.error(response.status.message);
+                }
+               });
               return false;
             });
+
+            function updateVisibilityPasswordField() {
+              if (jQuery.inArray(Number($('[name=chatroom]').val()), password_channels) != -1) {
+                $(".password_field").show().children("#password").val("");
+              } else {
+                $(".password_field").hide().children("#password").val("");
+              }
+            }
+
+            updateVisibilityPasswordField();
+            $('[name=chatroom]').change(updateVisibilityPasswordField);
+
+
         }
     );
     </script>
@@ -97,6 +86,11 @@
         <div>
           <label for="username">Benutzername</label>
           <input type="text" name="username" id="username" maxlength="20" />
+        </div>
+
+        <div class="password_field">
+          <label for="password">Passwort</label>
+          <input type="password" name="password" id="password" />
         </div>
 
         <div>

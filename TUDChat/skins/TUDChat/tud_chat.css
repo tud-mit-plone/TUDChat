@@ -244,10 +244,13 @@ input[disabled="disabled"], button[disabled="disabled"] {
     text-shadow: #eee 0 1px 0;
 }
 
-input[type="text"], select {
+input[type="text"], select, input[type="password"] {
     box-shadow: inset 0px 0px 2px rgba(0, 0, 0, 0.25);
     background-color: #fff;
     background-image: none;
+}
+input[type="password"] {
+
 }
 
 option{
@@ -310,6 +313,10 @@ table.future_sessions td, table.future_sessions th {
 
 span.chat_option {
     font-weight: normal;
+}
+
+.password_field {
+    display: none;
 }
 
 #chatAppendix {
