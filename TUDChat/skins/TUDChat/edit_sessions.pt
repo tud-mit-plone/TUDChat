@@ -29,7 +29,19 @@
 
   <style type="text/css">
   <!--
-    #session th { text-align:center; }
+    #sessions th, #sessions td {
+      text-align:center;
+      padding: 0 5px;
+    }
+    #sessions tr td:first-child + td {
+      text-align:left;
+    }
+
+    #sessions .info {
+      font-style: italic;
+      color: #555;
+    }
+
   -->
   </style>
 
@@ -49,8 +61,8 @@
         <th>Titel</th>
         <th>Passwort</th>
         <th>maximale Benutzer</th>
-        <th>Start-Zeit</th>
-        <th>Ende-Zeit</th>
+        <th>Startzeit</th>
+        <th>Endzeit</th>
         <th>Protokoll</th>
         <th>Bearbeiten</th>
         <th>Löschen?</th>
@@ -63,19 +75,25 @@
           <span tal:replace="session/name"/>
         </td>
         <td>
-          <span tal:replace="session/password"/>
+          <tal:value condition="session/password" replace="session/password" />
+          <tal:Altvalue condition="not:session/password">
+            <span class="info" tal:content="string:Keine Passwort gesetzt" />
+          </tal:Altvalue>
         </td>
         <td>
-          <span tal:replace="session/max_users"/>
+          <tal:value condition="session/max_users" replace="session/max_users" />
+          <tal:Altvalue condition="not:session/max_users">
+            <span class="info" tal:content="string:Keine Begrenzung" />
+          </tal:Altvalue>
         </td>
         <td>
-          <span tal:replace="python:str(session.get('start'))"/>
+          <span tal:replace="python:session.get('start').strftime('%d.%m.%Y, %H:%M Uhr')"/>
         </td>
         <td>
-          <span tal:replace="python:str(session.get('end'))"/>
+          <span tal:replace="python:session.get('end').strftime('%d.%m.%Y, %H:%M Uhr')"/>
         </td>
         <td>
-          <a tal:attributes="href python:context.id + '/TUDChat_log?chat_uid='+str(session.get('id'))">Log</a>
+          <a tal:attributes="href python:context.id + '/TUDChat_log?chat_uid='+str(session.get('id'))">Log ansehen</a>
         </td>
         <td>
           <a tal:attributes="href python:context.id + '/edit_session?chat_uid='+str(session.get('id'))">Bearbeiten</a>
@@ -89,8 +107,8 @@
 
   <div class="formControls">
     <input type="hidden" name="form.submitted" value="1" />
-    <input class="context" type="submit" id="save" name="form.button.Delete" value="Delete" />
-    <input class="context" type="submit" id="cancel_button" name="form.button.Cancel" value="Cancel" />
+    <input class="context" type="submit" id="save" name="form.button.Delete" value="Ausgew&auml;hlte Chat-Sitzungen l&ouml;schen" />
+    <input class="context" type="submit" id="cancel_button" name="form.button.Cancel" value="Abbrechen" />
   </div>
 
 </form>

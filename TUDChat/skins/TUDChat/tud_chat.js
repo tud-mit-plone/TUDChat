@@ -40,9 +40,9 @@ var goHierarchieUp = function(){
 	window.location = url.join('/');
 }
 
-var sortByName = function(object1, object2){
-  // Compare two objects by their 'name' properties
-  return object1.name > object2.name ? 1 : -1;
+var sortByRoleName = function(object1, object2){
+  // Compare two objects by their 'role' and 'name' properties lexicographically
+  return [!object1.is_admin, object1.name] >= [!object2.is_admin, object2.name] ? 1 : -1;
 }
 
 var updateCheck = function(){
@@ -110,7 +110,7 @@ var updateCheck = function(){
 
     if(typeof(data.users)!="undefined"){
       if(typeof(data.users['new'])!="undefined"){
-        var users = data.users['new'].sort(sortByName);
+        var users = data.users['new'].sort(sortByRoleName);
         // Get list of usernames
         var usernames = $(users).map(function(){ return $(this).attr("name"); }).get();
 
@@ -121,7 +121,9 @@ var updateCheck = function(){
           element = $(printNewUser(username, role)).attr({"data-uname": username, "title": role == 'admin' ? username + " ist Moderator." : ""});
 
           $("#userContainer").children().each(function(){ // Enumerate all existing names and insert alphabetically
-            if ($(this).text() > username) {
+            var otherRole = $(this).hasClass('adminrole');
+            var otherUsername = $(this).text();
+            if ([!otherRole, otherUsername] >= [role != 'admin', username]) {
                 $(element).insertBefore($(this));
                 added = true;
                 return false;

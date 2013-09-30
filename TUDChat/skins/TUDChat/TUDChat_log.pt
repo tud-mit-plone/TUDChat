@@ -7,8 +7,8 @@
   <script language="javascript">
 
     $(document).ready(
-        function(){    
-          $('#logtable tr:odd').css('background-color', '#eee');
+        function(){
+          $('#logtable tr:odd, #infotable tr:odd').css('background-color', '#eee');
         }
     );
 
@@ -17,10 +17,52 @@
 
 </metal:javascriptslot>
 
-<metal:block metal:fill-slot="css_slot">   
+<metal:block metal:fill-slot="css_slot">
   <style type="text/css">
   <!--
-    #logtable th { text-align:center; }
+    #infotable th, #infotable td {
+      padding: 0 5px;
+    }
+
+    #infotable td:first-child {
+      padding-right: 15px;
+    }
+
+    #infotable .info {
+      font-style: italic;
+      color: #555;
+    }
+
+    #logtable {
+      width: 100%;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    #logtable th {
+      text-align:center;
+    }
+    #logtable td {
+      padding: 0 5px;
+    }
+
+    #logtable th.column_id {
+      width: 3%;
+    }
+
+    #logtable th.column_time {
+      width: 10%;
+    }
+
+    #logtable th.column_name {
+      width: 8%;
+    }
+
+    #logtable td.column_id, #logtable td.column_time, #logtable td.column_name {
+      text-align: center;
+    }
+
+
   -->
   </style>
 </metal:block>
@@ -32,28 +74,66 @@
                   session_info python: here.getChatSessionInfo(chat_uid);
                   log python: here.getLogs(chat_uid)">
 
-<h2>Chat-Log</h2>
-<span tal:content="python: 'Chat-ID: '+str(session_info['id'])"></span><br />
-<span tal:content="python: 'Name: '+session_info['name']"></span><br />
-<span tal:content="python: 'Beschreibung: '+session_info['description']"></span><br />
-<span tal:content="python: 'Passwort: '+(session_info.get('password') or '')"></span><br />
-<span tal:content="python: 'maximale Benutzer: '+(session_info.get('max_users') and str(session_info.get('max_users')) or 'keine Begrenzung')"></span><br />
-<span tal:content="python: 'Startzeit: '+str(session_info['start'])"></span><br />
-<span tal:content="python: 'Endzeit: '+str(session_info['end'])"></span>
+<h1>Chat-Log</h1>
+<table id="infotable">
+    <tr>
+      <th colspan="2">
+        Informationen zur Sitzung:
+      </th>
+    </tr>
+    <tr>
+      <td>Chat-ID</td>
+      <td tal:content="session_info/id"></td>
+    </tr>
+    <tr>
+      <td>Name</td>
+      <td tal:content="session_info/name"></td>
+    </tr>
+    <tr>
+      <td>Beschreibung</td>
+      <td tal:content="session_info/description"></td>
+    </tr>
+    <tr>
+      <td>Passwort</td>
+      <td>
+        <tal:value condition="session_info/password" replace="session_info/password" />
+        <tal:Altvalue condition="not:session_info/password">
+          <span class="info" tal:content="string:Keine Passwort gesetzt" />
+        </tal:Altvalue>
+      </td>
+    </tr>
+    <tr>
+      <td>maximale Benutzer</td>
+      <td>
+        <tal:value condition="session_info/max_users" replace="session_info/max_users" />
+        <tal:Altvalue condition="not:session_info/max_users">
+          <span class="info" tal:content="string:Keine Begrenzung" />
+        </tal:Altvalue>
+      </td>
+    </tr>
+    <tr>
+      <td>Startzeit</td>
+      <td tal:content="session_info/start"></td>
+    </tr>
+    <tr>
+      <td>Endzeit</td>
+      <td tal:content="session_info/end"></td>
+    </tr>
+</table>
 
 <table id="logtable">
   <thead>
-    <th>ID</th>
-    <th>Zeit</th>
-    <th>Name</th>
-    <th>Nachricht</th>
+    <th class="column_id">ID</th>
+    <th class="column_time">Zeit</th>
+    <th class="column_name">Name</th>
+    <th class="column_message">Nachricht</th>
   </thead>
   <tbody>
     <tr tal:repeat="message log">
-      <td tal:content="message/id"></td>
-      <td tal:content="python: message['date'].strftime('%d.%m.%Y %H:%M:%S')"></td>
-      <td tal:content="message/user"></td>
-      <td tal:content="message/message"></td>
+      <td class="column_id" tal:content="message/id"></td>
+      <td class="column_time" tal:content="python: message['date'].strftime('%d.%m.%Y, %H:%M:%S Uhr')"></td>
+      <td class="column_name" tal:content="message/user"></td>
+      <td class="column_message" tal:content="message/message"></td>
     </tr>
   </tbody>
 </table>

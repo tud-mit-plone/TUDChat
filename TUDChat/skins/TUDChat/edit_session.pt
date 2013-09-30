@@ -97,8 +97,8 @@
   <div class="formControls">
     <input type="hidden" name="chat_uid" id="chat_uid" tal:attributes="value session_info/id" />
     <input type="hidden" name="form.submitted" value="1" />
-    <input class="context" type="submit" id="save" name="form.button.Create" value="Save" />
-    <input class="context" type="submit" id="cancel_button" name="form.button.Cancel" value="Cancel" />
+    <input class="context" type="submit" id="save" name="form.button.Create" value="Speichern" />
+    <input class="context" type="submit" id="cancel_button" name="form.button.Cancel" value="Abbrechen" />
   </div>
 
 </form>
