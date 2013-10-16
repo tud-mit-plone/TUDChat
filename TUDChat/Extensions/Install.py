@@ -18,18 +18,8 @@ from Products.TUDChat.config import *
 
 def setPermissions(self, out):
     """
-    setPermissions(self) => Set standard permissions / roles
     """
-    # As a default behavior, newly-created permissions are granted to owner and manager.
-    # To change this, just comment this code and grab back the code commented below to
-    # make it suit your needs.
-    for perm in PERMS_LIST:
-        self.manage_permission(perm, ('Manager', 'Owner'), acquire=1)
-
-    # Set special permissions
-    self.manage_permission(TUDChat_restrictedChatPermission, ('Member', 'Manager', 'Owner', ), acquire=1)
-    self.manage_permission(TUDChat_moderatePermission, ('Reviewer', 'Manager', ), acquire=1)
-    out.write("Reseted default permissions\n")
+    pass
 
 def install(self):
     """
@@ -38,7 +28,7 @@ def install(self):
 
     # install types
     typeInfo = listTypes(PROJECTNAME)
-    installTypes(self, out, typeInfo, PROJECTNAME)    
+    installTypes(self, out, typeInfo, PROJECTNAME)
     
     # install skin
     install_subskin(self, out, GLOBALS)
@@ -46,6 +36,16 @@ def install(self):
     # Add portal types to use portal factory
     pftool = getToolByName(self, 'portal_factory')
     pftool.manage_setPortalFactoryTypes(listOfTypeIds=(PROJECTNAME,))
+    
+    # install tool
+    portal_root = self.portal_url.getPortalObject()
+    if not hasattr(portal_root, "portal_tud_chat"):
+        portal_root.manage_addProduct['TUDChat'].manage_addTool('TUDChatTool')
+    
+    # add role for Chat Moderator
+    portal_root = self.portal_url.getPortalObject()
+    portal_root._addRole('ChatModerator')
+    portal_root.manage_role('ChatModerator', ('Access contents information', 'Manage properties', 'Modify portal content', 'View'))
 
     out.write('Installation completed.\n')
     return out.getvalue()

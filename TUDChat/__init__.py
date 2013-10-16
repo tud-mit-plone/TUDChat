@@ -31,7 +31,6 @@ def initialize(context):
     
     ret = ContentInit('%s Content' % PROJECTNAME,
                 content_types = tuple(content_types),
-                permission = TUDChat_addPermission,
                 extra_constructors = tuple(constructors),
                 fti = ftis,
                 ).initialize(context)

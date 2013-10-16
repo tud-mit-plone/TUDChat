@@ -52,7 +52,6 @@ class TUDChatTool(UniqueObject, SimpleItem):
     security.declareProtected(manage_properties, 'chat_list')
     chat_list = PageTemplateFile('../skins_tool/chat_list.pt', globals())
     
-    security.declarePrivate(TUDChat_moderatePermission, 'pathCleaner')
     def pathCleaner(self, path):
         """
             This function remove slash groups and slashes at the beginning and at the end of the path.
@@ -69,7 +68,6 @@ class TUDChatTool(UniqueObject, SimpleItem):
         
         return path
     
-    security.declareProtected(TUDChat_moderatePermission, 'getChatList')
     def getChatList(self):
         """
             This function search all TUDChats in the system, which are registered in the catalog.
