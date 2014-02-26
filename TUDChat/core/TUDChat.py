@@ -66,7 +66,6 @@ class TUDChat(BaseContent):
     timestamps               = {} # collection of timestamps to call methods in certain intervalls
     chat_rooms               = {} # chatroom container with userlist, kicked_users, banned_users and timestamps
     admin_roles              = ['Admin','ChatModerator']
-    admin_messages           = [] # list of message ids sent from admins
     own_database_prefixes    = {} # for each connector_id the own prefixes in this database
     htmlspecialchars         = {'"':'&quot;', '\'':'&#039;', '<':'&lt;', '>':'&gt;'} # char "&" is in function included
 
@@ -681,10 +680,8 @@ class TUDChat(BaseContent):
             message = message[:self.maxMessageLength]
         msgid = self.chat_storage.sendAction(chat_uid = chat_uid,
                             user = user,
-                            action = 'add_message',
+                            action = self.isAdmin(REQUEST) and 'mod_add_message' or 'user_add_message',
                             content = self.html_escape(message))
-        if self.isAdmin(REQUEST):
-            self.admin_messages.append(msgid)
 
     def editMessage(self, message_id, message, REQUEST = None):
         """ Edit a message """
@@ -697,7 +694,7 @@ class TUDChat(BaseContent):
             return
         self.chat_storage.sendAction(chat_uid = session.get('user_properties').get('chat_room'),
                                     user = session.get('user_properties').get('name'),
-                                    action = 'edit_message',
+                                    action = 'mod_edit_message',
                                     content = self.html_escape(message),
                                     target = message_id)
 
@@ -711,7 +708,7 @@ class TUDChat(BaseContent):
 
         self.chat_storage.sendAction(chat_uid = session.get('user_properties').get('chat_room'),
                                     user = session.get('user_properties').get('name'),
-                                    action = 'delete_message',
+                                    action = 'mod_delete_message',
                                     target = message_id)
 
     def getActions(self, REQUEST = None):
@@ -769,7 +766,7 @@ class TUDChat(BaseContent):
             list_actions[i]['attr'] = []
             if list_actions[i]['a_action'] != '':
                 list_actions[i]['attr'].append({'a_action':list_actions[i]['a_action'], 'a_name':list_actions[i]['a_name']})
-            if list_actions[i]['id'] in self.admin_messages or (list_actions[i]['target'] and int(list_actions[i]['target']) in self.admin_messages):
+            if list_actions[i]['action'] == 'mod_add_message':
                 list_actions[i]['attr'].append({'admin_message':True})
 
         return_dict = {
@@ -779,16 +776,16 @@ class TUDChat(BaseContent):
                                             'date': self.showDate and action['date'].strftime(self.chatDateFormat) or "",
                                             'name': action['user'],
                                             'message': action['message'],
-                                            'attributes': action['attr'] } for action in list_actions if action['action'] == "add_message"],
+                                            'attributes': action['attr'] } for action in list_actions if (action['action'] == "user_add_message" or action['action'] == "mod_add_message")],
                                 'to_delete': [ { 'id': action['target'],
                                                   'date': self.showDate and action['date'].strftime(self.chatDateFormat) or "",
                                                   'name': action['user'],
-                                                  'attributes': action['attr'] } for action in list_actions if action['action'] == "delete_message" ],
+                                                  'attributes': action['attr'] } for action in list_actions if action['action'] == "mod_delete_message" ],
                                 'to_edit': [ {  'id': action['target'],
                                                 'date': self.showDate and action['date'].strftime(self.chatDateFormat) or "",
                                                 'name': action['user'],
                                                 'message': action['message'],
-                                                'attributes': action['attr'] } for action in list_actions if action['action'] == "edit_message" ],
+                                                'attributes': action['attr'] } for action in list_actions if action['action'] == "mod_edit_message" ],
                             },
                         'users':
                             {
