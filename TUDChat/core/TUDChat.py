@@ -63,14 +63,21 @@ class TUDChat(BaseContent):
     chat_storage             = None
 
     # Data
-    timestamps               = {} # collection of timestamps to call methods in certain intervalls
-    chat_rooms               = {} # chatroom container with userlist, kicked_users, banned_users and timestamps
+    ## @brief collection of timestamps to call methods in certain intervalls
+    timestamps               = {}
+    ## @brief chatroom container with userlist, kicked_users, banned_users and timestamps
+    chat_rooms               = {}
+    ## @brief define roles that have admin privileges
     admin_roles              = ['Admin','ChatModerator']
-    admin_messages           = [] # list of message ids sent from admins
-    own_database_prefixes    = {} # for each connector_id the own prefixes in this database
-    htmlspecialchars         = {'"':'&quot;', '\'':'&#039;', '<':'&lt;', '>':'&gt;'} # char "&" is in function included
+    ## @brief list of message ids sent from admins
+    admin_messages           = []
+    ## @brief for each connector_id the own prefixes in this database
+    own_database_prefixes    = {}
+    ## @brief replacements for special html chars (char "&" is in function included)
+    htmlspecialchars         = {'"':'&quot;', '\'':'&#039;', '<':'&lt;', '>':'&gt;'} # {'"':'&quot;'} this comment is needed, because there is a bug in doxygen
 
     # Actions
+    ## @brief describe the menue for the chat
     actions = (
         {'id'           : 'view',
          'name'         : 'View',
@@ -106,6 +113,8 @@ class TUDChat(BaseContent):
     security.declareProtected(manage_properties, 'edit_sessions')
     edit_sessions = PageTemplateFile('../skins/TUDChat/edit_sessions.pt', globals())
 
+    ## @brief class counstructor which prepare the database connection
+    #  @param id the identifier of the chat object
     def __init__(self, id):
         self.id = id
         logger.info("Initialised 'TUDChat Content'...")
@@ -136,6 +145,8 @@ class TUDChat(BaseContent):
 
     # override the default actions
 
+    ## @brief check and apply admin settings
+    #  @param error list of errors
     def post_validate(self, REQUEST, errors):
         """
         This function checks the edit form values in context.
@@ -157,6 +168,8 @@ class TUDChat(BaseContent):
             REQUEST.set('post_validated', True)
 
     security.declarePublic("getAllowedDbList")
+    ## @brief get a list of for chat usage allowed database connections
+    #  @return list list of allowed databases
     def getAllowedDbList(self):
         """
         Get a list of allowed Mysql_Connection_IDs
@@ -188,6 +201,8 @@ class TUDChat(BaseContent):
         return
 
     security.declarePublic("getIp")
+    ## @brief get IP address from a request
+    #  @return string IP address as a string or None if not available
     def getIp(self, REQUEST): # see: http://dev.menttes.com/collective.developermanual/serving/http_request_and_response.html#request-client-ip
         """  Extract the client IP address from the HTTP request in proxy compatible way.
 
@@ -222,6 +237,8 @@ class TUDChat(BaseContent):
     # Access management
     ##########################################################################
 
+    ## @brief check, if a user is registered to a chat session
+    #  @return bool True, if user is registered, otherwise False
     def isRegistered(self, REQUEST = None):
         """ """
         session=REQUEST.SESSION
@@ -235,6 +252,8 @@ class TUDChat(BaseContent):
                 session.clear()
         return False
 
+    ## @brief check, if a user is admin for this chat
+    #  @return bool True, if user is admin, otherwise False
     def isAdmin(self, REQUEST = None):
         """ """
 
@@ -247,6 +266,8 @@ class TUDChat(BaseContent):
                 return True
         return False
 
+    ## @brief check, if a user is banned from this chat
+    #  @return bool True, if user is banned, otherwise False
     def isBanned(self, REQUEST = None):
         """ Checks if you are banned  """
         ip_address = self.getIp(REQUEST)
@@ -282,6 +303,8 @@ class TUDChat(BaseContent):
 
         return False
 
+    ## @brief tell the client the reason for the ban, if the client was banned
+    #  @return str ban reason
     def getBanReason(self, REQUEST = None):
         """ Helper method to get ban reason """
         ip_address = self.getIp(REQUEST)
@@ -303,6 +326,8 @@ class TUDChat(BaseContent):
             return 'Not banned'
         return
 
+    ## @brief this function returns information about the chat session of the requesting user
+    #  @return dict with the following infos: id,name,description,password,max_users,start,end,active
     def getChatInfo(self, REQUEST = None):
         """ Return all information about requesting users chat session """
         if REQUEST:
@@ -320,6 +345,13 @@ class TUDChat(BaseContent):
     # Chat Session Management
     ##########################################################################
 
+    ## @brief this function create a chat session
+    #  @param name str name of the chat session
+    #  @param description str description of the chat session
+    #  @param start str start time of the chat session (clients can't enter the chat before)
+    #  @param end str end time of the chat session (clients can't enter the chat after this time, all connected clients were kicked)
+    #  @param password str password to enter the chat room
+    #  @param max_users int user limit for this chat room
     def createChatSession(self, name, description, start, end, password = None, max_users = None, REQUEST = None):
         """ Create a chat session """
         if not self.isAdmin(REQUEST):
@@ -327,6 +359,14 @@ class TUDChat(BaseContent):
         self.chat_storage.createChatSession(name, description, start, end, password, max_users)
         return True
 
+    ## @brief this function modify an existing chat session
+    #  @param chat_uid int id of the chat which would be modified
+    #  @param name str new name of the chat session
+    #  @param description str new description of the chat session
+    #  @param start str new start time of the chat session (clients can't enter the chat before)
+    #  @param end str new end time of the chat session (clients can't enter the chat after this time, all connected clients were kicked)
+    #  @param password str new password to enter the chat room
+    #  @param max_users int new user limit for this chat room
     def editChatSession(self, chat_uid, name, description, start, end, password = None, max_users = None, REQUEST = None):
         """ Create a chat session """
         if not self.isAdmin(REQUEST):
@@ -334,6 +374,8 @@ class TUDChat(BaseContent):
         self.chat_storage.editChatSession(chat_uid, name, description, start, end, password, max_users)
         return True
 
+    ## @brief this function deletes an existing chat session
+    #  @param chat_uid int id of the chat which would be deleted
     def deleteChatSession(self, chat_uid, REQUEST = None):
         """ Delete a chat session """
         if not self.isAdmin(REQUEST):
@@ -350,6 +392,8 @@ class TUDChat(BaseContent):
                                     user = session.get('user_properties').get('name'),
                                     action = "close_chat")
 
+    ## @brief this function generate a list of all existing chat sessions for this chat content instance
+    #  @return list of dictonaries, the following infos are in every dict: id,name,description,password,max_users,start,end,status
     def getAllChatSessions(self, REQUEST = None):
         """ get a list of all active, planned and closed chat sessions with there current state """
         if not self.isAdmin(REQUEST):
@@ -362,12 +406,16 @@ class TUDChat(BaseContent):
 
         return result
 
+    ## @brief this function generate a list of all chat sessions which were active and planned
+    #  @return list of dictonaries, the following infos are in every dict: id,name,description,password,max_users,start,end
     def getChatSessions(self, REQUEST = None):
         """ get a list of all active and planned chat sessions """
         if not self.isAdmin(REQUEST):
             return
         return self.chat_storage.getChatSessions()
 
+    ## @brief this function generate a list of all chat sessions which were active
+    #  @return list of dictonaries, the following infos are in every dict: id,name,description,password,max_users,start,end
     def getActiveChatSessions(self, REQUEST = None):
         """ get a list of all active chat sessions """
         if self.chat_storage:
@@ -375,6 +423,8 @@ class TUDChat(BaseContent):
         else:
             return None
 
+    ## @brief this function generate a list of all chat sessions which were planned
+    #  @return list of dictonaries, the following infos are in every dict: id,name,start,end
     def getNextChatSessions(self, REQUEST = None):
         """ get the next chat session, which will start """
         if self.chat_storage:
@@ -382,6 +432,9 @@ class TUDChat(BaseContent):
         else:
             return None
 
+    ## @brief this function returns information about a specific chat session
+    #  @param chat_uid int id of the specific chat session
+    #  @return dict with the following infos: id,name,description,password,max_users,start,end,active
     def getChatSessionInfo(self, chat_uid, REQUEST = None):
         """ get all information about a specific chat_session"""
         if not self.isAdmin(REQUEST):
@@ -391,6 +444,9 @@ class TUDChat(BaseContent):
         session_info['end'] = session_info['end'].strftime('%d.%m.%Y, %H:%M Uhr')
         return session_info
 
+    ## @brief this function returns all chat messages about a specific chat session
+    #  @param chat_uid int id of the specific chat session
+    #  @return list of dictonaries, the following infos are in every dict: id, action, date, user, message, target, a_action, a_name
     def getLogs(self, chat_uid, REQUEST = None):
         """ Retrieve the whole and fully parsed chat log """
         if not self.isAdmin(REQUEST):
@@ -915,5 +971,26 @@ class TUDChat(BaseContent):
     def myRequest(self, REQUEST = None):
         """ reset last_action to get all messages from the beginning """
         return REQUEST
+    
+    def testAddRole(self, REQUEST = None):
+        """ """
+        if not self.isAdmin(REQUEST):
+            return
+        
+        #testobj = self.getParentNode()
+        #testobj._addRole('MyNewRole')
+        #testobj.manage_role('MyNewRole', ('Access contents information', 'Manage properties', 'Modify portal content', 'View'))
+        portal_root = self.portal_url.getPortalObject()
+        
+        #chat.manage_permission('View',('MyNewRole'),acquire=0)
+        #print(chat.manage_listLocalRoles())
+        #existing = chat.get_local_roles()
+        #print(existing)
+        #roles = ('MyNewRole',)
+        #for role in roles:
+        #    if role not in existing:
+        #        chat._addRole(role)
+        #print('Role added')
+        return True
 
 registerType(TUDChat, PROJECTNAME)
