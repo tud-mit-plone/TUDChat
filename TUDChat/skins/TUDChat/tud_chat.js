@@ -240,11 +240,11 @@ var applyAttributes = function (message, attributes) {
 
     if(typeof(attributes)!="undefined"){
         for (var i = 0; i < attributes.length; i++) {
-            if (attributes[i].a_action == 'edit_message') {
+            if (attributes[i].a_action == 'mod_edit_message') {
                 additional_content += " (bearbeitet durch "+ attributes[i].a_name +")";
                 entry_classes += " admin_edit";
             }
-            if (attributes[i].a_action == 'delete_message') {
+            if (attributes[i].a_action == 'mod_delete_message') {
                 additional_content = "Gel&ouml;scht durch "+ attributes[i].a_name;
                 entry_classes += " admin_delete";
             }
