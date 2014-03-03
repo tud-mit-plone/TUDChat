@@ -766,7 +766,7 @@ class TUDChat(BaseContent):
             list_actions[i]['attr'] = []
             if list_actions[i]['a_action'] != '':
                 list_actions[i]['attr'].append({'a_action':list_actions[i]['a_action'], 'a_name':list_actions[i]['a_name']})
-            if list_actions[i]['action'] == 'mod_add_message':
+            if list_actions[i]['action'] == 'mod_add_message' or list_actions[i]['u_action'] == 'mod_add_message':
                 list_actions[i]['attr'].append({'admin_message':True})
 
         return_dict = {
