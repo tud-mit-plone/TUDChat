@@ -130,13 +130,21 @@
   </thead>
   <tbody>
     <tr tal:repeat="message log">
-      <td class="column_id" tal:content="message/id"></td>
-      <td class="column_time" tal:content="python: message['date'].strftime('%d.%m.%Y, %H:%M:%S Uhr')"></td>
-      <td class="column_name" tal:content="message/user"></td>
-      <td class="column_message" tal:content="message/message"></td>
+      <tal:block define="admin_message python: message['action'] == 'mod_add_message' or message['u_action'] == 'mod_add_message'">
+        <td tal:condition="admin_message" class="column_id"><b tal:content="message/id"></b></td>
+        <td tal:condition="admin_message" class="column_time"><b tal:content="python: message['date'].strftime('%d.%m.%Y, %H:%M:%S Uhr')"></b></td>
+        <td tal:condition="admin_message" class="column_name"><b tal:content="message/user"></b></td>
+        <td tal:condition="admin_message" class="column_message"><b tal:content="message/message"></b></td>
+        <td tal:condition="not:admin_message" class="column_id" tal:content="message/id"></td>
+        <td tal:condition="not:admin_message" class="column_time" tal:content="python: message['date'].strftime('%d.%m.%Y, %H:%M:%S Uhr')"></td>
+        <td tal:condition="not:admin_message" class="column_name" tal:content="message/user"></td>
+        <td tal:condition="not:admin_message" class="column_message" tal:content="message/message"></td>
+      </tal:block>
     </tr>
   </tbody>
 </table>
+
+<p>Fett gedruckte Zeilen stellen Nachrichten von Moderatoren dar.</p>
 
 </body>
 </html>

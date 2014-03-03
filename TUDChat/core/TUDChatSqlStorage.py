@@ -61,7 +61,7 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
                 `chat_uid`        VARCHAR( 255 )       NOT NULL,
                 `date`            DATETIME             NOT NULL,
                 `user`            VARCHAR( 255 )       NOT NULL,
-                `action` ENUM( 'add_message', 'edit_message', 'delete_message', 'open_chat', 'close_chat', 'ban_user', 'unban_user' ) NOT NULL, 
+                `action` ENUM('user_add_message', 'mod_add_message', 'mod_edit_message', 'mod_delete_message') NOT NULL, 
                 `content`         TEXT                 NOT NULL,
                 `target`          INT                      NULL DEFAULT NULL,
             PRIMARY KEY (`id` ),
@@ -176,7 +176,7 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
         self.getActions = SQL('getActions', 'get actions of a chat',
             sql_connector_id, 'chat_uid last_action start_action',
             """
-            SELECT id, action, date, user, content AS message, NULL AS target, '' AS a_action, '' AS a_name
+            SELECT id, action, date, user, content AS message, NULL AS target, '' AS a_action, '' AS a_name, '' AS u_action
             FROM `%s_action`
             WHERE id NOT IN
               (SELECT target
@@ -184,12 +184,12 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
                WHERE target IS NOT NULL AND chat_uid = <dtml-sqlvar chat_uid type="int">)
               AND chat_uid = <dtml-sqlvar chat_uid type="int">
               AND id > <dtml-sqlvar last_action type="int">
-              AND action='add_message'
+              AND action LIKE '%%add_message'
             UNION ALL
-            SELECT action.a_id AS 'id', a_action.action AS action, u_action.date AS date, u_action.user AS user, a_action.content AS content, action.u_id as target, a_action.action AS a_action, a_action.user AS a_name
+            SELECT action.a_id AS 'id', a_action.action AS action, u_action.date AS date, u_action.user AS user, a_action.content AS content, action.u_id as target, a_action.action AS a_action, a_action.user AS a_name, u_action.action AS u_action
             FROM (SELECT target AS 'u_id', MAX(id) AS 'a_id'
                   FROM `%s_action`
-                  WHERE (action='delete_message' OR action='edit_message')
+                  WHERE (action='mod_delete_message' OR action='mod_edit_message')
                     AND chat_uid = <dtml-sqlvar chat_uid type="int">
                     AND id > <dtml-sqlvar last_action type="int">
                     AND <dtml-sqlvar last_action type="int"> >= target
@@ -198,10 +198,10 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             INNER JOIN `%s_action` AS a_action ON action.a_id = a_action.id
             INNER JOIN `%s_action` AS u_action ON action.u_id = u_action.id
             UNION ALL
-            SELECT action.u_id AS 'id', 'add_message' AS action, u_action.date AS date, u_action.user AS user, a_action.content AS content, NULL as target, a_action.action AS a_action, a_action.user AS a_name
+            SELECT action.u_id AS 'id', u_action.action AS action, u_action.date AS date, u_action.user AS user, a_action.content AS content, NULL as target, a_action.action AS a_action, a_action.user AS a_name, '' AS u_action
             FROM (SELECT target AS 'u_id', MAX(id) AS 'a_id'
                   FROM `%s_action`
-                  WHERE (action='delete_message' OR action='edit_message')
+                  WHERE (action='mod_delete_message' OR action='mod_edit_message')
                     AND chat_uid = <dtml-sqlvar chat_uid type="int">
                     AND id > <dtml-sqlvar last_action type="int">
                     AND <dtml-sqlvar last_action type="int"> < target
@@ -210,7 +210,7 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             INNER JOIN `%s_action` AS a_action ON action.a_id = a_action.id
             INNER JOIN `%s_action` AS u_action ON action.u_id = u_action.id
             UNION ALL
-            SELECT MAX(id) AS 'ID', '' AS 'action', NOW() AS 'date', '' AS 'user', '' AS 'message', '' AS 'target', '' AS 'a_action', '' AS 'a_name'
+            SELECT MAX(id) AS 'ID', '' AS 'action', NOW() AS 'date', '' AS 'user', '' AS 'message', '' AS 'target', '' AS 'a_action', '' AS 'a_name', '' AS u_action
             FROM `%s_action`
             WHERE chat_uid=<dtml-sqlvar chat_uid type="int">
             ORDER BY `ID` ASC
@@ -313,7 +313,7 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
         if results:
             #logger.info(results)
             #logger.info(results.dictionaries())
-            results = self.dictFromSql(results, names=["id", "action", "date", "user", "message", "target", "a_action", "a_name"])
+            results = self.dictFromSql(results, names=["id", "action", "date", "user", "message", "target", "a_action", "a_name", "u_action"])
             #logger.info(results)
             return results
         else:
