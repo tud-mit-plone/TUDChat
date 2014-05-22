@@ -11,6 +11,7 @@ import simplejson
 import random, string
 import os.path, time
 from cStringIO import StringIO
+import urlparse
 
 # Zope imports
 from AccessControl import ClassSecurityInfo
@@ -172,6 +173,32 @@ class TUDChat(BaseContent):
         for connection in portal_tud_chat_tool.getAllowedDbList(path):
             dl.add(connection, connection)
         return dl
+
+    ## @brief this function checks if the domain in the url matches the chat domain
+    #  @param url str complete url to check
+    #  @return str url to redirect if domains don't match, otherwise empty string
+    security.declarePublic("checkURL")
+    def checkURL(self, url):
+        """ chat domain check"""
+        portal_tud_chat_tool = getToolByName(self, 'portal_tud_chat')
+        chat_domain = portal_tud_chat_tool.chat_domain
+        transfer_protocol = portal_tud_chat_tool.transfer_protocol
+        
+        domain = urlparse.urlparse(url)
+        
+        if domain[1].count(":") == 0:
+            hostname = domain[1]
+            port = ""
+        elif domain[1].count(":") == 1:
+            hostname, port = domain[1].split(":")
+            port = ":"+port
+        else:
+            return ""
+        
+        if hostname != chat_domain:
+            return urlparse.urlunparse((transfer_protocol, chat_domain+port, domain[2], domain[3], domain[4], domain[5]))
+        else:
+            return ""
 
     security.declarePublic("show_id")
     def show_id(self,):

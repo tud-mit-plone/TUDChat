@@ -56,6 +56,10 @@
 
 <body metal:fill-slot="main" i18n:domain="tudchat">
 
+<tal:domain_check define="newurl python: here.checkURL(here.absolute_url());
+                          dummy python: newurl and request.RESPONSE.redirect(newurl) or None">
+</tal:domain_check>
+
 <h2 tal:content="here/title"> Title of chat </h2>
 
 <div class="chat_introduction" tal:content="here/introduction"> Introduction </div>
