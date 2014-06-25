@@ -88,12 +88,12 @@
         </div>
 
         <div>
-          <label for="username">Benutzername</label>
+          <label for="username">gewünschter Benutzername</label>
           <input type="text" name="username" id="username" maxlength="20" />
         </div>
 
         <div class="password_field">
-          <label for="password">Passwort</label>
+          <label for="password">Passwort für den Chatraum (falls geschützt)</label>
           <input type="password" name="password" id="password" />
         </div>
 
@@ -119,12 +119,14 @@
                 <tr>
                     <th>Titel</th>
                     <th>Beginn</th>
+                    <th>Ende</th>
                 </tr>
             </thead>
             <tbody>
                 <tr tal:repeat="session next_sessions">
                     <td tal:content="session/name"></td>
                     <td tal:content="python: session['start'].strftime('%d.%m.%y')+' '+session['start'].strftime('%H:%M')+' Uhr'"></td>
+                    <td tal:content="python: session['end'].strftime('%d.%m.%y')+' '+session['end'].strftime('%H:%M')+' Uhr'"></td>
                 </tr>
             </tbody>
         </table>

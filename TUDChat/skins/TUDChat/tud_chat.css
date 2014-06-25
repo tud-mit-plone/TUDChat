@@ -303,7 +303,7 @@ table.future_sessions td, table.future_sessions th {
     font-weight: bold;
     padding-right: 15px;
     display: inline-block;
-    width: 100px;
+    width: 300px;
     text-align: right;
     line-height: 2.5em;
 }
