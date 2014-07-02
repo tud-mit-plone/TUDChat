@@ -8,10 +8,10 @@ var sendMessage = function(){
 	message = $("#chatMsgValue").val();
 
 	if (sendMessageBlock)
-		return;
+		return false;
 
 	if (message == '')
-		return;
+		return false;
 
 	sendMessageBlock = true;
   $("#chatMsgSubmit").attr("disabled", "disabled");

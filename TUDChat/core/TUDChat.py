@@ -599,17 +599,18 @@ class TUDChat(BaseContent):
         """ Register yourself """
         REQUEST.SESSION.set('user_properties', None)
         chat_session = self.chat_storage.getChatSession(chatroom)
+        user = user.strip()
 
         if chat_session['password'] and chat_session['password'] != password:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das eingegebene Passwort ist nicht korrekt.'}})
         if chat_session['max_users'] and self.chat_rooms.get(chatroom) and chat_session['max_users'] <= len(self.chat_rooms[chatroom]['chat_users']):
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das Benutzerlimit für diese Chat-Session ist bereits erreicht.'}})
+        if len(re.findall(r"[a-zA-ZäöüÄÖÜ]",user))<3:
+            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername muss mindestens drei Buchstaben enthalten.'}})
         if len(user) < 3:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu kurz. (Er muss mindestens 3 Zeichen lang sein.)'}})
         if len(user) > 20:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu lang. (Er darf maximal 20 Zeichen lang sein.)'}})
-        if re.findall(r"[a-zA-Z]äöüÄÖÜ+",user):
-            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername muss mindestens einen Buchstaben enthalten.'}})
         if not chat_session['active']:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der gewählte Chat-Raum ist zurzeit nicht aktiv.'}})
         if self.chat_rooms.has_key(chatroom) and user.lower() in [chat_user.lower() for chat_user in self.chat_rooms[chatroom]['chat_users'].keys()]:
