@@ -199,6 +199,18 @@ class TUDChat(BaseContent):
             return urlparse.urlunparse((transfer_protocol, chat_domain+port, domain[2], domain[3], domain[4], domain[5]))
         else:
             return ""
+    
+    ## @brief this function checks for a valid utf-8 string
+    #  @param url str string to check
+    #  @return bool true for valid utf-8 otherwise false
+    security.declarePublic("checkUTF8")
+    def checkUTF8(self, string):
+        """ utf-8 check"""
+        try:
+            string.decode("utf8")
+        except:
+            return False
+        return True
 
     security.declarePublic("show_id")
     def show_id(self,):
@@ -611,6 +623,8 @@ class TUDChat(BaseContent):
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu kurz. (Er muss mindestens 3 Zeichen lang sein.)'}})
         if len(user) > 20:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu lang. (Er darf maximal 20 Zeichen lang sein.)'}})
+        if not self.checkUTF8(user):
+            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername enthält ungültige Zeichen. (Es sind nur UTF-8-Zeichen erlaubt.)'}})
         if not chat_session['active']:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der gewählte Chat-Raum ist zurzeit nicht aktiv.'}})
         if self.chat_rooms.has_key(chatroom) and user.lower() in [chat_user.lower() for chat_user in self.chat_rooms[chatroom]['chat_users'].keys()]:
@@ -703,6 +717,10 @@ class TUDChat(BaseContent):
             return
         else:
             self.chat_rooms[chat_uid]['chat_users'][user]['last_message_sent'] = now
+        
+        #filter invalid utf8
+        if not self.checkUTF8(message):
+            return
 
         if self.maxMessageLength:
             message = message[:self.maxMessageLength]
@@ -775,7 +793,7 @@ class TUDChat(BaseContent):
         if now - user_properties.get('chat_room_check') > 60: # Perform this check every 60 seconds
             user_properties['chat_room_check'] = now
             chat_session = self.chat_storage.getChatSession(chat_uid)
-            end_time = DateTime(chat_session['end'].utcdatetime())
+            end_time = DateTime(chat_session['end'])
             if not chat_session['active']:
                 self.removeUser(user, chat_uid)
                 session.set('user_properties', user_properties)
@@ -788,7 +806,12 @@ class TUDChat(BaseContent):
         # Lookup last action
         start_action = user_properties.get('start_action')
         last_action = user_properties.get('last_action')
-        list_actions = self.chat_storage.getActions(chat_uid = chat_uid, last_action = last_action, start_action = start_action)
+        #limit message count for users who get normally all messages since start action
+        if start_action==last_action:
+            limit = 30
+        else:
+            limit = 0
+        list_actions = self.chat_storage.getActions(chat_uid = chat_uid, last_action = last_action, start_action = start_action, limit = limit)
         # build a list of extra attributes
         for i in range(len(list_actions)):
             list_actions[i]['attr'] = []

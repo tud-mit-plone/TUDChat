@@ -306,15 +306,14 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
         result_dict = self.dictFromSql(result, ('action_id',))
         return result_dict[0]['action_id'] or 0
     
-    def getActions(self, chat_uid, last_action, start_action):
+    def getActions(self, chat_uid, last_action, start_action, limit = 0):
         results = self.sql_methods.getActions(chat_uid = chat_uid,
                                                 last_action = last_action,
                                                 start_action = start_action)
         if results:
-            #logger.info(results)
-            #logger.info(results.dictionaries())
             results = self.dictFromSql(results, names=["id", "action", "date", "user", "message", "target", "a_action", "a_name", "u_action"])
-            #logger.info(results)
+            if limit:
+                results = results[-limit-1:]
             return results
         else:
             return []
