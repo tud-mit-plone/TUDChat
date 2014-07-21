@@ -20,6 +20,7 @@ var sendMessage = function(){
 
 	$.post(base_url + "/sendMessage", { 'message': message },
         function(data) {                // Immediately update the chat, after sending the message
+            currentScrollMode = scrollMode.alwaysBottom;
             updateCheck();
           }
         );

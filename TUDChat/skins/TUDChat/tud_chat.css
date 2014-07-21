@@ -61,6 +61,9 @@ div#chatUser{
     width: 20%;
     border-left: 1px solid #acacac;
     word-wrap: break-word;
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
     div#chatUser ul{
         list-style:none;
