@@ -23,7 +23,7 @@ from Products.CMFCore import CMFCorePermissions
 # Product imports
 from Products.TUDChat.config import *
 
-class TUDChatTool(UniqueObject, SimpleItem):
+class TUDChatTool(UniqueObject, SimpleItem, PropertyManager):
     """ Tool for TUDChat """
 
     plone_tool = True
@@ -38,14 +38,21 @@ class TUDChatTool(UniqueObject, SimpleItem):
     security = ClassSecurityInfo()
     
     manage_options = ( 
-                      ( { 'label' : 'Datenbankliste konfigurieren'
-                         , 'action' : 'db_config'
-                         },
-                         { 'label' : 'Chatübersicht'
-                         , 'action' : 'chat_list'
-                         },
+                      ({ 'label' : 'Chatübersicht'
+                       , 'action' : 'chat_list'
+                       },
+                       { 'label' : 'Datenbankliste konfigurieren'
+                       , 'action' : 'db_config'
+                       },
                       )
-                     )
+                     ) + PropertyManager.manage_options
+    
+    chat_domain = "webchat.tu-dresden.de"
+    transfer_protocol = "https"
+    _properties = PropertyManager._properties + (
+                                                 {'id':'chat_domain', 'type':'string', 'mode':'w'},
+                                                 {'id':'transfer_protocol', 'type':'string', 'mode':'w'}
+                                                 )
     
     security.declareProtected(manage_properties, 'db_config')
     db_config = PageTemplateFile('../skins_tool/db_config.pt', globals())

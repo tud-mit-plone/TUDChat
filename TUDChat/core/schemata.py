@@ -106,7 +106,7 @@ TUDChatSchema = BaseSchema.copy() + Schema((
     ),
     StringField(
         'adminColor',
-        default         = '#000000',
+        default         = '#ff0000',
         required        = True,
         widget          = StringWidget(
                 label                   = "Textfarbe für Chatmoderator",
@@ -129,7 +129,7 @@ TUDChatSchema = BaseSchema.copy() + Schema((
     ),
     IntegerField(
         'refreshRate',
-        default         = 5,
+        default         = 2,
         required        = True,
         widget          = IntegerWidget(
                 label                   = "Aktualisierungs-Rate (in Sekunden)",

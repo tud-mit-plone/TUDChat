@@ -61,6 +61,9 @@ div#chatUser{
     width: 20%;
     border-left: 1px solid #acacac;
     word-wrap: break-word;
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
     div#chatUser ul{
         list-style:none;
@@ -303,7 +306,7 @@ table.future_sessions td, table.future_sessions th {
     font-weight: bold;
     padding-right: 15px;
     display: inline-block;
-    width: 100px;
+    width: 300px;
     text-align: right;
     line-height: 2.5em;
 }

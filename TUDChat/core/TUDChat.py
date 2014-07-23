@@ -11,6 +11,7 @@ import simplejson
 import random, string
 import os.path, time
 from cStringIO import StringIO
+import urlparse
 
 # Zope imports
 from AccessControl import ClassSecurityInfo
@@ -186,6 +187,44 @@ class TUDChat(BaseContent):
         for connection in portal_tud_chat_tool.getAllowedDbList(path):
             dl.add(connection, connection)
         return dl
+
+    ## @brief this function checks if the domain in the url matches the chat domain
+    #  @param url str complete url to check
+    #  @return str url to redirect if domains don't match, otherwise empty string
+    security.declarePublic("checkURL")
+    def checkURL(self, url):
+        """ chat domain check"""
+        portal_tud_chat_tool = getToolByName(self, 'portal_tud_chat')
+        chat_domain = portal_tud_chat_tool.chat_domain
+        transfer_protocol = portal_tud_chat_tool.transfer_protocol
+        
+        domain = urlparse.urlparse(url)
+        
+        if domain[1].count(":") == 0:
+            hostname = domain[1]
+            port = ""
+        elif domain[1].count(":") == 1:
+            hostname, port = domain[1].split(":")
+            port = ":"+port
+        else:
+            return ""
+        
+        if hostname != chat_domain:
+            return urlparse.urlunparse((transfer_protocol, chat_domain+port, domain[2], domain[3], domain[4], domain[5]))
+        else:
+            return ""
+    
+    ## @brief this function checks for a valid utf-8 string
+    #  @param url str string to check
+    #  @return bool true for valid utf-8 otherwise false
+    security.declarePublic("checkUTF8")
+    def checkUTF8(self, string):
+        """ utf-8 check"""
+        try:
+            string.decode("utf8")
+        except:
+            return False
+        return True
 
     security.declarePublic("show_id")
     def show_id(self,):
@@ -676,17 +715,20 @@ class TUDChat(BaseContent):
             If the room does not exist in the room list, it will be created here. """
         REQUEST.SESSION.set('user_properties', None)
         chat_session = self.chat_storage.getChatSession(chatroom)
+        user = user.strip()
 
         if chat_session['password'] and chat_session['password'] != password:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das eingegebene Passwort ist nicht korrekt.'}})
         if chat_session['max_users'] and self.chat_rooms.get(chatroom) and chat_session['max_users'] <= len(self.chat_rooms[chatroom]['chat_users']):
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das Benutzerlimit für diese Chat-Session ist bereits erreicht.'}})
+        if len(re.findall(r"[a-zA-ZäöüÄÖÜ]",user))<3:
+            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername muss mindestens drei Buchstaben enthalten.'}})
         if len(user) < 3:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu kurz. (Er muss mindestens 3 Zeichen lang sein.)'}})
         if len(user) > 20:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu lang. (Er darf maximal 20 Zeichen lang sein.)'}})
-        if re.findall(r"[a-zA-Z]äöüÄÖÜ+",user):
-            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername muss mindestens einen Buchstaben enthalten.'}})
+        if not self.checkUTF8(user):
+            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername enthält ungültige Zeichen. (Es sind nur UTF-8-Zeichen erlaubt.)'}})
         if not chat_session['active']:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der gewählte Chat-Raum ist zurzeit nicht aktiv.'}})
         if self.chat_rooms.has_key(chatroom) and user.lower() in [chat_user.lower() for chat_user in self.chat_rooms[chatroom]['chat_users'].keys()]:
@@ -790,15 +832,17 @@ class TUDChat(BaseContent):
             return
         else:
             self.chat_rooms[chat_uid]['chat_users'][user]['last_message_sent'] = now
+        
+        #filter invalid utf8
+        if not self.checkUTF8(message):
+            return
 
         if self.maxMessageLength:
             message = message[:self.maxMessageLength]
         msgid = self.chat_storage.sendAction(chat_uid = chat_uid,
                             user = user,
-                            action = 'add_message',
+                            action = self.isAdmin(REQUEST) and 'mod_add_message' or 'user_add_message',
                             content = self.html_escape(message))
-        if self.isAdmin(REQUEST):
-            self.admin_messages.append(msgid)
 
     ## @brief this function edits an already sent message
     #  @param message int id of the message to edit
@@ -815,7 +859,7 @@ class TUDChat(BaseContent):
             return
         self.chat_storage.sendAction(chat_uid = session.get('user_properties').get('chat_room'),
                                     user = session.get('user_properties').get('name'),
-                                    action = 'edit_message',
+                                    action = 'mod_edit_message',
                                     content = self.html_escape(message),
                                     target = message_id)
 
@@ -832,7 +876,7 @@ class TUDChat(BaseContent):
 
         self.chat_storage.sendAction(chat_uid = session.get('user_properties').get('chat_room'),
                                     user = session.get('user_properties').get('name'),
-                                    action = 'delete_message',
+                                    action = 'mod_delete_message',
                                     target = message_id)
 
     ## @brief this function returns all updates specific to the calling user since the last time this method was called
@@ -873,7 +917,7 @@ class TUDChat(BaseContent):
         if now - user_properties.get('chat_room_check') > 60: # Perform this check every 60 seconds
             user_properties['chat_room_check'] = now
             chat_session = self.chat_storage.getChatSession(chat_uid)
-            end_time = DateTime(chat_session['end'].utcdatetime())
+            end_time = DateTime(chat_session['end'])
             if not chat_session['active']:
                 self.removeUser(user, chat_uid)
                 session.set('user_properties', user_properties)
@@ -886,13 +930,18 @@ class TUDChat(BaseContent):
         # Lookup last action
         start_action = user_properties.get('start_action')
         last_action = user_properties.get('last_action')
-        list_actions = self.chat_storage.getActions(chat_uid = chat_uid, last_action = last_action, start_action = start_action)
+        #limit message count for users who get normally all messages since start action
+        if start_action==last_action:
+            limit = 30
+        else:
+            limit = 0
+        list_actions = self.chat_storage.getActions(chat_uid = chat_uid, last_action = last_action, start_action = start_action, limit = limit)
         # build a list of extra attributes
         for i in range(len(list_actions)):
             list_actions[i]['attr'] = []
             if list_actions[i]['a_action'] != '':
                 list_actions[i]['attr'].append({'a_action':list_actions[i]['a_action'], 'a_name':list_actions[i]['a_name']})
-            if list_actions[i]['id'] in self.admin_messages or (list_actions[i]['target'] and int(list_actions[i]['target']) in self.admin_messages):
+            if list_actions[i]['action'] == 'mod_add_message' or list_actions[i]['u_action'] == 'mod_add_message':
                 list_actions[i]['attr'].append({'admin_message':True})
 
         return_dict = {
@@ -902,16 +951,16 @@ class TUDChat(BaseContent):
                                             'date': self.showDate and action['date'].strftime(self.chatDateFormat) or "",
                                             'name': action['user'],
                                             'message': action['message'],
-                                            'attributes': action['attr'] } for action in list_actions if action['action'] == "add_message"],
+                                            'attributes': action['attr'] } for action in list_actions if (action['action'] == "user_add_message" or action['action'] == "mod_add_message")],
                                 'to_delete': [ { 'id': action['target'],
                                                   'date': self.showDate and action['date'].strftime(self.chatDateFormat) or "",
                                                   'name': action['user'],
-                                                  'attributes': action['attr'] } for action in list_actions if action['action'] == "delete_message" ],
+                                                  'attributes': action['attr'] } for action in list_actions if action['action'] == "mod_delete_message" ],
                                 'to_edit': [ {  'id': action['target'],
                                                 'date': self.showDate and action['date'].strftime(self.chatDateFormat) or "",
                                                 'name': action['user'],
                                                 'message': action['message'],
-                                                'attributes': action['attr'] } for action in list_actions if action['action'] == "edit_message" ],
+                                                'attributes': action['attr'] } for action in list_actions if action['action'] == "mod_edit_message" ],
                             },
                         'users':
                             {

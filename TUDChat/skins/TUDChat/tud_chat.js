@@ -8,10 +8,10 @@ var sendMessage = function(){
 	message = $("#chatMsgValue").val();
 
 	if (sendMessageBlock)
-		return;
+		return false;
 
 	if (message == '')
-		return;
+		return false;
 
 	sendMessageBlock = true;
   $("#chatMsgSubmit").attr("disabled", "disabled");
@@ -20,6 +20,7 @@ var sendMessage = function(){
 
 	$.post(base_url + "/sendMessage", { 'message': message },
         function(data) {                // Immediately update the chat, after sending the message
+            currentScrollMode = scrollMode.alwaysBottom;
             updateCheck();
           }
         );
@@ -240,11 +241,11 @@ var applyAttributes = function (message, attributes) {
 
     if(typeof(attributes)!="undefined"){
         for (var i = 0; i < attributes.length; i++) {
-            if (attributes[i].a_action == 'edit_message') {
+            if (attributes[i].a_action == 'mod_edit_message') {
                 additional_content += " (bearbeitet durch "+ attributes[i].a_name +")";
                 entry_classes += " admin_edit";
             }
-            if (attributes[i].a_action == 'delete_message') {
+            if (attributes[i].a_action == 'mod_delete_message') {
                 additional_content = "Gel&ouml;scht durch "+ attributes[i].a_name;
                 entry_classes += " admin_delete";
             }

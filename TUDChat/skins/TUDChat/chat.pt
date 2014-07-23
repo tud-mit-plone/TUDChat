@@ -53,7 +53,7 @@
             <div class="clear"></div>
             <div id="chatMsg">
                 <form id="chatMsgForm">
-                    <input type="text" name="msg" id="chatMsgValue" placeholder="Bitte geben Sie hier ihre Nachricht ein." tal:attributes="maxlength python: here.maxMessageLength>0 and here.maxMessageLength or None"/>
+                    <input type="text" name="msg" id="chatMsgValue" autocomplete="off" placeholder="Bitte geben Sie hier ihre Nachricht ein." tal:attributes="maxlength python: here.maxMessageLength>0 and here.maxMessageLength or None"/>
                     <span id="counter" tal:condition="python: here.maxMessageLength > 0"></span>
                     <button id="chatMsgSubmit" type="submit" class="simpleButton" title="Zum Absenden hier klicken oder 'Enter' drücken.">Absenden</button>
                 </form>
