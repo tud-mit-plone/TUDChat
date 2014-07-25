@@ -1,3 +1,15 @@
+/* Fixing layout problem when mid column is expanding */
+
+#portal-columns {
+    table-layout: fixed !important;
+}
+
+/* Left column width was not sufficient */
+#portal-column-one {
+    width: 211px !important;
+}
+
+
 div.clear{
     clear:both;
     width:0;
@@ -30,7 +42,19 @@ div#chatContent{
     margin-right: 20%;
     height:400px;
     overflow:auto;
-    word-wrap: break-word;
+    word-wrap:break-word;
+    /* Fixing word wrap when using dynamic content */
+/* -ms-word-break: break-all;
+     word-break: break-all;
+*/
+     /* Non standard for webkit */
+/*     word-break: break-word;
+
+-webkit-hyphens: auto;
+   -moz-hyphens: auto;
+    -ms-hyphens: auto;
+        hyphens: auto;
+*/
 }
     div#chatContent ul{
         list-style:none;
