@@ -1,0 +1,13 @@
+\anchor Installation
+Installation in Plone
+---------------------
+
+Für die Installation in Plone ist es notwendig den TUDChat-Ordner in das „parts/productdistros“-Verzeichnis der Zope-Instanz einzufügen. Nach einem Neustart der Instanz müssen folgende Aktionen durchgeführt werden:
+1. Innerhalb des „Portal Setup“ wählt man den Punkt zum Installieren und Deinstallieren von Produkten. In diesem Fenster muss dann der Chat ausgewählt und mit einem Klick auf den entsprechenden Button installiert werden.
+2. Für die Datenbankverbindung muss ein „Z MySQL Database Connection“-Objekt angelegt werden. Beim Anlegen sollte dann der entsprechende Verbindungsstring angegeben werden und die Option „Unicode support“ aktiviert sein, um eine korrekte Funktionsweise zu gewährleisten. Wichtig ist, dass das Objekt für die Datenbankverbindung auf dem direkten Pfad oberhalb des Chat-Objektes liegen muss.
+3. Nun wählt man das Chat-Tool mit einem Linksklick im ZMI aus. Dies sollte sich im Stammknoten der Plone-Instanz befinden. Es öffnet sich ein Fenster, welches eine Übersicht aller Chat-Objekte zeigt. Im oberen Bereich muss das Register „Datenbankliste konfigurieren“ gewählt werden um die Datenbanken zu konfigurieren. Im unteren Teil besteht nun die Möglichkeit über eine Pfadangabe eine Liste der „Z MySQL“-Datenbankverbindungen in diesem Pfad anzuzeigen. Anschließend können dann oberhalb die zu verwendenden Datenbanken ausgewählt oder gelöscht werden. Ein Klick auf „Ändern“ übernimmt die entsprechenden Einstellungen.
+4. Innerhalb des Chat-Tools wird nun das Register „Properties“ ausgewählt. Hier muss zum einen die Chat-Domain und zum anderen das Transfer-Protokoll für alle Chat-Objekte festgelegt werden. Sobald ein Chat aufgerufen wird, bei dem die Domain oder das Protokoll nicht mit den hier eingestellten Werten übereinstimmt, erfolgt eine Weiterleitung anhand der konfigurierten Werte.
+5. Anschließend kann das „TUDChat Content“-Objekt angelegt werden. Beim Anlegen gilt es zu beachten, dass neben der Vergabe einer ID auch der Radio-Button ausgewählt werden muss.
+6. Der angelegte „TUDChat Content“ kann nun direkt über das CMS aufgerufen werden (alternativ im ZMI das Objekt auswählen und den Reiter „View“ anklicken). Im Reiter „Chat-Einstellungen“ muss jetzt eine Datenbank, ein Tabellenpräfix und ein Titel festgelegt werden.
+7. Über den Reiter „Chat-Sitzung hinzufügen“ können nun die Chat-Sitzungen angelegt werden.
+8. Optional besteht die Möglichkeit Moderatoren für den Chat festzulegen. Hierfür muss dem Benutzer über das ZMI (Security  local roles) die lokale Rolle „ChatModerator“ zugewiesen werden.
