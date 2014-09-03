@@ -93,7 +93,7 @@
         </div>
 
         <div class="password_field">
-          <label for="password">Passwort für den Chatraum (falls geschützt)</label>
+          <label for="password">Passwort für den Chatraum</label>
           <input type="password" name="password" id="password" />
         </div>
 
