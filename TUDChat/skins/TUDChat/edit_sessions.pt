@@ -57,6 +57,7 @@
   <div class="field">
     <table width="100%" id='sessions'>
       <tr>
+        <th></th>
         <th>Status</th>
         <th>Titel</th>
         <th>Passwort</th>
@@ -65,9 +66,11 @@
         <th>Endzeit</th>
         <th>Protokoll</th>
         <th>Bearbeiten</th>
-        <th>Löschen?</th>
       </tr>
       <tr tal:repeat="session python: here.getAllChatSessions(context.REQUEST)">
+        <td>
+          <input type="checkbox" name="delete:list:int" tal:attributes="value session/id"/>
+        </td>
         <td>
           <span tal:replace="session/status"/>
         </td>
@@ -98,9 +101,6 @@
         <td>
           <a tal:attributes="href python:context.id + '/edit_session?chat_uid='+str(session.get('id'))">Bearbeiten</a>
         </td>
-        <td>
-          <input type="checkbox" name="delete:list:int" tal:attributes="value session/id"/>
-        </td>
       </tr>
     </table>
   </div>
@@ -108,7 +108,6 @@
   <div class="formControls">
     <input type="hidden" name="form.submitted" value="1" />
     <input class="context" type="submit" id="save" name="form.button.Delete" value="Ausgew&auml;hlte Chat-Sitzungen l&ouml;schen" />
-    <input class="context" type="submit" id="cancel_button" name="form.button.Cancel" value="Abbrechen" />
   </div>
 
 </form>
