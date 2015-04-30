@@ -14,7 +14,7 @@ from cStringIO import StringIO
 import urlparse
 
 # Zope imports
-from AccessControl import ClassSecurityInfo
+from AccessControl import ClassSecurityInfo, getSecurityManager
 from AccessControl.Permissions import manage_properties
 from DateTime import DateTime
 
@@ -183,9 +183,9 @@ class TUDChat(BaseContent):
         portal_tud_chat_tool = getToolByName(self, 'portal_tud_chat')
         chat_domain = portal_tud_chat_tool.chat_domain
         transfer_protocol = portal_tud_chat_tool.transfer_protocol
-        
+
         domain = urlparse.urlparse(url)
-        
+
         if domain[1].count(":") == 0:
             hostname = domain[1]
             port = ""
@@ -194,12 +194,12 @@ class TUDChat(BaseContent):
             port = ":"+port
         else:
             return ""
-        
+
         if hostname != chat_domain:
             return urlparse.urlunparse((transfer_protocol, chat_domain+port, domain[2], domain[3], domain[4], domain[5]))
         else:
             return ""
-    
+
     ## @brief this function checks for a valid utf-8 string
     #  @param url str string to check
     #  @return bool true for valid utf-8 otherwise false
@@ -275,15 +275,11 @@ class TUDChat(BaseContent):
 
     def isAdmin(self, REQUEST = None):
         """ """
+        # use the existing security mechanism, look for admin roles on the context
+        # this respects groups and acquires settings along the path
+        user = getSecurityManager().getUser()
+        return user.has_role(self.admin_roles, self)
 
-        member = getToolByName(self, 'portal_membership').getAuthenticatedMember()
-        member_roles = list(member.getRoles())
-        local_roles = list(self.get_local_roles_for_userid( userid=member.getId() ))
-
-        for role in member_roles + local_roles:
-            if role in self.admin_roles:
-                return True
-        return False
 
     def isBanned(self, REQUEST = None):
         """ Checks if you are banned  """
@@ -717,7 +713,7 @@ class TUDChat(BaseContent):
             return
         else:
             self.chat_rooms[chat_uid]['chat_users'][user]['last_message_sent'] = now
-        
+
         #filter invalid utf8
         if not self.checkUTF8(message):
             return
