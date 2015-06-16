@@ -5,10 +5,13 @@
 }
 
 /* Left column width was not sufficient */
+/* unfortunately, no one documented the why. px-width lead to strange display problems on chrome,
+   removed it (back to 16em original width) */
+/*
 #portal-column-one {
     width: 211px !important;
 }
-
+*/
 
 div.clear{
     clear:both;
