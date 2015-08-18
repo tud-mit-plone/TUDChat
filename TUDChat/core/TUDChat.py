@@ -373,6 +373,10 @@ class TUDChat(BaseContent):
         if not self.isAdmin(REQUEST):
             return
         self.chat_storage.deleteChatSession(chat_uid)
+        try:
+            del self.chat_rooms[chat_uid]
+        except:
+            pass
         return True
 
     def closeChatSession(self, REQUEST = None):
