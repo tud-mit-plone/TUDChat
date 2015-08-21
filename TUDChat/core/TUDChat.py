@@ -435,6 +435,8 @@ class TUDChat(BaseContent):
         result = []
         for x in self.chat_storage.getAllChatSessions():
             x['status'] = (x['start'] > DateTime().timeTime() and 'geplant') or (x['end'] < DateTime().timeTime() and 'abgelaufen') or 'aktiv'
+            x['showlog'] = x['status'] == 'abgelaufen'
+            x['active'] = x['status'] == 'aktiv'
             result.append(x)
 
         return result
@@ -473,6 +475,7 @@ class TUDChat(BaseContent):
         if not self.isAdmin(REQUEST):
             return
         session_info = self.chat_storage.getChatSession(chat_uid)
+        session_info['showlog'] = session_info['end'] < DateTime().timeTime()
         session_info['start'] = session_info['start'].strftime('%d.%m.%Y, %H:%M Uhr')
         session_info['end'] = session_info['end'].strftime('%d.%m.%Y, %H:%M Uhr')
         return session_info

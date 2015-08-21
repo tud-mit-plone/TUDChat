@@ -69,7 +69,7 @@
       </tr>
       <tr tal:repeat="session python: here.getAllChatSessions(context.REQUEST)">
         <td>
-          <input type="checkbox" name="delete:list:int" tal:attributes="value session/id"/>
+          <input tal:condition="not:session/active" type="checkbox" name="delete:list:int" tal:attributes="value session/id"/>
         </td>
         <td>
           <span tal:replace="session/status"/>
@@ -96,7 +96,7 @@
           <span tal:replace="python:session.get('end').strftime('%d.%m.%Y, %H:%M Uhr')"/>
         </td>
         <td>
-          <a tal:attributes="href python:context.id + '/TUDChat_log?chat_uid='+str(session.get('id'))">Log ansehen</a>
+          <a tal:condition="session/showlog" tal:attributes="href python:context.id + '/TUDChat_log?chat_uid='+str(session.get('id'))">Log ansehen</a>
         </td>
         <td>
           <a tal:attributes="href python:context.id + '/edit_session?chat_uid='+str(session.get('id'))">Bearbeiten</a>
