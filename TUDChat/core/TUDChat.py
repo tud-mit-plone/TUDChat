@@ -710,7 +710,7 @@ class TUDChat(BaseContent):
     #  @param chatroom int id of the room where the user want to enter
     #  @param password str optional password of the room
     #  @return bool true if the user was successfully added to the room, otherwise false
-    def registerMe(self, user, chatroom, password=None, REQUEST = None):
+    def registerMe(self, user, chatroom, agreement="false", password=None, REQUEST = None):
         """ Register a user to a chat room.
             Before the user was added, this function will check the pre-conditions to enter the room (password, user limit, user name restrictions, banned users, room state)
             If the room does not exist in the room list, it will be created here. """
@@ -718,6 +718,8 @@ class TUDChat(BaseContent):
         chat_session = self.chat_storage.getChatSession(chatroom)
         user = user.strip()
 
+        if agreement == "false":
+            return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ohne Zustimmung zum Datenschutzhinweis kann der Chat nicht betreten werden.'}})
         if chat_session['password'] and chat_session['password'] != password:
             return simplejson.dumps({'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das eingegebene Passwort ist nicht korrekt.'}})
         if chat_session['max_users'] and self.chat_rooms.get(chatroom) and chat_session['max_users'] <= len(self.chat_rooms[chatroom]['chat_users']):

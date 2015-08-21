@@ -345,6 +345,10 @@ span.chat_option {
     font-weight: normal;
 }
 
+.agreement_field label {
+    line-height: 1.3em;
+}
+
 .password_field {
     display: none;
 }

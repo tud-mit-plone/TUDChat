@@ -14,7 +14,7 @@
             $('#login').submit(function() {
               $("input[type='submit']").attr("disabled", "disabled");
 
-              $.getJSON(base_url + "/registerMe", { user: $("input[name='username']").val(), chatroom: $("[name='chatroom']").val(), password: $("#password").val() }, function(response) {
+              $.getJSON(base_url + "/registerMe", { user: $("input[name='username']").val(), chatroom: $("[name='chatroom']").val(), agreement: $("[name='agreement']").prop("checked"), password: $("#password").val() }, function(response) {
 
                 $.doTimeout( 'enableSubmitButton', 2000, function(){
                     $("input[type='submit']").removeAttr("disabled");
@@ -64,15 +64,20 @@
 
 <div class="chat_introduction" tal:content="here/introduction"> Introduction </div>
 
+<div class="chat_explanation"><span class="introduction">Datenschutzhinweis:</span>
+    Um an einem Chat teilnehmen zu können, wählen Sie bitte unten einen Raum aus, tragen Ihren gewünschten Benutzernamen ein und bestätigen, dass Sie diesen Datenschutzhinweis zur Kenntnis genommen haben.<br />
+    Möchten Sie anonym bleiben, können Sie einen Phantasienamen wählen. Der Benutzername muss zwischen 3 und 20 Zeichen lang sein und mindestens 3 Buchstaben enthalten.<br />
+    Wenn Sie eine Nachricht im Chat verschicken, können alle Teilnehmer den von Ihnen gewählten Benutzernamen und die Nachricht sehen. Die Nachrichten werden zusammen mit einem Zeitstempel über die Chatlaufzeit hinaus anonymisiert gespeichert. Bitte beachten Sie, dass persönliche Angaben in den Chatnachrichten nicht anonymisiert werden können. Die Moderatoren können die Chats im Nachhinein auswerten (zum Beispiel zur Verbesserung der FAQ-Angebote). Die Löschung der Daten erfolgt spätestens nach 3 Monaten.<br />
+    Die Räume sind zeitlich befristet und werden moderiert. Bei Fehlverhalten von Chatnutzern können Konsequenzen in Form von einer Verwarnung und permanenter Verweisung des Chatraums folgen. Zur Realisierung der Verweisung wird in diesem Fall ein Cookie in Ihrem Browser gesetzt.<br />
+    Private Nachrichten können aktuell im Chat nicht verschickt werden. Sollten Sie vertrauliche Informationen übertragen wollen, nutzen Sie bitte die E-Mail-Kontaktdaten auf den Webseiten.
+</div>
+
 <tal:block define="sessions python:here.getActiveChatSessions();
                    next_sessions python:here.getNextChatSessions()"
            condition="python:here.getActiveChatSessions() is not None">
 
-
     <form id="login" class="chat_login" action="" tal:condition="sessions">
         <script language="javascript" tal:content="python: 'var password_channels = [' + ','.join([str(session['id']) for session in sessions if session.get('password') != None]) + '];'"></script>
-        <div class="chat_explanation"><span class="introduction">Hinweis zur Benutzung:</span>Bitte wählen Sie einen Raum und einen Benutzernamen aus. Bitte beachten Sie, dass ein Raum zeitlich befristet ist und der Benutzername den formalen Ansprüchen genügen muss (3 bis 20 Zeichen, davon mindestens drei Buchstaben). Die Chaträume werden <em>moderiert</em> und es können bei Fehlverhalten Konsequenzen in Form von einer Verwarnung und permanenter Verweisung des Chatraums folgen.</div>
-
         <div>
           <label for="chatroom">Raum</label>
           <tal:block condition="python: len(sessions) > 1">
@@ -95,6 +100,13 @@
         <div class="password_field">
           <label for="password">Passwort für den Chatraum</label>
           <input type="password" name="password" id="password" />
+        </div>
+        
+        <div class="agreement_field">
+          <label for="agreement">Ich habe den Datenschutzhinweis gelesen und verstanden und möchte unter den darin genannten Bedingungen teilnehmen.</label>
+          <span>
+            <input type="checkbox" name="agreement" id="agreement" />
+          </span>
         </div>
 
         <div>
