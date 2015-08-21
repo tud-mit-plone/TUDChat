@@ -1099,13 +1099,9 @@ class TUDChat(BaseContent):
 
         return str(not already_exist)
 
-<<<<<<< HEAD
     security.declareProtected(CMFCorePermissions.View, "myRequest")
     def myRequest(self, REQUEST = None):
         """ reset last_action to get all messages from the beginning """
         return REQUEST
 
 registerType(TUDChat, PROJECTNAME)
-=======
-registerType(TUDChat, PROJECTNAME)
->>>>>>> feature/documentation
