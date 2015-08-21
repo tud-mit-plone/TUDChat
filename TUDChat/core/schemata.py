@@ -169,6 +169,7 @@ TUDChatSchema = BaseSchema.copy() + Schema((
         required        = True,
         vocabulary      = BAN_STRATEGIES,
         widget          = SelectionWidget(
+                visible                 = -1,
                 label                   = "Ban-Strategie",
                 description             = "Bitte wählen Sie mit welchen Mitteln gebannte Benutzer markiert werden. ",
                 i18n_domain             = "tudchat",

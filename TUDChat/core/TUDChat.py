@@ -304,7 +304,7 @@ class TUDChat(BaseContent):
     #  @return bool True, if user is banned, otherwise False
     def isBanned(self, REQUEST = None):
         """ Check, if a user is banned.  """
-        ip_address = self.getIp(REQUEST)
+        #ip_address = self.getIp(REQUEST)
         session=REQUEST.SESSION
         user_properties=session.get('user_properties')
         if user_properties:
@@ -316,12 +316,14 @@ class TUDChat(BaseContent):
         if BanStrategy.COOKIE in self.banStrategy and REQUEST.get('tudchat_is_banned') == 'true':
             return True
 
+        """
         # Check by IP address in all chat rooms
         if BanStrategy.IP in self.banStrategy:
             for chat_uid in self.chat_rooms.keys():
                 banEntry = dict((user,baninfo) for user,baninfo in self.chat_rooms[chat_uid]['banned_chat_users'].iteritems() if baninfo.get('ip_address') == ip_address)
                 if len(banEntry) > 0:
                     return True
+        """
 
         if not session.get('user_properties'):
             return False
@@ -341,7 +343,7 @@ class TUDChat(BaseContent):
     #  @return str ban reason
     def getBanReason(self, REQUEST = None):
         """ Helper method to get ban reason """
-        ip_address = self.getIp(REQUEST)
+        #ip_address = self.getIp(REQUEST)
 
         if BanStrategy.COOKIE in self.banStrategy:
             # Retrieve information from given cookies or just recently set cookies
@@ -351,6 +353,7 @@ class TUDChat(BaseContent):
             if tudchat_is_banned == 'true':
                 return tudchat_ban_reason
 
+        """
         if BanStrategy.IP in self.banStrategy:
             # Check by IP-Address in all chat rooms
             for chat_uid in self.chat_rooms.keys():
@@ -358,6 +361,7 @@ class TUDChat(BaseContent):
                 if len(banEntry) > 0:
                     return banEntry[banEntry.keys()[0]].get('reason')
             return 'Not banned'
+        """
         return
 
     ## @brief this function returns information about the chat session of the requesting user
@@ -585,14 +589,13 @@ class TUDChat(BaseContent):
     security.declarePrivate('addUser')
     ## @brief this function adds an user to an existing chat session
     #  @param user str user name to add
-    #  @param ip str ip address of the user
     #  @param chat_uid int id of the room, where the user want to join
     #  @param is_admin bool true if the user has admin privileges
     #  @return bool true on success or false if the user is already in the room
-    def addUser(self, user, ip, chat_uid, is_admin):
+    def addUser(self, user, chat_uid, is_admin):
         """ Add yourself to the user list. """
         if not self.chat_rooms[chat_uid]['chat_users'].has_key(user):
-            self.chat_rooms[chat_uid]['chat_users'][user] = {'ip_address': ip, 'date': DateTime().timeTime(), 'last_message_sent' : 0, 'is_admin' : is_admin }
+            self.chat_rooms[chat_uid]['chat_users'][user] = {'date': DateTime().timeTime(), 'last_message_sent' : 0, 'is_admin' : is_admin }
             self._p_changed = 1
             return True
         return False
@@ -638,14 +641,13 @@ class TUDChat(BaseContent):
     security.declarePrivate('addBannedUser')
     ## @brief this function returns all users of a specific room
     #  @param user str user name to be banned
-    #  @param ip str ip address of the user to be banned
     #  @param reason str reason for banning the user
     #  @param chat_uid int id of the room where the user is inside
     #  @return bool true if the user was banned succesfully, otherwise false
-    def addBannedUser(self, user, ip, reason, chat_uid):
+    def addBannedUser(self, user, reason, chat_uid):
         """ Ban a user with a given reason. """
         if not user in self.chat_rooms[chat_uid]['banned_chat_users'].keys() and user in self.chat_rooms[chat_uid]['chat_users'].keys():
-            self.chat_rooms[chat_uid]['banned_chat_users'][user] = { 'reason': reason, 'ip_address': ip }
+            self.chat_rooms[chat_uid]['banned_chat_users'][user] = { 'reason': reason }
             self.removeUser(user, chat_uid)
             return True
         return False
@@ -749,7 +751,7 @@ class TUDChat(BaseContent):
                                     'banned_chat_users' : {}
                                     }
 
-        if not self.isBanned(REQUEST) and user and self.addUser(user, self.getIp(REQUEST), chatroom, self.isAdmin(REQUEST)):
+        if not self.isBanned(REQUEST) and user and self.addUser(user, chatroom, self.isAdmin(REQUEST)):
             session.set('user_properties', {'name': user,
                                             'start_action' : start_action_id,
                                             'last_action': start_action_id,
@@ -1041,9 +1043,8 @@ class TUDChat(BaseContent):
         self.userHeartbeat(REQUEST)
 
         chat_uid = session.get('user_properties').get('chat_room')
-        ip = self.chat_rooms[chat_uid]['chat_users'][user]['ip_address']
 
-        return simplejson.dumps(self.addBannedUser(user, ip, reason, chat_uid))
+        return simplejson.dumps(self.addBannedUser(user, reason, chat_uid))
 
     ##########################################################################
     # Debugging
