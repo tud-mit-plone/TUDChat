@@ -419,6 +419,7 @@ class TUDChat(BaseContent):
         if not self.isAdmin(REQUEST):
             return
         self.chat_storage.deleteChatSession(chat_uid)
+        self.chat_storage.deleteActions(chat_uid)
         try:
             del self.chat_rooms[chat_uid]
         except:

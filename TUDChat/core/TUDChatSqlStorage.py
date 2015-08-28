@@ -242,6 +242,13 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             SELECT LAST_INSERT_ID() AS newid            
             """ % (prefix))
         
+        self.deleteActions = SQL('deleteActions', 'Delete actions of a chat session',
+            sql_connector_id, 'chat_uid',
+            """
+            DELETE FROM `%s_action`
+            WHERE chat_uid = <dtml-sqlvar chat_uid type="string">
+            """ % (prefix))
+        
 class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
     """
     TUDChat SQL storage
@@ -325,6 +332,10 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
                                     content = content,
                                     target = target)
         return int(self.dictFromSql(newid, names=('newid',))[0]['newid'])
+    
+    def deleteActions(self, chat_uid):
+        result = self.sql_methods.deleteActions(chat_uid = chat_uid)
+        return True
 
     def dictFromSql(self, results=(), names=()):
         """ 
