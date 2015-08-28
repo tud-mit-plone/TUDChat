@@ -73,7 +73,7 @@
       tal:define="chat_uid python: request.get('chat_uid');
                   session_info python: here.getChatSessionInfo(chat_uid);
                   log python: here.getLogs(chat_uid)">
-<tal:block condition="session_info/showlog">
+<tal:block condition="session_info/locked">
     <h1>Chat-Log</h1>
     <table id="infotable">
         <tr>

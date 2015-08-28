@@ -75,7 +75,7 @@ class TUDChatTool(UniqueObject, SimpleItem, PropertyManager):
         
         return path
     
-    def getChatList(self):
+    def getChatList(self, withObjects = False):
         """
             This function search all TUDChats in the system, which are registered in the catalog.
             This function return a list of dictonaries with id and path.
@@ -89,7 +89,12 @@ class TUDChatTool(UniqueObject, SimpleItem, PropertyManager):
             dict = {}
             dict['id'] = brain['id']
             dict['path'] = brain.getPath()
-            results.append(dict)
+            try:
+                if withObjects:
+                    dict['obj'] = brain.getObject()
+                results.append(dict)
+            except:
+                pass
         
         return results
     
@@ -205,5 +210,18 @@ class TUDChatTool(UniqueObject, SimpleItem, PropertyManager):
                     break
         
         return db_id_list
+    
+    def lockClosedChatSessions(self):
+        """
+            This function calls in all chat content objects a method which obfuscate user names of closed unlocked chat sessions and lock these sessions after obfuscation.
+            A cron should periodical call this function.
+            The count of locked chats will be returned.
+        """
+        chats = self.getChatList(withObjects = True)
+        locked = 0
+        for chat in chats:
+            locked += chat['obj'].lockClosedChatSessions()
+        
+        return locked
 
 InitializeClass(TUDChatTool)

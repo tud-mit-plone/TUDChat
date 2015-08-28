@@ -42,9 +42,7 @@
 
         <h1>Chat-Sitzung bearbeiten</h1>
 
-<p tal:condition="python:not here.chat_storage">Es wurde noch keine Datenbank konfiguriert. Diese kann in den Chat-Einstellungen eingestellt werden.</p>
-
-<div tal:condition="python:here.chat_storage">
+<div tal:condition="not: session_info/locked">
 
 <form tal:attributes="action string:${here_url}/addSessionSubmit" name="form" method="post">
 

@@ -436,7 +436,6 @@ class TUDChat(BaseContent):
         result = []
         for x in self.chat_storage.getAllChatSessions():
             x['status'] = (x['start'] > DateTime().timeTime() and 'geplant') or (x['end'] < DateTime().timeTime() and 'abgelaufen') or 'aktiv'
-            x['showlog'] = x['status'] == 'abgelaufen'
             x['active'] = x['status'] == 'aktiv'
             result.append(x)
 
@@ -476,10 +475,58 @@ class TUDChat(BaseContent):
         if not self.isAdmin(REQUEST):
             return
         session_info = self.chat_storage.getChatSession(chat_uid)
-        session_info['showlog'] = session_info['end'] < DateTime().timeTime()
         session_info['start'] = session_info['start'].strftime('%d.%m.%Y, %H:%M Uhr')
         session_info['end'] = session_info['end'].strftime('%d.%m.%Y, %H:%M Uhr')
         return session_info
+
+    ## @brief this function obfuscates user names of closed unlocked chat sessions and locks these chat sessions
+    #  @return int count of locked chat sessions
+    def lockClosedChatSessions(self):
+        """
+        Locks closed unlocked chat sessions and obfuscates user names of message senders and in messages.
+        Only closed unlocked chat sessions that are closed for more than five minutes will be processed.
+        
+        """
+        if not self.chat_storage:
+            return 0
+        
+        chats = self.chat_storage.getClosedUnlockedChatSessions()
+        now = DateTime().timeTime()
+        locked = 0
+        
+        for chat in chats:
+            #lock only chat sessions that are closed for more than five minutes
+            if chat['end'] < now - 300:
+                users = [user['user'] for user in self.chat_storage.getUsersBySessionId(chat['id'])]
+                #replace long user names before short user names
+                #this is import for user names that containing other user names (for example: "Max" and "Max Mustermann")
+                users.sort(cmp = lambda a, b: len(a)-len(b), reverse = True)
+                actions = self.chat_storage.getRawActionContents(chat['id'])
+                i = 0
+                
+                #obfuscate user names
+                for user in users:
+                    old_name = user
+                    
+                    i += 1
+                    new_name = "Benutzer "+str(i)
+                    while new_name in users:
+                        i += 1
+                        new_name = "Benutzer "+str(i)
+                    
+                    self.chat_storage.updateUserName(chat['id'], old_name, new_name)
+                    
+                    old_name = re.compile(old_name, re.IGNORECASE)
+                    for action in actions:
+                        action['content'] = old_name.sub(new_name, action['content'])
+                
+                for action in actions:
+                    self.chat_storage.updateActionContent(action['id'], action['content'])
+                
+                self.chat_storage.lockChatSession(chat['id'])
+                locked += 1
+        
+        return locked
 
     ## @brief this function returns all chat messages about a specific chat session
     #  @param chat_uid int id of the specific chat session

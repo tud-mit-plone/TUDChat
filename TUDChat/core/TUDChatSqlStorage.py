@@ -49,6 +49,7 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
                 `max_users`   INT UNSIGNED         DEFAULT NULL,
                 `start`       DATETIME             DEFAULT NULL,
                 `end`         DATETIME             DEFAULT NULL,
+                `locked`      TINYINT(1)           DEFAULT NULL,
             PRIMARY KEY (`id` )
             );
             """ % (prefix))
@@ -109,16 +110,14 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             """
             DELETE FROM `%s_session`
             WHERE id = <dtml-sqlvar chat_uid type="string">
-            """ % (prefix)) 
+            """ % (prefix))
 
-        self.closeChatSession = SQL('closeChatSession', 'close chat session',
+        self.lockChatSession = SQL('lockChatSession', 'lock chat session',
             sql_connector_id, 'chat_uid', 
             """
-            UPDATE `%s_action`
-            SET         is_open = 0,
-                        closed = NOW()
-            WHERE
-                    id         = <dtml-sqlvar chat_uid type="int">
+            UPDATE `%s_session`
+            SET locked = 1
+            WHERE id = <dtml-sqlvar chat_uid type="int">
             """ % (prefix))
         
         self.getAllChatSessions = SQL('getAllChatSessions', 'get all planned, active and closed chat sessions',
@@ -156,6 +155,14 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             ORDER BY    start, id
             """ % (prefix))
         self.getNextChatSessions.max_rows_ = 0
+        
+        self.getClosedUnlockedChatSessions = SQL('getClosedUnlockedChatSessions', 'get closed chat sessions which are unlocked',
+            sql_connector_id, '', 
+            """
+            SELECT      *
+            FROM        `%s_session`
+            WHERE       (end < NOW() AND locked IS NULL)
+            """ % (prefix))
         
         self.getLastChatAction = SQL('getLastChatAction', 'get the last action from an active chat by chat_uid',
             sql_connector_id, 'chat_uid',
@@ -217,6 +224,15 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             """ % (prefix, prefix, prefix, prefix, prefix, prefix, prefix, prefix, prefix))
         self.getActions.max_rows_ = 0
         
+        self.getRawActionContents = SQL('getRawActionContents', 'get raw actions of a chat session',
+            sql_connector_id, 'chat_uid',
+            """
+            SELECT id, content
+            FROM `%s_action`
+            WHERE chat_uid = <dtml-sqlvar chat_uid type="int">
+            """ % (prefix))
+        self.getRawActionContents.max_rows_ = 0
+        
         self.getActionById = SQL('getActionById', 'get action by its id',
             sql_connector_id, 'action_id',
             """
@@ -242,7 +258,31 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             SELECT LAST_INSERT_ID() AS newid            
             """ % (prefix))
         
-        self.deleteActions = SQL('deleteActions', 'Delete actions of a chat session',
+        self.getUsersBySessionId = SQL('getUsersBySessionId', 'get users of a chat session',
+            sql_connector_id, 'chat_uid',
+            """
+            SELECT DISTINCT user
+            FROM            `%s_action`
+            WHERE           chat_uid = <dtml-sqlvar chat_uid type="int">
+            """ % (prefix))
+        
+        self.updateUserName = SQL('updateUserName', 'change name of user of a chat session',
+            sql_connector_id, 'chat_uid old_name new_name',
+            """
+            UPDATE `%s_action`
+            SET user = <dtml-sqlvar new_name type="string">
+            WHERE chat_uid = <dtml-sqlvar chat_uid type="int"> AND user = <dtml-sqlvar old_name type="string">
+            """ % (prefix))
+        
+        self.updateActionContent = SQL('updateActionContent', 'change content of an action',
+            sql_connector_id, 'action_id new_content',
+            """
+            UPDATE `%s_action`
+            SET content = <dtml-sqlvar new_content type="string">
+            WHERE id = <dtml-sqlvar action_id type="int">
+            """ % (prefix))
+        
+        self.deleteActions = SQL('deleteActions', 'delete actions of a chat session',
             sql_connector_id, 'chat_uid',
             """
             DELETE FROM `%s_action`
@@ -285,16 +325,16 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
         
     def getChatSession(self, chat_uid):
         result = self.sql_methods.getChatSessionById(chat_uid = chat_uid)
-        session_dict = self.dictFromSql(result, names=('id','name','description','password','max_users','start','end','active',))[0]
+        session_dict = self.dictFromSql(result, names=('id','name','description','password','max_users','start','end','active','locked',))[0]
         return session_dict
         
-    def closeChatSession(self, chat_uid):
-        self.sql_methods.closeChatSession(chat_uid = chat_uid)
+    def lockChatSession(self, chat_uid):
+        self.sql_methods.lockChatSession(chat_uid = chat_uid)
         return True
     
     def getAllChatSessions(self):
         result = self.sql_methods.getAllChatSessions()
-        return self.dictFromSql(result, ('id','name','description','password','max_users','start','end',))
+        return self.dictFromSql(result, ('id','name','description','password','max_users','start','end','locked'))
     
     def getChatSessions(self):
         result = self.sql_methods.getChatSessions()
@@ -307,6 +347,10 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
     def getNextChatSessions(self):
         result = self.sql_methods.getNextChatSessions()
         return self.dictFromSql(result, ('id','name','start','end',))
+    
+    def getClosedUnlockedChatSessions(self):
+        result = self.sql_methods.getClosedUnlockedChatSessions()
+        return self.dictFromSql(result, ('id','start','end',))
     
     def getLastChatAction(self, chat_uid):
         result = self.sql_methods.getLastChatAction(chat_uid = chat_uid)
@@ -324,6 +368,13 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
             return results
         else:
             return []
+    
+    def getRawActionContents(self, chat_uid):
+        results = self.sql_methods.getRawActionContents(chat_uid = chat_uid)
+        if results:
+            return self.dictFromSql(results, names=["id", "content"])
+        else:
+            return []
             
     def sendAction(self, chat_uid, user, action, content = "", target = None):
         newid = self.sql_methods.sendAction(chat_uid = chat_uid,
@@ -332,6 +383,21 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
                                     content = content,
                                     target = target)
         return int(self.dictFromSql(newid, names=('newid',))[0]['newid'])
+    
+    def getUsersBySessionId(self, chat_uid):
+        results = self.sql_methods.getUsersBySessionId(chat_uid = chat_uid)
+        if results:
+            return self.dictFromSql(results, ('user',))
+        else:
+            return []
+    
+    def updateUserName(self, chat_uid, old_name, new_name):
+        result = self.sql_methods.updateUserName(chat_uid = chat_uid, old_name = old_name, new_name = new_name)
+        return True
+    
+    def updateActionContent(self, action_id, new_content):
+        result = self.sql_methods.updateActionContent(action_id = action_id, new_content = new_content)
+        return True
     
     def deleteActions(self, chat_uid):
         result = self.sql_methods.deleteActions(chat_uid = chat_uid)
