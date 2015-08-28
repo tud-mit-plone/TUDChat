@@ -95,7 +95,7 @@
 
         <div class="password_field">
           <label for="password">Passwort für den Chatraum</label>
-          <input type="password" name="password" id="password" />
+          <input type="password" name="password" id="password" autocomplete="off" />
         </div>
         
         <div class="agreement_field">
