@@ -516,7 +516,7 @@ class TUDChat(BaseContent):
                     
                     self.chat_storage.updateUserName(chat['id'], old_name, new_name)
                     
-                    old_name = re.compile(old_name, re.IGNORECASE)
+                    old_name = re.compile(re.escape(old_name), re.IGNORECASE)
                     for action in actions:
                         action['content'] = old_name.sub(new_name, action['content'])
                 
