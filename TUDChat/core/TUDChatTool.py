@@ -104,7 +104,7 @@ class TUDChatTool(UniqueObject, SimpleItem, PropertyManager):
             This function return a list of ids.
         """
         portal = self.portal_url.getPortalObject()
-        folder = portal.path2ob(path)
+        folder = portal.restrictedTraverse(path)
         if folder:
             olist = folder.objectValues()
             result = [o.getId() for o in olist if o.meta_type=='Z MySQL Database Connection']
