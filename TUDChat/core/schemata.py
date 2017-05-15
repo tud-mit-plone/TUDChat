@@ -20,17 +20,8 @@
 """
 __docformat__ = 'restructuredtext'
 
-
-# CMF imports
-from Products.CMFCore import CMFCorePermissions
-from Products.CMFCore.utils import getToolByName
-
 # Archetypes imports
 from Products.Archetypes.public import *
-
-# Validators
-from Products.validation.interfaces.IValidator import IValidator
-from Products.validation.validators.ExpressionValidator import ExpressionValidator
 
 TIME_FORMATS = DisplayList((
     ('%H:%M:%S', 'Uhrzeit'),

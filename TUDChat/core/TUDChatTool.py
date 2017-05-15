@@ -18,7 +18,6 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 # CMF imports
 from Products.CMFCore.utils import UniqueObject, getToolByName
-from Products.CMFCore import CMFCorePermissions
 
 # Product imports
 from Products.TUDChat.config import *

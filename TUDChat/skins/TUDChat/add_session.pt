@@ -30,13 +30,14 @@
 
 </metal:javascriptslot>
 
-<metal:cssslot fill-slot="css_slot">
+<metal:cssslot fill-slot="style_slot">
   <link rel="stylesheet" href="jquery-ui-timepicker-addon.css" type="text/css" media="screen" />
   <link rel="stylesheet" href="tud_chat_css/ui-lightness/jquery-ui-1.8.19.custom.css" type="text/css" media="screen" />
 
 </metal:cssslot>
 
-<metal:main fill-slot="main" tal:define="errors request/errors|python:{}">
+<metal:main fill-slot="main" tal:define="errors request/errors|python:{};
+                                         here_url context/@@plone_context_state/object_url">
 
         <h1>Chat-Sitzung hinzufügen</h1>
 

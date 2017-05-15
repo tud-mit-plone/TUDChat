@@ -4,7 +4,6 @@
 import Acquisition
 import Globals
 from AccessControl import ClassSecurityInfo
-from Interface import Interface
 from DateTime import DateTime
 
 # Products imports

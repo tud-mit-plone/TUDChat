@@ -2,10 +2,8 @@
 """
 TUDChat product
 """
-
 # CMF imports
 from Products.CMFCore.DirectoryView import registerDirectory
-from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.utils import ContentInit, ToolInit
 
 # AT imports

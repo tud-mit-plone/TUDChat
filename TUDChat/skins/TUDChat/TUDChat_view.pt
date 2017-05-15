@@ -47,7 +47,7 @@
     </script>
 </metal:block>
 
-<metal:block metal:fill-slot="css_slot">
+<metal:block metal:fill-slot="style_slot">
     <link rel="stylesheet" type="text/css" href="tud_chat.css" />
     <link rel="stylesheet" type="text/css" tal:attributes="href string:${here/absolute_url}/tud_chat_additional.css" />
 </metal:block>

@@ -2,7 +2,7 @@
 """ Interface for the Persistence Layer (probably biased towards SQL-Databases)
 """
 
-from Interface import Interface
+from zope.interface import Interface
 
 class ITUDChatStorage(Interface):
 

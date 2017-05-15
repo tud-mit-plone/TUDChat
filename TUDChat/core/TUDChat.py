@@ -8,9 +8,6 @@ __docformat__ = 'restructuredtext'
 # Python imports
 import re
 import simplejson
-import random, string
-import os.path, time
-from cStringIO import StringIO
 import urlparse
 
 # Zope imports
@@ -20,7 +17,7 @@ from DateTime import DateTime
 
 # CMF imports
 from Products.CMFCore.utils import getToolByName
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore import permissions
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 # Archetypes imports
@@ -36,9 +33,6 @@ from Products.TUDChat.core.schemata import TUDChatSchema
 from Products.TUDChat.core.InteractionInterface import ITUDChatInteractionInterface
 from Products.TUDChat.core.PersistenceInterface import ITUDChatStorage
 from Products.TUDChat.core.TUDChatSqlStorage import TUDChatSqlStorage
-
-# for Debugging only
-from pprint import saferepr
 
 import logging
 logger = logging.getLogger('TUDChat')
@@ -83,25 +77,25 @@ class TUDChat(BaseContent):
         {'id'           : 'view',
          'name'         : 'View',
          'action'       : 'string:${object_url}/TUDChat_view',
-         'permissions'  : (CMFCorePermissions.View, ),
+         'permissions'  : (permissions.View, ),
          'category'     : 'object'
          },
         {'id'           : 'edit',
          'name'         : 'Chat-Einstellungen',
          'action'       : 'string:${object_url}/base_edit',
-         'permissions'  : (CMFCorePermissions.ManageProperties, ),
+         'permissions'  : (permissions.ManageProperties, ),
          'category'     : 'object'
          },
         {'id'           : 'add_session',
          'name'         : 'Chat-Sitzung hinzufügen',
          'action'       : 'string:${object_url}/add_session',
-         'permissions'  : (CMFCorePermissions.ManageProperties, ),
+         'permissions'  : (permissions.ManageProperties, ),
          'category'     : 'object'
          },
         {'id'           : 'edit_sessions',
          'name'         : 'Chat-Sitzungen verwalten',
          'action'       : 'string:${object_url}/edit_sessions',
-         'permissions'  : (CMFCorePermissions.ManageProperties, ),
+         'permissions'  : (permissions.ManageProperties, ),
          'category'     : 'object'
          },
     )
@@ -485,15 +479,15 @@ class TUDChat(BaseContent):
         """
         Locks closed unlocked chat sessions and obfuscates user names of message senders and in messages.
         Only closed unlocked chat sessions that are closed for more than five minutes will be processed.
-        
+
         """
         if not self.chat_storage:
             return 0
-        
+
         chats = self.chat_storage.getClosedUnlockedChatSessions()
         now = DateTime().timeTime()
         locked = 0
-        
+
         for chat in chats:
             #lock only chat sessions that are closed for more than five minutes
             if chat['end'] < now - 300:
@@ -503,29 +497,29 @@ class TUDChat(BaseContent):
                 users.sort(cmp = lambda a, b: len(a)-len(b), reverse = True)
                 actions = self.chat_storage.getRawActionContents(chat['id'])
                 i = 0
-                
+
                 #obfuscate user names
                 for user in users:
                     old_name = user
-                    
+
                     i += 1
                     new_name = "Benutzer "+str(i)
                     while new_name in users:
                         i += 1
                         new_name = "Benutzer "+str(i)
-                    
+
                     self.chat_storage.updateUserName(chat['id'], old_name, new_name)
-                    
+
                     old_name = re.compile(re.escape(old_name), re.IGNORECASE)
                     for action in actions:
                         action['content'] = old_name.sub(new_name, action['content'])
-                
+
                 for action in actions:
                     self.chat_storage.updateActionContent(action['id'], action['content'])
-                
+
                 self.chat_storage.lockChatSession(chat['id'])
                 locked += 1
-        
+
         return locked
 
     ## @brief this function returns all chat messages about a specific chat session
@@ -755,7 +749,7 @@ class TUDChat(BaseContent):
     # Exposed methods
     ###################################
 
-    security.declareProtected(CMFCorePermissions.View, "registerMe")
+    security.declareProtected(permissions.View, "registerMe")
     ## @brief this function registers an user to a chat room
     #  @param user str proposed name of the user
     #  @param chatroom int id of the room where the user want to enter
@@ -815,7 +809,7 @@ class TUDChat(BaseContent):
             return simplejson.dumps(True)
         return simplejson.dumps(False)
 
-    security.declareProtected(CMFCorePermissions.View, "logout")
+    security.declareProtected(permissions.View, "logout")
     ## @brief this function removes an user from a chat room
     #  @return bool true if the user was successfully removed from the room, otherwise false
     def logout(self, REQUEST = None):
@@ -1103,7 +1097,7 @@ class TUDChat(BaseContent):
     # Debugging
     ##########################################################################
 
-    security.declareProtected(CMFCorePermissions.View, "status")
+    security.declareProtected(permissions.View, "status")
     ## @brief this function returns status information about all chat rooms and the session of the calling user
     #  @param asJSON bool set to true if you want JSON formatted response
     #  @return str status information in JSON or non-JSON format
@@ -1122,7 +1116,7 @@ class TUDChat(BaseContent):
         else:
             return d
 
-    security.declareProtected(CMFCorePermissions.View, "resetLastAction")
+    security.declareProtected(permissions.View, "resetLastAction")
     ## @brief this function resets the last action to the start action of the user's chat room
     def resetLastAction(self, REQUEST = None):
         """ Reset last_action to get all messages from the beginning. """
@@ -1133,7 +1127,7 @@ class TUDChat(BaseContent):
             user_properties['user_list'] = []
             session.set('user_properties', user_properties)
 
-    security.declareProtected(CMFCorePermissions.View, "addPrefix")
+    security.declareProtected(permissions.View, "addPrefix")
     ## @brief this function adds a prefix to a given database
     #  @param db str database connector id
     #  @param prefix str prefix of the database
@@ -1153,7 +1147,7 @@ class TUDChat(BaseContent):
 
         return str(not already_exist)
 
-    security.declareProtected(CMFCorePermissions.View, "myRequest")
+    security.declareProtected(permissions.View, "myRequest")
     def myRequest(self, REQUEST = None):
         """ reset last_action to get all messages from the beginning """
         return REQUEST

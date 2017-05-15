@@ -2,7 +2,7 @@
 """ Interface exposed for the Chat client
 """
 
-from Interface import Interface
+from zope.interface import Interface
 
 class ITUDChatInteractionInterface(Interface):
 

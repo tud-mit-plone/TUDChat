@@ -18,8 +18,8 @@
     <script type="text/javascript" tal:content="structure string:var refreshRate = ${here/refreshRate} * 1000; var blockTime = ${here/blockTime} * 1000; var ownUsername = '${request/SESSION/user_properties/name|nothing}'; var base_url = '${here/absolute_url}'; var maxMessageLength = ${here/maxMessageLength}">
     </script>
 </metal:block>
-
-<metal:block metal:fill-slot="css_slot">
+    
+<metal:block metal:fill-slot="style_slot">
     <link rel="stylesheet" type="text/css" href="tud_chat.css" />
     <link rel="stylesheet" type="text/css" tal:condition="python:here.isAdmin(here.REQUEST) == True" href="tud_chat_admin.css" />
     <link rel="stylesheet" type="text/css" tal:attributes="href string:${here/absolute_url}/tud_chat_additional.css" />

@@ -3,10 +3,6 @@
     Configuration for this product
 """
 
-import os
- 
-from Products.CMFCore.CMFCorePermissions import setDefaultRoles
-
 GLOBALS = globals()
 PROJECTNAME = 'TUDChat'
 SKINS_DIR = 'skins'
