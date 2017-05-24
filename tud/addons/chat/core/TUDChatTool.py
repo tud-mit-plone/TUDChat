@@ -20,7 +20,7 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.CMFCore.utils import UniqueObject, getToolByName
 
 # Product imports
-from Products.TUDChat.config import *
+from tud.addons.chat.config import *
 
 class TUDChatTool(UniqueObject, SimpleItem, PropertyManager):
     """ Tool for TUDChat """

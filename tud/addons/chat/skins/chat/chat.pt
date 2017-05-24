@@ -15,7 +15,7 @@
     <script language="javascript" tal:condition="python:not here.isAdmin(here.REQUEST) == True" src="tud_chat_user.js"></script>
     <script language="javascript" src="tud_chat.js"></script>
 
-    <script type="text/javascript" tal:content="structure string:var refreshRate = ${here/refreshRate} * 1000; var blockTime = ${here/blockTime} * 1000; var ownUsername = '${request/SESSION/user_properties/name|nothing}'; var base_url = '${here/absolute_url}'; var maxMessageLength = ${here/maxMessageLength}">
+    <script type="text/javascript" tal:content="structure string:var refreshRate = ${here/refreshRate} * 1000; var blockTime = ${here/blockTime} * 1000; var ownUsername = '${request/SESSION/user_properties/name|nothing}'; var chat_url = '${here/absolute_url}'; var maxMessageLength = ${here/maxMessageLength}">
     </script>
 </metal:block>
     

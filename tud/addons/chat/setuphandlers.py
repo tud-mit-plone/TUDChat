@@ -14,38 +14,40 @@ from Products.Archetypes import listTypes
 from Products.Archetypes.Extensions.utils import installTypes, install_subskin
 
 # Product imports
-from Products.TUDChat.config import *
+from tud.addons.chat.config import *
 
 def setPermissions(self, out):
     """
     """
     pass
 
-def install(self):
-    """
-    """
+def setupVarious(context):
+    '''
+    Ordinarily, GenericSetup handlers check for the existence of XML files.
+    Here, we are not parsing an XML file, but we use a text file as a
+    flag to check that we actually meant for this import step to be run.
+    The file is found in profiles/default.
+    '''
+
+    if context.readDataFile('tud.addons.chat-default.txt') is None:
+        return
+
+    site = context.getSite()
+
     out = StringIO()
 
     # install types
     typeInfo = listTypes(PROJECTNAME)
-    installTypes(self, out, typeInfo, PROJECTNAME)
-    
-    # install skin
-    install_subskin(self, out, GLOBALS)
+    installTypes(site, out, typeInfo, PROJECTNAME)
 
     # Add portal types to use portal factory
-    pftool = getToolByName(self, 'portal_factory')
+    pftool = getToolByName(site, 'portal_factory')
     pftool.manage_setPortalFactoryTypes(listOfTypeIds=(PROJECTNAME,))
-    
+
     # install tool
-    portal_root = self.portal_url.getPortalObject()
+    portal_root = site.portal_url.getPortalObject()
     if not hasattr(portal_root, "portal_tud_chat"):
-        portal_root.manage_addProduct['TUDChat'].manage_addTool('TUDChatTool')
-    
-    # add role for Chat Moderator
-    portal_root = self.portal_url.getPortalObject()
-    portal_root._addRole('ChatModerator')
-    portal_root.manage_role('ChatModerator', ('Access contents information', 'Manage properties', 'Modify portal content', 'View'))
+        portal_root.manage_addProduct['tud.addons.chat'].manage_addTool('TUDChatTool')
 
     out.write('Installation completed.\n')
     return out.getvalue()

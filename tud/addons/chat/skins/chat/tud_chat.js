@@ -18,7 +18,7 @@ var sendMessage = function(){
   $("#chatMsgValue").val("");
   $('#chatMsgValue').keyup();
 
-	$.post(base_url + "/sendMessage", { 'message': message },
+	$.post(chat_url + "/sendMessage", { 'message': message },
         function(data) {                // Immediately update the chat, after sending the message
             currentScrollMode = scrollMode.alwaysBottom;
             updateCheck();
@@ -52,7 +52,7 @@ var updateCheck = function(){
 		return;
 	updateCheckBlock = true;
 
-	$.getJSON(base_url + "/getActions", function(data){
+	$.getJSON(chat_url + "/getActions", function(data){
 		// Status
 
 		if (data.status.code == 1) { // Not authorized
@@ -264,7 +264,7 @@ $(document).ready(
 
     $("#chatMsgForm").submit(sendMessage);
 
-		$.get(base_url + "/resetLastAction", function(data){
+		$.get(chat_url + "/resetLastAction", function(data){
 		updateCheckTimeout();
 		});
 
@@ -273,7 +273,7 @@ $(document).ready(
             $.ajax(
               {type: "GET",
                dataType: "text",
-               url: base_url + "/logout",
+               url: chat_url + "/logout",
                 success: function(data) {
              	    goHierarchieUp();
                  },

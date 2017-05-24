@@ -28,14 +28,14 @@ except ImportError:
     from Products.Archetypes.public import *
 
 # Product imports
-from Products.TUDChat.config import *
-from Products.TUDChat.core.schemata import TUDChatSchema
-from Products.TUDChat.core.InteractionInterface import ITUDChatInteractionInterface
-from Products.TUDChat.core.PersistenceInterface import ITUDChatStorage
-from Products.TUDChat.core.TUDChatSqlStorage import TUDChatSqlStorage
+from tud.addons.chat.config import *
+from tud.addons.chat.core.schemata import TUDChatSchema
+from tud.addons.chat.core.InteractionInterface import ITUDChatInteractionInterface
+from tud.addons.chat.core.PersistenceInterface import ITUDChatStorage
+from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
 
 import logging
-logger = logging.getLogger('TUDChat')
+logger = logging.getLogger('tud.addons.chat')
 
 class UserStatus:
     OK, NOT_AUTHORIZED, KICKED, BANNED, LOGIN_ERROR, WARNED, CHAT_WARN = range(7)
@@ -104,9 +104,9 @@ class TUDChat(BaseContent):
 
     # Page Templates
     security.declareProtected(manage_properties, 'add_session')
-    add_session = PageTemplateFile('../skins/TUDChat/add_session.pt', globals())
+    add_session = PageTemplateFile('../skins/chat/add_session.pt', globals())
     security.declareProtected(manage_properties, 'edit_sessions')
-    edit_sessions = PageTemplateFile('../skins/TUDChat/edit_sessions.pt', globals())
+    edit_sessions = PageTemplateFile('../skins/chat/edit_sessions.pt', globals())
 
     ## @brief class constructor which prepares the database connection
     #  @param id the identifier of the chat object
