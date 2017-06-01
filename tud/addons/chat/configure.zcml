@@ -8,6 +8,8 @@
             package         = "."
             initialize      = ".initialize"/>
 
+    <include package=".content"/>
+
     <cmf:registerDirectory
             name            = "skins"
             directory       = "skins"

@@ -36,14 +36,6 @@ def setupVarious(context):
 
     out = StringIO()
 
-    # install types
-    typeInfo = listTypes(PROJECTNAME)
-    installTypes(site, out, typeInfo, PROJECTNAME)
-
-    # Add portal types to use portal factory
-    pftool = getToolByName(site, 'portal_factory')
-    pftool.manage_setPortalFactoryTypes(listOfTypeIds=(PROJECTNAME,))
-
     # install tool
     portal_root = site.portal_url.getPortalObject()
     if not hasattr(portal_root, "portal_tud_chat"):

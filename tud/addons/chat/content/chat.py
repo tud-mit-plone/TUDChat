@@ -1,41 +1,164 @@
 # -*- coding: utf-8 -*-
-## TUDChat
-"""
-    TUDChat
-"""
-__docformat__ = 'restructuredtext'
 
 # Python imports
 import re
 import simplejson
 import urlparse
+import logging
 
 # Zope imports
-from AccessControl import ClassSecurityInfo, getSecurityManager
-from AccessControl.Permissions import manage_properties
 from DateTime import DateTime
+from AccessControl import ClassSecurityInfo, getSecurityManager
+from zope.schema.vocabulary import SimpleTerm
+from zope.schema.vocabulary import SimpleVocabulary
 
 # CMF imports
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore import permissions
-from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
-# Archetypes imports
+from Products.Archetypes import atapi
+from Products.ATContentTypes.content import base, schemata
+from Products.Archetypes.atapi import Schema
+from Products.Archetypes.atapi import ReferenceField
+from Products.Archetypes.atapi import StringField, BooleanField, IntegerField
+from Products.Archetypes.public import StringWidget, SelectionWidget, BooleanWidget, IntegerWidget
+from Products.Archetypes.public import DisplayList
+
 try:
-    from Products.LinguaPlone.public import *
+    from raptus.multilanguagefields import fields
+    from raptus.multilanguagefields import widgets
 except ImportError:
-    # No multilingual support
-    from Products.Archetypes.public import *
+    from Products.Archetypes import Field as fields
+    from Products.Archetypes import Widget as widgets
 
-# Product imports
-from tud.addons.chat.config import *
-from tud.addons.chat.core.schemata import TUDChatSchema
 from tud.addons.chat.core.InteractionInterface import ITUDChatInteractionInterface
-from tud.addons.chat.core.PersistenceInterface import ITUDChatStorage
 from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
 
-import logging
 logger = logging.getLogger('tud.addons.chat')
+
+TIME_FORMATS = DisplayList((
+    ('%H:%M:%S', 'Uhrzeit'),
+    ('%H:%M', 'Uhrzeit (ohne Sekunden)'),
+    ('%d.%m.%Y %H:%M:%S', 'Datum und Uhrzeit'),
+    ('%d.%m.%Y %H:%M', 'Datum und Uhrzeit (ohne Sekunden)'),
+    ))
+
+BAN_STRATEGIES = DisplayList((
+    ('COOKIE', 'Nur Cookie (empfohlen)'),
+    ('IP', 'Nur IP-Adresse'),
+    ('COOKIE_AND_IP', 'Cookie und IP-Adresse (restriktiv)'),
+    ))
+
+ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
+    fields.TextField('introduction',
+        required           = False,
+        searchable         = False,
+        schemata           = 'default',
+        default            = '',
+        widget            = widgets.TextAreaWidget(
+            label        = u"Begrueßungstext",
+            description  = u"Bitte geben Sie den Text an, der bei der Raumauswahl angezeigt werden soll."
+        )
+    ),
+    StringField("connector_id",
+        required           = True,
+        searchable         = False,
+        primary            = False,
+        schemata           = 'default',
+        default            = '',
+        storage            = atapi.AnnotationStorage(),
+        enforceVocabulary  = True,
+        vocabulary         = "getAllowedDbList",
+        widget             = SelectionWidget(
+            label        = u"Datenbank",
+            description  = u"Mit welcher Datenbank soll der Chat betrieben werden?"
+        )
+    ),
+    StringField("database_prefix",
+        required           = True,
+        searchable         = False,
+        primary            = False,
+        schemata           = 'default',
+        default            = '',
+        storage            = atapi.AnnotationStorage(),
+        widget             = StringWidget(
+            label        = u"Datenbank-Praefix",
+            description  = u"Bitte geben Sie einen Praefix fuer Tabellen in der Datebank an; z.B.: 'institutionsname'"
+        )
+    ),
+    BooleanField('showDate',
+        required           = True,
+        default            = True,
+        widget             = BooleanWidget(
+            label        = u"Zeitstempel an Chatnachrichten?",
+            description  = u"Bitte geben Sie an, ob die Chatnachricht mit einem Zeitstempel begleitet werden soll."
+        )
+    ),
+    StringField('chatDateFormat',
+        required           = False,
+        default            = '%H:%M:%S',
+        vocabulary         = TIME_FORMATS,
+        widget             = SelectionWidget(
+            label        = u"Format des Zeitstempels",
+            description  = u"Bitte geben Sie das Format des Zeitstempels an.",
+            format       = "select",
+        )
+    ),
+    StringField('adminColor',
+        required           = True,
+        default            = '#ff0000',
+        widget             = StringWidget(
+            label        = u"Textfarbe fuer Chatmoderator",
+            description  = u"Bitte geben Sie die Textfarbe als HTML-Farbcode fuer die Chatmoderatoren an."
+        )
+    ),
+    IntegerField('timeout',
+        required           = True,
+        default            = 15,
+        widget             = IntegerWidget(
+            label        = u"Socket-Timeout (in Sekunden)",
+            description  = u"Bitte geben Sie den Socket-Timeout fuer den Chatuser an. Nach dieser Zeit wird dieser automatisch aus dem Chat entfernt."
+        )
+    ),
+    IntegerField('refreshRate',
+        required           = True,
+        default            = 2,
+        widget             = IntegerWidget(
+            label        = u"Aktualisierungs-Rate (in Sekunden)",
+            description  = u"Bitte geben Sie Frequenz an, in welcher der Chat aktualisiert werden soll."
+        )
+    ),
+    IntegerField('maxMessageLength',
+        required           = True,
+        default            = 0,
+        widget             = IntegerWidget(
+            label        = u"maximale Nachrichtenlaenge",
+            description  = u"Bitte geben Sie die maximale Anzahl von Zeichen an, aus der eine einzelne Chat-Nachricht bestehen darf. (0 bedeutet, dass keine Begrenzung aktiv ist)"
+        )
+    ),
+    IntegerField('blockTime',
+        required           = True,
+        default            = 1,
+        widget             = IntegerWidget(
+            label        = u"Wartezeit zwischen Nachrichten (in Sekunden)",
+            description  = u"Bitte geben Sie die Wartezeit an, bis der Benutzer wieder erneut eine Nachricht schicken kann."
+        )
+    ),
+    StringField('banStrategy',
+        required           = True,
+        default            = 'COOKIE',
+        vocabulary         = BAN_STRATEGIES,
+        widget             = SelectionWidget(
+            visible      = -1,
+            label        = u"Ban-Strategie",
+            description  = u"Bitte waehlen Sie mit welchen Mitteln gebannte Benutzer markiert werden. ",
+            format       = "select"
+        )
+    ),
+),
+)
+
+schemata.finalizeATCTSchema(ChatSchema, folderish=False, moveDiscussion=False)
 
 class UserStatus:
     OK, NOT_AUTHORIZED, KICKED, BANNED, LOGIN_ERROR, WARNED, CHAT_WARN = range(7)
@@ -43,19 +166,24 @@ class UserStatus:
 class BanStrategy:
     COOKIE, IP, COOKIE_AND_IP = ('COOKIE', 'IP', 'COOKIE_AND_IP')
 
+class Chat(base.ATCTContent):
+    """Chat content type
 
-class TUDChat(BaseContent):
-    """TUDChat class"""
+    """
 
     __implements__ = (ITUDChatInteractionInterface,)
-    meta_type                = 'TUDChat'
-    archetype_name           = 'Chat'
-    content_icon             = 'content_icon.gif'
-    default_view             = 'TUDChat_view'
-    schema                   = TUDChatSchema
-    isPrincipiaFolderish     = False
 
-    chat_storage             = None
+    meta_type = 'Chat'
+    portal_type = "Chat"
+    archetype_name = 'Chat'
+    isPrincipiaFolderish = False
+
+    #: Archetype schema
+    schema = ChatSchema
+
+    security = ClassSecurityInfo()
+
+    chat_storage = None
 
     # Data
     ## @brief collection of timestamps to call methods in certain intervals
@@ -71,68 +199,11 @@ class TUDChat(BaseContent):
     ## @brief replacements for special html chars (char "&" is in function included)
     htmlspecialchars         = {'"':'&quot;', '\'':'&#039;', '<':'&lt;', '>':'&gt;'} # {'"':'&quot;'} this comment is needed, because there is a bug in doxygen
 
-    # Actions
-    ## @brief describe the menu for the chat
-    actions = (
-        {'id'           : 'view',
-         'name'         : 'View',
-         'action'       : 'string:${object_url}/TUDChat_view',
-         'permissions'  : (permissions.View, ),
-         'category'     : 'object'
-         },
-        {'id'           : 'edit',
-         'name'         : 'Chat-Einstellungen',
-         'action'       : 'string:${object_url}/base_edit',
-         'permissions'  : (permissions.ManageProperties, ),
-         'category'     : 'object'
-         },
-        {'id'           : 'add_session',
-         'name'         : 'Chat-Sitzung hinzufügen',
-         'action'       : 'string:${object_url}/add_session',
-         'permissions'  : (permissions.ManageProperties, ),
-         'category'     : 'object'
-         },
-        {'id'           : 'edit_sessions',
-         'name'         : 'Chat-Sitzungen verwalten',
-         'action'       : 'string:${object_url}/edit_sessions',
-         'permissions'  : (permissions.ManageProperties, ),
-         'category'     : 'object'
-         },
-    )
-
-    security = ClassSecurityInfo()
-
-    # Page Templates
-    security.declareProtected(manage_properties, 'add_session')
-    add_session = PageTemplateFile('../skins/chat/add_session.pt', globals())
-    security.declareProtected(manage_properties, 'edit_sessions')
-    edit_sessions = PageTemplateFile('../skins/chat/edit_sessions.pt', globals())
-
     ## @brief class constructor which prepares the database connection
     #  @param id the identifier of the chat object
     def __init__(self, id):
-        self.id = id
-        logger.info("Initialised 'TUDChat Content'...")
-        self.chat_storage = None
+        super(Chat, self).__init__(id)
         self.own_database_prefixes = self.own_database_prefixes
-
-
-    security.declarePrivate('_post_init')
-    def _post_init(self):
-        """
-        _post_init(self) => Post-init method (being called AFTER the class has been set into the ZODB)
-        """
-        # We set the object creator as a Reviewer - as it won't be possible to do so
-        # later because of permission restrictions
-        obj = self
-        member_id = getToolByName(self, 'portal_membership').getAuthenticatedMember().getId()
-        roles = list(obj.get_local_roles_for_userid( userid=member_id ))
-        if "Reviewer" not in roles:
-            roles.append( "Reviewer" )
-            obj.manage_setLocalRoles( member_id, roles )
-        # We reindex the object
-        self.reindexObject()
-        logger.info("Postinit")
 
     ##########################################################################
     # General Utility methods
@@ -1152,4 +1223,4 @@ class TUDChat(BaseContent):
         """ reset last_action to get all messages from the beginning """
         return REQUEST
 
-registerType(TUDChat, PROJECTNAME)
+atapi.registerType(Chat, 'tud.addons.chat')

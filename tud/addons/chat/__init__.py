@@ -22,11 +22,11 @@ logger = logging.getLogger('tud.addons.chat')
 # Initialization method
 def initialize(context):
     logger.info('tud.addons.chat initalize')
-    listOfTypes = listTypes(PROJECTNAME)
-    content_types, constructors, ftis = process_types(listOfTypes, PROJECTNAME)
+    listOfTypes = listTypes('tud.addons.chat')
+    content_types, constructors, ftis = process_types(listOfTypes, 'tud.addons.chat')
     logger.info('content_types, constructors, ftis : %s' % str((content_types, constructors, ftis,)))
 
-    ret = ContentInit('%s Content' % PROJECTNAME,
+    ret = ContentInit('%s Content' % 'tud.addons.chat',
                 content_types = tuple(content_types),
                 extra_constructors = tuple(constructors),
                 fti = ftis,
