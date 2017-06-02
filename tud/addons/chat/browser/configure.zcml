@@ -1,0 +1,14 @@
+<configure
+        xmlns="http://namespaces.zope.org/zope"
+        xmlns:browser="http://namespaces.zope.org/browser">
+
+    <browser:page
+             for         = "tud.addons.chat.content.chat.Chat"
+             name        = "view"
+             class       = ".chat.ChatView"
+             template    = "templates/chat_view.pt"
+             layer       = "tud.addons.chat.interfaces.IAddonInstalled"
+             permission  = "zope2.View"
+     />
+
+</configure>

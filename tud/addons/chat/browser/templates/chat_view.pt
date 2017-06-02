@@ -1,5 +1,5 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
-  metal:use-macro="here/main_template/macros/master" i18n:domain="plone">
+  metal:use-macro="context/main_template/macros/master" i18n:domain="plone">
 <head>
 
 <metal:block metal:fill-slot="javascript_head_slot">
@@ -7,7 +7,7 @@
     <script language="javascript" src="jquery-1.7.min.js"></script>
     <script language="javascript" src="jquery.notification.js"></script>
     <script language="javascript" src="jquery.ba-dotimeout.min.js"></script>
-    <script type="text/javascript" tal:content="string:var chat_url = '${here/absolute_url}';"></script>
+    <script type="text/javascript" tal:content="string:var chat_url = '${context/absolute_url}';"></script>
     <script language="javascript">
     $(document).ready(
         function() {
@@ -49,41 +49,41 @@
 
 <metal:block metal:fill-slot="style_slot">
     <link rel="stylesheet" type="text/css" href="tud_chat.css" />
-    <link rel="stylesheet" type="text/css" tal:attributes="href string:${here/absolute_url}/tud_chat_additional.css" />
+    <link rel="stylesheet" type="text/css" tal:attributes="href string:${context/absolute_url}/tud_chat_additional.css" />
 </metal:block>
 
 </head>
 
-<body metal:fill-slot="main" i18n:domain="tudchat">
+<body metal:fill-slot="main" i18n:domain="tudchat"
+      tal:define="active_sessions view/getActiveChatSessions;
+                  next_sessions view/getNextChatSessions">
 
-<tal:domain_check define="newurl python: here.checkURL(here.absolute_url());
+<tal:domain_check define="newurl python: view.checkURL(context.absolute_url());
                           dummy python: newurl and request.RESPONSE.redirect(newurl) or None">
 </tal:domain_check>
 
-<h2 tal:content="here/title"> Title of chat </h2>
+<h2 tal:content="view/getTitle"> Title of chat </h2>
 
-<div class="chat_introduction" tal:content="here/introduction"> Introduction </div>
+<div class="chat_introduction" tal:content="view/getIntroduction"> Introduction </div>
 
 <div class="chat_explanation"><span class="introduction">Datenschutzhinweis:</span>
     Um an einem Chat teilnehmen zu können, wählen Sie bitte unten einen Chat-Raum aus, tragen Ihren gewünschten Benutzernamen ein und bestätigen, dass Sie diesen Datenschutzhinweis zur Kenntnis genommen haben. Um anonym zu bleiben, nutzen Sie bitte einen Nickname als Benutzernamen. Er muss zwischen 3 und 20 Zeichen lang sein und mindestens 3 Buchstaben enthalten. Wenn Sie eine Nachricht im Chat verschicken, können alle Teilnehmer den von Ihnen gewählten Benutzernamen und die Nachricht sehen. Die Nachrichten werden zusammen mit einem Zeitstempel über die Chatlaufzeit hinaus anonymisiert gespeichert. Bitte beachten Sie, dass persönliche Angaben in den Chatnachrichten nicht anonymisiert werden können. Die Moderatoren können die Chats im Nachhinein  ausschließlich  zur Verbesserung der FAQ-Angebote auswerten. Die Löschung der Daten erfolgt spätestens nach 3 Monaten. Die Räume sind zeitlich befristet und werden moderiert. Bei Fehlverhalten von Chatnutzern können Konsequenzen in Form von einer Verwarnung und permanenter Verweisung des Chatraums folgen. Zur Realisierung der Verweisung wird in diesem Fall ein Cookie in Ihrem Browser gesetzt. Private Nachrichten können aktuell im Chat nicht verschickt werden. Sollten Sie vertrauliche Informationen übertragen wollen, nutzen Sie bitte die E-Mail-Kontaktdaten auf den Webseiten.
 </div>
 
-<tal:block define="sessions python:here.getActiveChatSessions();
-                   next_sessions python:here.getNextChatSessions()"
-           condition="python:here.getActiveChatSessions() is not None">
+<tal:block condition="python:active_sessions is not None">
 
-    <form id="login" class="chat_login" action="" tal:condition="sessions">
-        <script language="javascript" tal:content="python: 'var password_channels = [' + ','.join([str(session['id']) for session in sessions if session.get('password') != None]) + '];'"></script>
+    <form id="login" class="chat_login" action="" tal:condition="active_sessions">
+        <script language="javascript" tal:content="python: 'var password_channels = [' + ','.join([str(session['id']) for session in active_sessions if session.get('password') != None]) + '];'"></script>
         <div>
           <label for="chatroom">Raum</label>
-          <tal:block condition="python: len(sessions) > 1">
+          <tal:block condition="python: len(active_sessions) > 1">
             <select name="chatroom">
-                <tal:block repeat="session sessions">
+                <tal:block repeat="session active_sessions">
                     <option tal:attributes="value session/id" class="chat_option" tal:content="session/name"> Chat session name </option>
                 </tal:block>
             </select>
           </tal:block>
-          <tal:block condition="python: len(sessions) == 1" tal:define="session python:sessions[0]">
+          <tal:block condition="python: len(active_sessions) == 1" tal:define="session python:active_sessions[0]">
             <input type="hidden" name="chatroom" tal:attributes="value session/id" /> <span class="chat_option" tal:content="session/name" />
           </tal:block>
         </div>
@@ -97,9 +97,9 @@
           <label for="password">Passwort für den Chatraum</label>
           <input type="password" name="password" id="password" autocomplete="off" />
         </div>
-        
+
         <div class="agreement_field">
-		  <div class="left">
+          <div class="left">
             <label for="agreement">Ich habe den Datenschutzhinweis gelesen und verstanden und möchte unter den darin genannten Bedingungen teilnehmen.</label>
           </div>
           <div class="left">
@@ -114,7 +114,7 @@
         </div>
     </form>
 
-    <tal:block condition="python: not sessions">
+    <tal:block condition="python: not active_sessions">
       <div class="chat_nosession">
         Es existiert derzeit keine aktive Chatsitzung.
         <span tal:condition="python: next_sessions">Es werden allerdings welche stattfinden.</span>
@@ -143,6 +143,6 @@
         </table>
     </tal:block>
 </tal:block>
-<p tal:condition="python:here.getActiveChatSessions() is None">Es wurde noch keine Datenbank konfiguriert. Diese kann in den Chat-Einstellungen eingestellt werden.</p>
+<p tal:condition="python:active_sessions is None">Es wurde noch keine Datenbank konfiguriert. Diese kann in den Chat-Einstellungen eingestellt werden.</p>
 </body>
 </html>

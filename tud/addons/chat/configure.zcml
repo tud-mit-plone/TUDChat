@@ -9,6 +9,7 @@
             initialize      = ".initialize"/>
 
     <include package=".content"/>
+    <include package=".browser"/>
 
     <cmf:registerDirectory
             name            = "skins"

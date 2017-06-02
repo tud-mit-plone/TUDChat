@@ -253,32 +253,6 @@ class Chat(base.ATCTContent):
             dl.add(connection, connection)
         return dl
 
-    ## @brief this function checks if the domain in the url matches the chat domain
-    #  @param url str complete url to check
-    #  @return str url to redirect if domains don't match, otherwise empty string
-    security.declarePublic("checkURL")
-    def checkURL(self, url):
-        """ chat domain check"""
-        portal_tud_chat_tool = getToolByName(self, 'portal_tud_chat')
-        chat_domain = portal_tud_chat_tool.chat_domain
-        transfer_protocol = portal_tud_chat_tool.transfer_protocol
-
-        domain = urlparse.urlparse(url)
-
-        if domain[1].count(":") == 0:
-            hostname = domain[1]
-            port = ""
-        elif domain[1].count(":") == 1:
-            hostname, port = domain[1].split(":")
-            port = ":"+port
-        else:
-            return ""
-
-        if hostname != chat_domain:
-            return urlparse.urlunparse((transfer_protocol, chat_domain+port, domain[2], domain[3], domain[4], domain[5]))
-        else:
-            return ""
-
     ## @brief this function checks for a valid utf-8 string
     #  @param url str string to check
     #  @return bool true for valid utf-8 otherwise false
@@ -513,24 +487,6 @@ class Chat(base.ATCTContent):
         if not self.isAdmin(REQUEST):
             return
         return self.chat_storage.getChatSessions()
-
-    ## @brief this function generates a list of all chat sessions which were active
-    #  @return list of dictionaries, the following information are in every dict: id,name,description,password,max_users,start,end
-    def getActiveChatSessions(self, REQUEST = None):
-        """ Get a list of all active chat sessions. """
-        if self.chat_storage:
-            return self.chat_storage.getActiveChatSessions()
-        else:
-            return None
-
-    ## @brief this function generates a list of all chat sessions which were planned
-    #  @return list of dictionaries, the following information are in every dict: id,name,start,end
-    def getNextChatSessions(self, REQUEST = None):
-        """ Get the next chat session, which will start. """
-        if self.chat_storage:
-            return self.chat_storage.getNextChatSessions()
-        else:
-            return None
 
     ## @brief this function returns information about a specific chat session
     #  @param chat_uid int id of the specific chat session

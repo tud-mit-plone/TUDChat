@@ -9,17 +9,17 @@
     <property name="content_meta_type">Chat</property>
     <property name="product">tud.addons.chat</property>
     <property name="factory">addChat</property>
-    <property name="immediate_view">TUDChat_view</property>
+    <property name="immediate_view">view</property>
     <!-- parent-child relation -->
     <property name="global_allow">True</property>
     <property name="filter_content_types">False</property>
     <!-- allow discussion -->
     <property name="allow_discussion">False</property>
     <!-- set default view-->
-    <property name="default_view">TUDChat_view</property>
+    <property name="default_view">view</property>
     <!-- available view in view-selection -->
     <property name="view_methods">
-        <element value="TUDChat_view"/>
+        <element value="view"/>
     </property>
     <alias from="(Default)"
            to="(dynamic view)"/>
@@ -33,7 +33,7 @@
             action_id="view"
             category="object"
             condition_expr=""
-            url_expr="string:${object_url}/TUDChat_view"
+            url_expr="string:${object_url}/"
             visible="True">
         <permission value="View"/>
     </action>
