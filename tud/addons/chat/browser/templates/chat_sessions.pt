@@ -48,7 +48,7 @@
 
 </metal:cssslot>
 
-<metal:main fill-slot="main" tal:define="wtool context/portal_workflow;">
+<metal:main fill-slot="main">
 
 <h1>Chat-Sitzungen verwalten</h1>
 
@@ -64,9 +64,9 @@
       <th>Protokoll</th>
       <th>Bearbeiten</th>
     </tr>
-    <tr tal:repeat="session python: context.getChildNodes()">
+    <tr tal:repeat="session python: view.getSessions()">
       <td>
-        <span tal:replace="python: context.getStateTitle(session)"/>
+        <span tal:replace="python: view.getStateTitle(session)"/>
       </td>
       <td>
         <span tal:replace="session/title"/>
@@ -92,10 +92,10 @@
               tal:replace="python:chat_end.strftime('%d.%m.%Y, %H:%M Uhr')"/>
       </td>
       <td>
-        <a tal:condition="python: wtool.getInfoFor(session, 'review_state') == 'locked'" tal:attributes="href python:session.absolute_url() + '/TUDChat_log'">Log ansehen</a>
+        <a tal:condition="python: view.getState(session) == 'locked'" tal:attributes="href python:session.absolute_url() + '/TUDChat_log'">Log ansehen</a>
       </td>
       <td>
-        <a tal:condition="python: wtool.getInfoFor(session, 'review_state') == 'open'" tal:attributes="href python:session.absolute_url() + '/edit'">Bearbeiten</a>
+        <a tal:condition="python: view.getState(session) == 'open'" tal:attributes="href python:session.absolute_url() + '/edit'">Bearbeiten</a>
       </td>
     </tr>
   </table>

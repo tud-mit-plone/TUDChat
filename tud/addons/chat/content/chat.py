@@ -264,14 +264,4 @@ class Chat(base.ATCTFolder):
 
         return str(not already_exist)
 
-    def getStateTitle(self, obj):
-        """ Returns current workflow state title of given object """
-        wftool = getToolByName(self, 'portal_workflow')
-        state = wftool.getInfoFor(obj, 'review_state')
-        workflows = wftool.getWorkflowsFor(obj)
-        if workflows:
-            for wf in workflows:
-                if state in wf.states:
-                    return wf.states[state].title or state
-
 atapi.registerType(Chat, 'tud.addons.chat')

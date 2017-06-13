@@ -10,5 +10,13 @@
              layer       = "tud.addons.chat.interfaces.IAddonInstalled"
              permission  = "zope2.View"
      />
+     <browser:page
+             for         = "tud.addons.chat.content.chat.Chat"
+             name        = "chat_sessions"
+             class       = ".chat.ChatSessionsView"
+             template    = "templates/chat_sessions.pt"
+             layer       = "tud.addons.chat.interfaces.IAddonInstalled"
+             permission  = "cmf.ModifyPortalContent"
+     />
 
 </configure>

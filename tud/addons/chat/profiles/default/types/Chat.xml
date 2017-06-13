@@ -49,10 +49,10 @@
         <permission value="Modify portal content"/>
     </action>
     <action title="Chat-Sitzungen verwalten"
-            action_id="edit_sessions"
+            action_id="chat_sessions"
             category="object"
             condition_expr=""
-            url_expr="string:${object_url}/edit_sessions"
+            url_expr="string:${object_url}/chat_sessions"
             visible="True">
         <permission value="Modify portal content"/>
     </action>

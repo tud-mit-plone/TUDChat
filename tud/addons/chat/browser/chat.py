@@ -67,3 +67,26 @@ class ChatView(BrowserView):
             'review_state': 'open'
             }
         return [brain.getObject() for brain in catalog(query)]
+
+class ChatSessionsView(BrowserView):
+    """Chat sessions view
+    """
+
+    def getSessions(self):
+        """ Returns all chat sessions """
+        return self.context.getChildNodes()
+
+    def getState(self, obj):
+        """ Returns current workflow state of given object """
+        wftool = getToolByName(self, 'portal_workflow')
+        return wftool.getInfoFor(obj, 'review_state')
+
+    def getStateTitle(self, obj):
+        """ Returns current workflow state title of given object """
+        wftool = getToolByName(self, 'portal_workflow')
+        state = wftool.getInfoFor(obj, 'review_state')
+        workflows = wftool.getWorkflowsFor(obj)
+        if workflows:
+            for wf in workflows:
+                if state in wf.states:
+                    return wf.states[state].title or state
