@@ -1,7 +1,10 @@
 import urlparse
+from datetime import datetime
 
 from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
+
+from tud.addons.chat.interfaces import IChatSession
 
 class ChatView(BrowserView):
     """Default chat view
@@ -39,19 +42,28 @@ class ChatView(BrowserView):
             return ""
 
     ## @brief this function generates a list of all chat sessions which were active
-    #  @return list of dictionaries, the following information are in every dict: id,name,description,password,max_users,start,end
+    #  @return list of chat session objects
     def getActiveChatSessions(self):
         """ Get a list of all active chat sessions. """
-        if self.context.chat_storage:
-            return self.context.chat_storage.getActiveChatSessions()
-        else:
-            return None
+        catalog = getToolByName(self.context, 'portal_catalog')
+        query = {
+            'object_provides': IChatSession.__identifier__,
+            'path': '/'.join(self.context.getPhysicalPath()),
+            'ChatSessionStartDate': {'query': datetime.now(), 'range': 'max'},
+            'ChatSessionEndDate': {'query': datetime.now(), 'range': 'min'},
+            'review_state': 'open'
+            }
+        return [brain.getObject() for brain in catalog(query)]
 
     ## @brief this function generates a list of all chat sessions which were planned
-    #  @return list of dictionaries, the following information are in every dict: id,name,start,end
+    #  @return list of chat session objects
     def getNextChatSessions(self):
         """ Get the next chat session, which will start. """
-        if self.context.chat_storage:
-            return self.context.chat_storage.getNextChatSessions()
-        else:
-            return None
+        catalog = getToolByName(self.context, 'portal_catalog')
+        query = {
+            'object_provides': IChatSession.__identifier__,
+            'path': '/'.join(self.context.getPhysicalPath()),
+            'ChatSessionStartDate': {'query': datetime.now(), 'range': 'min'},
+            'review_state': 'open'
+            }
+        return [brain.getObject() for brain in catalog(query)]

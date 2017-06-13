@@ -1,0 +1,35 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope">
+
+    <adapter
+        name="ChatSessionStartDate"
+        factory=".chat_session.startDateIndexer"
+      />
+
+    <adapter
+        name="ChatSessionEndDate"
+        factory=".chat_session.endDateIndexer"
+      />
+
+    <subscriber
+        for="tud.addons.chat.interfaces.IChatSession
+             Products.Archetypes.interfaces.IObjectInitializedEvent"
+        handler=".chat_session.added_handler"
+        />
+    <subscriber
+        for="tud.addons.chat.interfaces.IChatSession
+             Products.CMFCore.interfaces.IActionSucceededEvent"
+        handler=".chat_session.action_succeeded_handler"
+        />
+    <subscriber
+        for="tud.addons.chat.interfaces.IChatSession
+             zope.lifecycleevent.interfaces.IObjectRemovedEvent"
+        handler=".chat_session.removed_handler"
+        />
+    <subscriber
+        provides="Products.Archetypes.interfaces.IObjectPostValidation"
+        for="tud.addons.chat.interfaces.IChatSession"
+        factory=".chat_session.StartEndDateValidator"
+        />
+
+</configure>

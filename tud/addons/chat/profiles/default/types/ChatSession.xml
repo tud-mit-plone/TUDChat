@@ -1,28 +1,25 @@
 <?xml version="1.0"?>
-<object name="Chat"
+<object name="ChatSession"
         meta_type="Factory-based Type Information with dynamic views"
         i18n:domain="plone"
         xmlns:i18n="http://xml.zope.org/namespaces/i18n">
-    <property name="title">Chat</property>
+    <property name="title">ChatSession</property>
     <property name="description"></property>
     <property name="content_icon"></property>
-    <property name="content_meta_type">Chat</property>
+    <property name="content_meta_type">ChatSession</property>
     <property name="product">tud.addons.chat</property>
-    <property name="factory">addChat</property>
-    <property name="immediate_view">view</property>
+    <property name="factory">addChatSession</property>
+    <property name="immediate_view">chat</property>
     <!-- parent-child relation -->
-    <property name="global_allow">True</property>
-    <property name="filter_content_types">True</property>
-    <property name="allowed_content_types">
-        <element value="ChatSession"/>
-    </property>
+    <property name="global_allow">False</property>
+    <property name="filter_content_types">False</property>
     <!-- allow discussion -->
     <property name="allow_discussion">False</property>
     <!-- set default view-->
-    <property name="default_view">view</property>
+    <property name="default_view">chat</property>
     <!-- available view in view-selection -->
     <property name="view_methods">
-        <element value="view"/>
+        <element value="chat"/>
     </property>
     <alias from="(Default)"
            to="(dynamic view)"/>
@@ -36,7 +33,7 @@
             action_id="view"
             category="object"
             condition_expr=""
-            url_expr="string:${object_url}/"
+            url_expr="string:${object_url}/chat"
             visible="True">
         <permission value="View"/>
     </action>
@@ -45,14 +42,6 @@
             category="object"
             condition_expr=""
             url_expr="string:${object_url}/edit"
-            visible="True">
-        <permission value="Modify portal content"/>
-    </action>
-    <action title="Chat-Sitzungen verwalten"
-            action_id="edit_sessions"
-            category="object"
-            condition_expr=""
-            url_expr="string:${object_url}/edit_sessions"
             visible="True">
         <permission value="Modify portal content"/>
     </action>

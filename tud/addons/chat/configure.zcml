@@ -8,6 +8,7 @@
             package         = "."
             initialize      = ".initialize"/>
 
+    <include package=".adapter"/>
     <include package=".content"/>
     <include package=".browser"/>
 

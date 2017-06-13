@@ -7,14 +7,15 @@
     <script language="javascript" src="jquery-1.7.min.js"></script>
     <script language="javascript" src="jquery.notification.js"></script>
     <script language="javascript" src="jquery.ba-dotimeout.min.js"></script>
-    <script type="text/javascript" tal:content="string:var chat_url = '${context/absolute_url}';"></script>
     <script language="javascript">
     $(document).ready(
         function() {
             $('#login').submit(function() {
+              var chat_url = $("[name='chatroom']").val();
+
               $("input[type='submit']").attr("disabled", "disabled");
 
-              $.getJSON(chat_url + "/registerMe", { user: $("input[name='username']").val(), chatroom: $("[name='chatroom']").val(), agreement: $("[name='agreement']").prop("checked"), password: $("#password").val() }, function(response) {
+              $.getJSON(chat_url + "/registerMe", { user: $("input[name='username']").val(), agreement: $("[name='agreement']").prop("checked"), password: $("#password").val() }, function(response) {
 
                 $.doTimeout( 'enableSubmitButton', 2000, function(){
                     $("input[type='submit']").removeAttr("disabled");
@@ -31,7 +32,7 @@
             });
 
             function updateVisibilityPasswordField() {
-              if (jQuery.inArray(Number($('[name=chatroom]').val()), password_channels) != -1) {
+              if (jQuery.inArray($('[name=chatroom]').val(), password_channels) != -1) {
                 $(".password_field").show().children("#password").val("");
               } else {
                 $(".password_field").hide().children("#password").val("");
@@ -40,7 +41,6 @@
 
             updateVisibilityPasswordField();
             $('[name=chatroom]').change(updateVisibilityPasswordField);
-
 
         }
     );
@@ -73,18 +73,18 @@
 <tal:block condition="python:active_sessions is not None">
 
     <form id="login" class="chat_login" action="" tal:condition="active_sessions">
-        <script language="javascript" tal:content="python: 'var password_channels = [' + ','.join([str(session['id']) for session in active_sessions if session.get('password') != None]) + '];'"></script>
+        <script language="javascript" tal:content="python: 'var password_channels = [' + ','.join(['\'{}\''.format(str(session.absolute_url())) for session in active_sessions if session.getField('password').get(session) != '']) + '];'"></script>
         <div>
           <label for="chatroom">Raum</label>
           <tal:block condition="python: len(active_sessions) > 1">
             <select name="chatroom">
                 <tal:block repeat="session active_sessions">
-                    <option tal:attributes="value session/id" class="chat_option" tal:content="session/name"> Chat session name </option>
+                    <option tal:attributes="value session/absolute_url" class="chat_option" tal:content="session/title"> Chat session name </option>
                 </tal:block>
             </select>
           </tal:block>
           <tal:block condition="python: len(active_sessions) == 1" tal:define="session python:active_sessions[0]">
-            <input type="hidden" name="chatroom" tal:attributes="value session/id" /> <span class="chat_option" tal:content="session/name" />
+            <input type="hidden" name="chatroom" tal:attributes="value session/absolute_url" /> <span class="chat_option" tal:content="session/title" />
           </tal:block>
         </div>
 
@@ -135,9 +135,11 @@
             </thead>
             <tbody>
                 <tr tal:repeat="session next_sessions">
-                    <td tal:content="session/name"></td>
-                    <td tal:content="python: session['start'].strftime('%d.%m.%y')+' '+session['start'].strftime('%H:%M')+' Uhr'"></td>
-                    <td tal:content="python: session['end'].strftime('%d.%m.%y')+' '+session['end'].strftime('%H:%M')+' Uhr'"></td>
+                    <td tal:content="session/title"></td>
+                    <td tal:define="session_start session/start_date;"
+                        tal:content="python: session_start.strftime('%d.%m.%y')+' '+session_start.strftime('%H:%M')+' Uhr'"></td>
+                    <td tal:define="session_end session/end_date;"
+                        tal:content="python: session_end.strftime('%d.%m.%y')+' '+session_end.strftime('%H:%M')+' Uhr'"></td>
                 </tr>
             </tbody>
         </table>

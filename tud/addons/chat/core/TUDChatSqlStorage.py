@@ -29,28 +29,12 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
         #Create tables
         create_table_query = ()
 
-        self.tableCheck = SQL('tableCheck', 'Check for the existence of the action und session table with a given prefix',
+        self.tableCheck = SQL('tableCheck', 'Check for the existence of the action table with a given prefix',
             sql_connector_id, '',
             """
             SELECT table_name
             FROM INFORMATION_SCHEMA.TABLES
-            WHERE table_name='%s_action' OR table_name='%s_session'
-            """ % (prefix, prefix))
-
-        self.createTableChatSession = SQL('createTableChatSession', 'Create session table',
-            sql_connector_id, '',
-            """
-            CREATE TABLE IF NOT EXISTS `%s_session` (
-                `id`          INT UNSIGNED         NOT NULL AUTO_INCREMENT,
-                `name`        VARCHAR( 255 )       NOT NULL,
-                `description` VARCHAR( 255 )       DEFAULT NULL,
-                `password`    VARCHAR( 30 )        DEFAULT NULL,
-                `max_users`   INT UNSIGNED         DEFAULT NULL,
-                `start`       DATETIME             DEFAULT NULL,
-                `end`         DATETIME             DEFAULT NULL,
-                `locked`      TINYINT(1)           DEFAULT NULL,
-            PRIMARY KEY (`id` )
-            );
+            WHERE table_name='%s_action'
             """ % (prefix))
 
         self.createTableChatAction = SQL('createTableChatAction', 'Create action table',
@@ -58,137 +42,41 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             """
             CREATE TABLE IF NOT EXISTS `%s_action` (
                 `id`              INT UNSIGNED         NOT NULL AUTO_INCREMENT ,
-                `chat_uid`        VARCHAR( 255 )       NOT NULL,
+                `chat_id`        VARCHAR( 255 )       NOT NULL,
                 `date`            DATETIME             NOT NULL,
                 `user`            VARCHAR( 255 )       NOT NULL,
                 `action` ENUM('user_add_message', 'mod_add_message', 'mod_edit_message', 'mod_delete_message') NOT NULL,
                 `content`         TEXT                 NOT NULL,
                 `target`          INT                      NULL DEFAULT NULL,
             PRIMARY KEY (`id` ),
-            INDEX ( `chat_uid` )
+            INDEX ( `chat_id` )
             );
             """ % (prefix))
 
-        self.createChatSession = SQL('createChatSession', 'Create chat session',
-            sql_connector_id, 'name description starttime endtime password max_users',
-            """
-            INSERT INTO `%s_session` (
-                `name`,
-                `description`,
-                `start`,
-                `end`,
-                `password`,
-                `max_users` )
-            VALUES (
-                <dtml-sqlvar name type="string">,
-                <dtml-sqlvar description type="string">,
-                <dtml-sqlvar starttime type="string">,
-                <dtml-sqlvar endtime type="string">,
-                <dtml-sqlvar password type="string">,
-                <dtml-sqlvar max_users type="string">
-            );
-            <dtml-var sql_delimiter>
-            SELECT LAST_INSERT_ID() AS newid
-            """ % (prefix))
-
-        self.editChatSession = SQL('editChatSession', 'Edit chat session',
-            sql_connector_id, 'chat_uid name description starttime endtime password max_users',
-            """
-            UPDATE `%s_session` SET
-                `name` = <dtml-sqlvar name type="string">,
-                `description` = <dtml-sqlvar description type="string">,
-                `start` = <dtml-sqlvar starttime type="string">,
-                `end` = <dtml-sqlvar endtime type="string">,
-                `password` = <dtml-sqlvar password type="string">,
-                `max_users` = <dtml-sqlvar max_users type="string">
-            WHERE id = <dtml-sqlvar chat_uid type="string">
-            """ % (prefix))
-
-        self.deleteChatSession = SQL('deleteChatSession', 'Delete chat session',
-            sql_connector_id, 'chat_uid',
-            """
-            DELETE FROM `%s_session`
-            WHERE id = <dtml-sqlvar chat_uid type="string">
-            """ % (prefix))
-
-        self.lockChatSession = SQL('lockChatSession', 'lock chat session',
-            sql_connector_id, 'chat_uid',
-            """
-            UPDATE `%s_session`
-            SET locked = 1
-            WHERE id = <dtml-sqlvar chat_uid type="int">
-            """ % (prefix))
-
-        self.getAllChatSessions = SQL('getAllChatSessions', 'get all planned, active and closed chat sessions',
+        self.getMaxSessionId = SQL('getMaxSessionId', 'get max session id',
             sql_connector_id, '',
             """
-            SELECT      *
-            FROM        `%s_session`
-            ORDER BY    id DESC
+            SELECT MAX(`chat_id`) FROM `%s_action`
             """ % (prefix))
 
-        self.getChatSessions = SQL('getChatSessions', 'get all planned and active chat sessions',
-            sql_connector_id, '',
-            """
-            SELECT      *
-            FROM        `%s_session`
-            WHERE       (end > NOW() OR end is NULL)
-            ORDER BY    id
-            """ % (prefix))
-
-        self.getActiveChatSessions = SQL('getActiveChatSessions', 'get active chat sessions',
-            sql_connector_id, '',
-            """
-            SELECT      *
-            FROM        `%s_session`
-            WHERE       (end > NOW() OR end is NULL)
-            AND         start < NOW()
-            """ % (prefix))
-
-        self.getNextChatSessions = SQL('getNextChatSessions', 'get next chat session',
-            sql_connector_id, '',
-            """
-            SELECT      *
-            FROM        `%s_session`
-            WHERE       start > NOW()
-            ORDER BY    start, id
-            """ % (prefix))
-        self.getNextChatSessions.max_rows_ = 0
-
-        self.getClosedUnlockedChatSessions = SQL('getClosedUnlockedChatSessions', 'get closed chat sessions which are unlocked',
-            sql_connector_id, '',
-            """
-            SELECT      *
-            FROM        `%s_session`
-            WHERE       (end < NOW() AND locked IS NULL)
-            """ % (prefix))
-
-        self.getLastChatAction = SQL('getLastChatAction', 'get the last action from an active chat by chat_uid',
-            sql_connector_id, 'chat_uid',
+        self.getLastChatAction = SQL('getLastChatAction', 'get the last action from an active chat by chat_id',
+            sql_connector_id, 'chat_id',
             """
             SELECT      MAX(id) AS action_id
             FROM        `%s_action`
-            WHERE       chat_uid = <dtml-sqlvar chat_uid type="int">
-            """ % (prefix))
-
-        self.getChatSessionById = SQL('getChatSessionById', 'get chat session by its id',
-            sql_connector_id, 'chat_uid',
-            """
-            SELECT        *, start<NOW() and NOW()<end as active
-            FROM         `%s_session`
-            WHERE         id = <dtml-sqlvar chat_uid type="int">
+            WHERE       chat_id = <dtml-sqlvar chat_id type="int">
             """ % (prefix))
 
         self.getActions = SQL('getActions', 'get actions of a chat',
-            sql_connector_id, 'chat_uid last_action start_action',
+            sql_connector_id, 'chat_id last_action start_action',
             """
             SELECT id, action, date, user, content AS message, NULL AS target, '' AS a_action, '' AS a_name, '' AS u_action
             FROM `%s_action`
             WHERE id NOT IN
               (SELECT target
                FROM `%s_action`
-               WHERE target IS NOT NULL AND chat_uid = <dtml-sqlvar chat_uid type="int">)
-              AND chat_uid = <dtml-sqlvar chat_uid type="int">
+               WHERE target IS NOT NULL AND chat_id = <dtml-sqlvar chat_id type="int">)
+              AND chat_id = <dtml-sqlvar chat_id type="int">
               AND id > <dtml-sqlvar last_action type="int">
               AND action LIKE '%%add_message'
             UNION ALL
@@ -196,7 +84,7 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             FROM (SELECT target AS 'u_id', MAX(id) AS 'a_id'
                   FROM `%s_action`
                   WHERE (action='mod_delete_message' OR action='mod_edit_message')
-                    AND chat_uid = <dtml-sqlvar chat_uid type="int">
+                    AND chat_id = <dtml-sqlvar chat_id type="int">
                     AND id > <dtml-sqlvar last_action type="int">
                     AND <dtml-sqlvar last_action type="int"> >= target
                     AND target >= <dtml-sqlvar start_action type="int">
@@ -208,7 +96,7 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             FROM (SELECT target AS 'u_id', MAX(id) AS 'a_id'
                   FROM `%s_action`
                   WHERE (action='mod_delete_message' OR action='mod_edit_message')
-                    AND chat_uid = <dtml-sqlvar chat_uid type="int">
+                    AND chat_id = <dtml-sqlvar chat_id type="int">
                     AND id > <dtml-sqlvar last_action type="int">
                     AND <dtml-sqlvar last_action type="int"> < target
                     AND target >= <dtml-sqlvar start_action type="int">
@@ -218,35 +106,27 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             UNION ALL
             SELECT MAX(id) AS 'ID', '' AS 'action', NOW() AS 'date', '' AS 'user', '' AS 'message', '' AS 'target', '' AS 'a_action', '' AS 'a_name', '' AS u_action
             FROM `%s_action`
-            WHERE chat_uid=<dtml-sqlvar chat_uid type="int">
+            WHERE chat_id=<dtml-sqlvar chat_id type="int">
             ORDER BY `ID` ASC
             """ % (prefix, prefix, prefix, prefix, prefix, prefix, prefix, prefix, prefix))
         self.getActions.max_rows_ = 0
 
         self.getRawActionContents = SQL('getRawActionContents', 'get raw actions of a chat session',
-            sql_connector_id, 'chat_uid',
+            sql_connector_id, 'chat_id',
             """
             SELECT id, content
             FROM `%s_action`
-            WHERE chat_uid = <dtml-sqlvar chat_uid type="int">
+            WHERE chat_id = <dtml-sqlvar chat_id type="int">
             """ % (prefix))
         self.getRawActionContents.max_rows_ = 0
 
-        self.getActionById = SQL('getActionById', 'get action by its id',
-            sql_connector_id, 'action_id',
-            """
-            SELECT        *
-            FROM         `%s_action`
-            WHERE         id = <dtml-sqlvar action_id type="string">
-            """ % (prefix))
-
         self.sendAction = SQL('sendAction', 'send an action',
-            sql_connector_id, 'chat_uid user action content target',
+            sql_connector_id, 'chat_id user action content target',
             """
             INSERT INTO `%s_action` (
-                `chat_uid`, `date`, `user`, `action`, `content`, `target`  )
+                `chat_id`, `date`, `user`, `action`, `content`, `target`  )
             VALUES (
-                <dtml-sqlvar chat_uid type="int">,
+                <dtml-sqlvar chat_id type="int">,
                 NOW(),
                 <dtml-sqlvar user type="string">,
                 <dtml-sqlvar action type="string">,
@@ -258,19 +138,19 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             """ % (prefix))
 
         self.getUsersBySessionId = SQL('getUsersBySessionId', 'get users of a chat session',
-            sql_connector_id, 'chat_uid',
+            sql_connector_id, 'chat_id',
             """
             SELECT DISTINCT user
             FROM            `%s_action`
-            WHERE           chat_uid = <dtml-sqlvar chat_uid type="int">
+            WHERE           chat_id = <dtml-sqlvar chat_id type="int">
             """ % (prefix))
 
         self.updateUserName = SQL('updateUserName', 'change name of user of a chat session',
-            sql_connector_id, 'chat_uid old_name new_name',
+            sql_connector_id, 'chat_id old_name new_name',
             """
             UPDATE `%s_action`
             SET user = <dtml-sqlvar new_name type="string">
-            WHERE chat_uid = <dtml-sqlvar chat_uid type="int"> AND user = <dtml-sqlvar old_name type="string">
+            WHERE chat_id = <dtml-sqlvar chat_id type="int"> AND user = <dtml-sqlvar old_name type="string">
             """ % (prefix))
 
         self.updateActionContent = SQL('updateActionContent', 'change content of an action',
@@ -282,10 +162,10 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             """ % (prefix))
 
         self.deleteActions = SQL('deleteActions', 'delete actions of a chat session',
-            sql_connector_id, 'chat_uid',
+            sql_connector_id, 'chat_id',
             """
             DELETE FROM `%s_action`
-            WHERE chat_uid = <dtml-sqlvar chat_uid type="string">
+            WHERE chat_id = <dtml-sqlvar chat_id type="string">
             """ % (prefix))
 
 class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
@@ -302,62 +182,25 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
         self.sql_methods = TUDChatSqlMethods(sql_connector_id, prefix)
 
     def createTables(self):
-        if len(self.sql_methods.tableCheck().dictionaries())<2:
-            self.sql_methods.createTableChatSession()
+        if len(self.sql_methods.tableCheck().dictionaries())<1:
             self.sql_methods.createTableChatAction()
             return True
         else:
             return False
 
-    def createChatSession(self, name, description = "NULL", start = "NOW()", end = "NULL", password = None, max_users = "NULL"):
-        result = self.sql_methods.createChatSession(name =name, description=description, starttime = start, endtime = end, password = password, max_users = max_users)
-        chat_uid = int(self.dictFromSql(result, names=('newid',))[0]['newid'])
-        return chat_uid
+    def getMaxSessionId(self):
+        result = self.sql_methods.getMaxSessionId().tuples()[0][0]
+        if result:
+            result = int(result)
+        return result
 
-    def editChatSession(self, chat_uid, name, description = "NULL", start = "NOW()", end = "NULL", password = None, max_users = "NULL"):
-        self.sql_methods.editChatSession(chat_uid = chat_uid, name =name, description=description, starttime = start, endtime = end, password = password, max_users = max_users)
-        return True
-
-    def deleteChatSession(self, id):
-        result = self.sql_methods.deleteChatSession(chat_uid = id)
-        return True
-
-    def getChatSession(self, chat_uid):
-        result = self.sql_methods.getChatSessionById(chat_uid = chat_uid)
-        session_dict = self.dictFromSql(result, names=('id','name','description','password','max_users','start','end','active','locked',))[0]
-        return session_dict
-
-    def lockChatSession(self, chat_uid):
-        self.sql_methods.lockChatSession(chat_uid = chat_uid)
-        return True
-
-    def getAllChatSessions(self):
-        result = self.sql_methods.getAllChatSessions()
-        return self.dictFromSql(result, ('id','name','description','password','max_users','start','end','locked'))
-
-    def getChatSessions(self):
-        result = self.sql_methods.getChatSessions()
-        return self.dictFromSql(result, ('id','name','description','password','max_users','start','end',))
-
-    def getActiveChatSessions(self):
-        result = self.sql_methods.getActiveChatSessions()
-        return self.dictFromSql(result, ('id','name','description','password','max_users','start','end',))
-
-    def getNextChatSessions(self):
-        result = self.sql_methods.getNextChatSessions()
-        return self.dictFromSql(result, ('id','name','start','end',))
-
-    def getClosedUnlockedChatSessions(self):
-        result = self.sql_methods.getClosedUnlockedChatSessions()
-        return self.dictFromSql(result, ('id','start','end',))
-
-    def getLastChatAction(self, chat_uid):
-        result = self.sql_methods.getLastChatAction(chat_uid = chat_uid)
+    def getLastChatAction(self, chat_id):
+        result = self.sql_methods.getLastChatAction(chat_id = chat_id)
         result_dict = self.dictFromSql(result, ('action_id',))
         return result_dict[0]['action_id'] or 0
 
-    def getActions(self, chat_uid, last_action, start_action, limit = 0):
-        results = self.sql_methods.getActions(chat_uid = chat_uid,
+    def getActions(self, chat_id, last_action, start_action, limit = 0):
+        results = self.sql_methods.getActions(chat_id = chat_id,
                                                 last_action = last_action,
                                                 start_action = start_action)
         if results:
@@ -368,38 +211,38 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
         else:
             return []
 
-    def getRawActionContents(self, chat_uid):
-        results = self.sql_methods.getRawActionContents(chat_uid = chat_uid)
+    def getRawActionContents(self, chat_id):
+        results = self.sql_methods.getRawActionContents(chat_id = chat_id)
         if results:
             return self.dictFromSql(results, names=["id", "content"])
         else:
             return []
 
-    def sendAction(self, chat_uid, user, action, content = "", target = None):
-        newid = self.sql_methods.sendAction(chat_uid = chat_uid,
+    def sendAction(self, chat_id, user, action, content = "", target = None):
+        newid = self.sql_methods.sendAction(chat_id = chat_id,
                                     user = user,
                                     action = action,
                                     content = content,
                                     target = target)
         return int(self.dictFromSql(newid, names=('newid',))[0]['newid'])
 
-    def getUsersBySessionId(self, chat_uid):
-        results = self.sql_methods.getUsersBySessionId(chat_uid = chat_uid)
+    def getUsersBySessionId(self, chat_id):
+        results = self.sql_methods.getUsersBySessionId(chat_id = chat_id)
         if results:
             return self.dictFromSql(results, ('user',))
         else:
             return []
 
-    def updateUserName(self, chat_uid, old_name, new_name):
-        result = self.sql_methods.updateUserName(chat_uid = chat_uid, old_name = old_name, new_name = new_name)
+    def updateUserName(self, chat_id, old_name, new_name):
+        result = self.sql_methods.updateUserName(chat_id = chat_id, old_name = old_name, new_name = new_name)
         return True
 
     def updateActionContent(self, action_id, new_content):
         result = self.sql_methods.updateActionContent(action_id = action_id, new_content = new_content)
         return True
 
-    def deleteActions(self, chat_uid):
-        result = self.sql_methods.deleteActions(chat_uid = chat_uid)
+    def deleteActions(self, chat_id):
+        result = self.sql_methods.deleteActions(chat_id = chat_id)
         return True
 
     def dictFromSql(self, results=(), names=()):

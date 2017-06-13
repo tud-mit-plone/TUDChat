@@ -25,6 +25,7 @@ setup(name='tud.addons.chat',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'plone.api',
           'Products.ZMySQLDA',
           'simplejson',
           # -*- Extra requirements: -*-

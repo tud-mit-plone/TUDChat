@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<object name="portal_catalog" meta_type="Plone Catalog Tool">
+    <index name="ChatSessionStartDate" meta_type="DateIndex">
+        <indexed_attr value="Start_date" />
+    </index>
+    <index name="ChatSessionEndDate" meta_type="DateIndex">
+        <indexed_attr value="End_date" />
+    </index>
+</object>

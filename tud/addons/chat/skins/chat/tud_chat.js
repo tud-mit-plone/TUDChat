@@ -5,20 +5,20 @@ var scrollBlock      = false;
 var firstGetActions = true;
 
 var sendMessage = function(){
-	message = $("#chatMsgValue").val();
+    message = $("#chatMsgValue").val();
 
-	if (sendMessageBlock)
-		return false;
+    if (sendMessageBlock)
+        return false;
 
-	if (message == '')
-		return false;
+    if (message == '')
+        return false;
 
-	sendMessageBlock = true;
+    sendMessageBlock = true;
   $("#chatMsgSubmit").attr("disabled", "disabled");
   $("#chatMsgValue").val("");
   $('#chatMsgValue').keyup();
 
-	$.post(chat_url + "/sendMessage", { 'message': message },
+    $.post(chat_url + "/sendMessage", { 'message': message },
         function(data) {                // Immediately update the chat, after sending the message
             currentScrollMode = scrollMode.alwaysBottom;
             updateCheck();
@@ -26,19 +26,20 @@ var sendMessage = function(){
         );
   $.doTimeout( 'remove_sendMessageBlock', blockTime, function(){
       $("#chatMsgSubmit").removeAttr("disabled");
-    	$("#chatMsgValue").focus();
-    	sendMessageBlock = false;
+        $("#chatMsgValue").focus();
+        sendMessageBlock = false;
   });
   return false;
 };
 
 var goHierarchieUp = function(){
-	// Move from {obj}/chat to {obj}
-	var url = window.location.href;
-	if (url.substr(-1) == '/') url = url.substr(0, url.length - 2);
-	url = url.split('/');
-	url.pop();
-	window.location = url.join('/');
+    // Move from {obj_chat}/{obj_session}/chat to {obj_chat}
+    var url = window.location.href;
+    if (url.substr(-1) == '/') url = url.substr(0, url.length - 2);
+    url = url.split('/');
+    url.pop();
+    url.pop();
+    window.location = url.join('/');
 }
 
 var sortByRoleName = function(object1, object2){
@@ -48,49 +49,49 @@ var sortByRoleName = function(object1, object2){
 
 var updateCheck = function(){
 
-	if (updateCheckBlock) // temporary workaround
-		return;
-	updateCheckBlock = true;
+    if (updateCheckBlock) // temporary workaround
+        return;
+    updateCheckBlock = true;
 
-	$.getJSON(chat_url + "/getActions", function(data){
-		// Status
+    $.getJSON(chat_url + "/getActions", function(data){
+        // Status
 
-		if (data.status.code == 1) { // Not authorized
-			// $.doTimeout( 'updateCheck'); // stop updateCheck
-			$.notification.error("Sie sind nicht authorisiert! Bitte loggen Sie sich ein.", false, [{"name" :"Ok",
+        if (data.status.code == 1) { // Not authorized
+            // $.doTimeout( 'updateCheck'); // stop updateCheck
+            $.notification.error("Sie sind nicht authorisiert! Bitte loggen Sie sich ein.", false, [{"name" :"Ok",
                                                                           "click":function(){
                                                                               $.notification.clear();
                                                                               goHierarchieUp();
                                                                           }},
                                                                          ]);
-			return;
-		}
-		if (data.status.code == 2) { // Kicked
-			//$.doTimeout( 'updateCheck' ); // stop updateCheck
-			if (data.status.message != "") {
-				kickmessage = data.status.message;
-			}else{
-				kickmessage = "Sie wurden von einem Moderator des Chats verwiesen!";
-			}
-			$.notification.error(kickmessage, false, [{"name" :"Ok",
+            return;
+        }
+        if (data.status.code == 2) { // Kicked
+            //$.doTimeout( 'updateCheck' ); // stop updateCheck
+            if (data.status.message != "") {
+                kickmessage = data.status.message;
+            }else{
+                kickmessage = "Sie wurden von einem Moderator des Chats verwiesen!";
+            }
+            $.notification.error(kickmessage, false, [{"name" :"Ok",
                                                                           "click":function(){
                                                                               $.notification.clear();
                                                                               goHierarchieUp();
                                                                           }},
                                                                          ]);
-			return;
-		}
+            return;
+        }
 
-		if (data.status.code == 3) { // Banned
-			//$.doTimeout( 'updateCheck' ); // stop updateCheck
-			$.notification.error("Sie wurden dauerhaft des Chats verwiesen! <br/><br/>Grund: " + data.status.message, false, [{"name" :"Ok",
+        if (data.status.code == 3) { // Banned
+            //$.doTimeout( 'updateCheck' ); // stop updateCheck
+            $.notification.error("Sie wurden dauerhaft des Chats verwiesen! <br/><br/>Grund: " + data.status.message, false, [{"name" :"Ok",
                                                                           "click":function(){
                                                                               $.notification.clear();
                                                                               goHierarchieUp();
                                                                           }},
                                                                          ]);
-			return;
-		}
+            return;
+        }
 
     if (data.status.code == 5) { // Warned
       //$.doTimeout( 'updateCheck' ); // stop updateCheck
@@ -106,8 +107,8 @@ var updateCheck = function(){
       }
 
 
-		if (data.status.code > 6) // != OK
-			return;
+        if (data.status.code > 6) // != OK
+            return;
 
     if(typeof(data.users)!="undefined"){
       if(typeof(data.users['new'])!="undefined"){
@@ -163,39 +164,39 @@ var updateCheck = function(){
 
       }
 
-		if(typeof(data.messages)!="undefined"){
-			if(typeof(data.messages['new'])!="undefined"){
-				message = data.messages['new'];
-				for(var i in data.messages['new']) {
-					if(message[i].date != "")
-						message[i].date = message[i].date+" ";
-					$("#chatContainer").append(printMessage(message[i]));
-				}
-			}
-			if(typeof(data.messages.to_edit)!="undefined"){
-				message = data.messages.to_edit;
-				for(var i in data.messages.to_edit){
-					if(message[i].date != "")
-						message[i].date = message[i].date+" ";
-					$("#chatEntry"+message[i].id).replaceWith(printMessage(message[i]));
-				}
-			}
-			if(typeof(data.messages.to_delete)!="undefined"){
+        if(typeof(data.messages)!="undefined"){
+            if(typeof(data.messages['new'])!="undefined"){
+                message = data.messages['new'];
+                for(var i in data.messages['new']) {
+                    if(message[i].date != "")
+                        message[i].date = message[i].date+" ";
+                    $("#chatContainer").append(printMessage(message[i]));
+                }
+            }
+            if(typeof(data.messages.to_edit)!="undefined"){
+                message = data.messages.to_edit;
+                for(var i in data.messages.to_edit){
+                    if(message[i].date != "")
+                        message[i].date = message[i].date+" ";
+                    $("#chatEntry"+message[i].id).replaceWith(printMessage(message[i]));
+                }
+            }
+            if(typeof(data.messages.to_delete)!="undefined"){
                 message = data.messages.to_delete;
-				for(var i in data.messages.to_delete){
-					if(message[i].date != "")
-						message[i].date = message[i].date+" ";
-					$("#chatEntry"+message[i].id).replaceWith(printMessage(message[i]));
-				}
-			}
-		}
+                for(var i in data.messages.to_delete){
+                    if(message[i].date != "")
+                        message[i].date = message[i].date+" ";
+                    $("#chatEntry"+message[i].id).replaceWith(printMessage(message[i]));
+                }
+            }
+        }
 
     firstGetActions = false;
     updateCheckBlock = false;
 
     if (!scrollBlock)
       performScrollMode();
-	});
+    });
 };
 
 var updateCheckTimeout = function(){
@@ -259,14 +260,14 @@ var applyAttributes = function (message, attributes) {
 
 
 $(document).ready(
-	function(){
-		jQuery.ajaxSetup({'cache':false});
+    function(){
+        jQuery.ajaxSetup({'cache':false});
 
     $("#chatMsgForm").submit(sendMessage);
 
-		$.get(chat_url + "/resetLastAction", function(data){
-		updateCheckTimeout();
-		});
+        $.get(chat_url + "/resetLastAction", function(data){
+        updateCheckTimeout();
+        });
 
         $("#logout").click(function() {
             updateCheckBlock = true;
@@ -275,7 +276,7 @@ $(document).ready(
                dataType: "text",
                url: chat_url + "/logout",
                 success: function(data) {
-             	    goHierarchieUp();
+                     goHierarchieUp();
                  },
                 error:function (xhr, ajaxOptions, thrownError){ // leave chat no matter what
                   goHierarchieUp();
@@ -319,7 +320,7 @@ $(document).ready(
       $('#chatMsgValue').keypress();
     }
 
-	}
+    }
 );
 
 

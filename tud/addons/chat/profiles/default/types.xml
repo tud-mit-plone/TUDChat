@@ -11,4 +11,6 @@
         meta_type="Plone Types Tool">
     <object name="Chat"
             meta_type="Factory-based Type Information with dynamic views" />
+    <object name="ChatSession"
+            meta_type="Factory-based Type Information with dynamic views" />
 </object>
