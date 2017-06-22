@@ -11,28 +11,29 @@
     <script language="javascript" src="hyperlink.js"></script>
     <script language="javascript" src="jquery.notification.js"></script>
     <script language="javascript" src="jquery.scroll.js"></script>
-    <script language="javascript" tal:condition="python:context.isAdmin(context.REQUEST) == True" src="tud_chat_admin.js"></script>
-    <script language="javascript" tal:condition="python:not context.isAdmin(context.REQUEST) == True" src="tud_chat_user.js"></script>
+    <script language="javascript" tal:condition="view/isAdmin" src="tud_chat_admin.js"></script>
+    <script language="javascript" tal:condition="not: view/isAdmin" src="tud_chat_user.js"></script>
     <script language="javascript" src="tud_chat.js"></script>
 
-    <script type="text/javascript" tal:define="chat context/getParentNode"
-                                   tal:content="structure string:var refreshRate = ${chat/refreshRate} * 1000; var blockTime = ${chat/blockTime} * 1000; var ownUsername = '${request/SESSION/user_properties/name|nothing}'; var chat_url = '${context/absolute_url}'; var maxMessageLength = ${chat/maxMessageLength}">
+    <script type="text/javascript" tal:define="chat_info view/getChatInformation"
+                                   tal:content="structure string:var refreshRate = ${chat_info/refreshRate} * 1000; var blockTime = ${chat_info/blockTime} * 1000; var ownUsername = '${request/SESSION/user_properties/name|nothing}'; var chat_url = '${context/absolute_url}'; var maxMessageLength = ${chat_info/maxMessageLength}">
     </script>
 </metal:block>
 
 <metal:block metal:fill-slot="style_slot">
     <link rel="stylesheet" type="text/css" href="tud_chat.css" />
-    <link rel="stylesheet" type="text/css" tal:condition="python:context.isAdmin(context.REQUEST) == True" href="tud_chat_admin.css" />
+    <link rel="stylesheet" type="text/css" tal:condition="view/isAdmin" href="tud_chat_admin.css" />
     <link rel="stylesheet" type="text/css" tal:attributes="href string:${context/absolute_url}/tud_chat_additional.css" />
 </metal:block>
 
 </head>
 
 
-<body metal:fill-slot="main" i18n:domain="tudchat" tal:define="chat context/getParentNode;
-                                                               max_msg_length chat/maxMessageLength">
-    <h2 tal:content="context/title"></h2>
-    <tal:block define="description context/description"
+<body metal:fill-slot="main" i18n:domain="tudchat" tal:define="chat_info view/getChatInformation;
+                                                               session_info view/getSessionInformation;
+                                                               max_msg_length chat_info/maxMessageLength">
+    <h2 tal:content="session_info/title"></h2>
+    <tal:block define="description session_info/description"
                condition="description">
         <tal:block define="lines python:description.splitlines()">
             <p class="chat_description">
@@ -65,7 +66,7 @@
     <div id="chatAppendix">
 
         <h3>Hinweise zur Benutzung:</h3>
-        <div tal:define="chat_end context/end_date;
+        <div tal:define="chat_end session_info/end_date;
                          chat_end python: chat_end.strftime('%d.%m.%Y, %H:%M Uhr')">
             Die Chaträume werden <em class='admin'>moderiert</em> und es können bei Fehlverhalten Konsequenzen in Form von einer Verwarnung und permanenter Verweisung des Chatraums folgen. <span class="chatDuration" tal:content="string: Dieser Chat ist bis zum ${chat_end} aktiv und wird anschließend automatisch geschlossen."></span>
         </div>

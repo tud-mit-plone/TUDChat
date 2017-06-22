@@ -282,19 +282,6 @@ class ChatSession(base.ATCTContent):
         return
 
     ##########################################################################
-    # Chat Session Management
-    ##########################################################################
-
-    ## @brief this function returns all chat messages about a specific chat session
-    #  @param chat_id int id of the specific chat session
-    #  @return list of dictionaries, the following information are in every dict: id, action, date, user, message, target, a_action, a_name
-    def getLogs(self, chat_id, REQUEST = None):
-        """ Retrieve the whole and fully parsed chat log """
-        if not self.isAdmin(REQUEST):
-            return
-        return self.getChatStorage().getActions(chat_id, 0, 0)[:-1]
-
-    ##########################################################################
     #  User Management
     ##########################################################################
 

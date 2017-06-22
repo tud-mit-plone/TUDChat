@@ -1,5 +1,5 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
-  metal:use-macro="here/main_template/macros/master" i18n:domain="plone">
+  metal:use-macro="context/main_template/macros/master" i18n:domain="plone">
 <head>
 
 <metal:javascriptslot fill-slot="javascript_head_slot">
@@ -70,8 +70,9 @@
 </head>
 
 <body metal:fill-slot="main" i18n:domain="tudchat"
-      tal:define="chat_id context/chat_id;
-                  log python: here.getLogs(chat_id);"
+      tal:define="session_info view/getSessionInformation;
+                  chat_id session_info/chat_id;
+                  log python: view.getLogs();"
       tal:condition="python: context_state.workflow_state() == 'locked'">
     <h1>Chat-Log</h1>
     <table id="infotable">
@@ -82,21 +83,21 @@
         </tr>
         <tr>
           <td>Chat-ID</td>
-          <td tal:content="context/chat_id"></td>
+          <td tal:content="session_info/chat_id"></td>
         </tr>
         <tr>
           <td>Name</td>
-          <td tal:content="context/title"></td>
+          <td tal:content="session_info/title"></td>
         </tr>
         <tr>
           <td>Beschreibung</td>
-          <td tal:content="context/description"></td>
+          <td tal:content="session_info/description"></td>
         </tr>
         <tr>
           <td>Passwort</td>
           <td>
-            <tal:value condition="context/password" replace="context/password" />
-            <tal:Altvalue condition="not:context/password">
+            <tal:value condition="session_info/password" replace="session_info/password" />
+            <tal:Altvalue condition="not:session_info/password">
               <span class="info" tal:content="string:Keine Passwort gesetzt" />
             </tal:Altvalue>
           </td>
@@ -104,20 +105,20 @@
         <tr>
           <td>maximale Benutzer</td>
           <td>
-            <tal:value condition="context/max_users" replace="context/max_users" />
-            <tal:Altvalue condition="not:context/max_users">
+            <tal:value condition="session_info/max_users" replace="session_info/max_users" />
+            <tal:Altvalue condition="not:session_info/max_users">
               <span class="info" tal:content="string:Keine Begrenzung" />
             </tal:Altvalue>
           </td>
         </tr>
         <tr>
           <td>Startzeit</td>
-          <td tal:define="chat_start context/start_date"
+          <td tal:define="chat_start session_info/start_date"
               tal:content="python:chat_start.strftime('%d.%m.%Y, %H:%M Uhr')"></td>
         </tr>
         <tr>
           <td>Endzeit</td>
-          <td tal:define="chat_end context/end_date"
+          <td tal:define="chat_end session_info/end_date"
               tal:content="python:chat_end.strftime('%d.%m.%Y, %H:%M Uhr')"></td>
         </tr>
     </table>

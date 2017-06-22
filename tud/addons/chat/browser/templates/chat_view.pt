@@ -22,7 +22,7 @@
                 });
 
                 if (response == true) {
-                    window.location = chat_url + "/chat?" + new Date().getTime();
+                    window.location = chat_url + "?" + new Date().getTime();
                 } else {
                     if (response.status.message != '')
                         $.notification.error(response.status.message);

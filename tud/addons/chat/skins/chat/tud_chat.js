@@ -33,11 +33,10 @@ var sendMessage = function(){
 };
 
 var goHierarchieUp = function(){
-    // Move from {obj_chat}/{obj_session}/chat to {obj_chat}
+    // Move from {obj_chat}/{obj_session} to {obj_chat}
     var url = window.location.href;
     if (url.substr(-1) == '/') url = url.substr(0, url.length - 2);
     url = url.split('/');
-    url.pop();
     url.pop();
     window.location = url.join('/');
 }

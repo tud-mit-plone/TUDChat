@@ -19,4 +19,21 @@
              permission  = "cmf.ModifyPortalContent"
      />
 
+     <browser:page
+             for         = "tud.addons.chat.content.chat_session.ChatSession"
+             name        = "view"
+             class       = ".chat_session.ChatSessionView"
+             template    = "templates/chat_session_view.pt"
+             layer       = "tud.addons.chat.interfaces.IAddonInstalled"
+             permission  = "zope2.View"
+     />
+     <browser:page
+             for         = "tud.addons.chat.content.chat_session.ChatSession"
+             name        = "log"
+             class       = ".chat_session.ChatSessionLogView"
+             template    = "templates/chat_session_log.pt"
+             layer       = "tud.addons.chat.interfaces.IAddonInstalled"
+             permission  = "cmf.ModifyPortalContent"
+     />
+
 </configure>
