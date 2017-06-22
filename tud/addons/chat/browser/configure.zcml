@@ -29,6 +29,13 @@
      />
      <browser:page
              for         = "tud.addons.chat.content.chat_session.ChatSession"
+             name        = "ajax"
+             class       = ".chat_session.ChatSessionAjaxView"
+             layer       = "tud.addons.chat.interfaces.IAddonInstalled"
+             permission  = "zope2.View"
+     />
+     <browser:page
+             for         = "tud.addons.chat.content.chat_session.ChatSession"
              name        = "log"
              class       = ".chat_session.ChatSessionLogView"
              template    = "templates/chat_session_log.pt"

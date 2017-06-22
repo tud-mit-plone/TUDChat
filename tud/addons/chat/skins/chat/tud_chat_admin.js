@@ -22,7 +22,7 @@ function printNewUser(user, role) {
 
 
 $(document).ready(
-	function(){
+    function(){
 
         $("body").delegate("a.edit", "click", function(e) {
             var oldMsg = $("#chatEntry"+$(e.target).attr("data-mid")).children("span.message_content").text();
@@ -35,7 +35,7 @@ $(document).ready(
                                                                         [{"name" :"Bearbeiten",
                                                                             "click":function(){
                                                                               if (oldMsg != $("#newMsg").val()) {
-                                                                                $.post(chat_url + "/editMessage", { 'message_id' :mId, 'message': $("#newMsg").val() } , function(data) { updateCheck(); });
+                                                                                $.post(ajax_url, {'method': 'editMessage', 'message_id' :mId, 'message': $("#newMsg").val() } , function(data) { updateCheck(); });
                                                                               }
                                                                               $("#chatEntry"+mId).removeClass("selected");
                                                                               $.notification.clear();
@@ -53,7 +53,7 @@ $(document).ready(
             $.notification.warn("Wollen Sie wirklich diese Nachricht löschen? <br/><br/>" + $("#chatEntry"+$(e.target).attr("data-mid")).children("span.username").text() + " " + message, false,
                                                                         [{"name" :"Ok",
                                                                             "click":function(){
-                                                                              $.get(chat_url + "/deleteMessage", { 'message_id': $(e.target).attr("data-mid") }, function(data) { updateCheck(); });
+                                                                              $.post(ajax_url, {'method': 'deleteMessage', 'message_id': $(e.target).attr("data-mid") }, function(data) { updateCheck(); });
                                                                               $.notification.clear();
                                                                             }},
                                                                         {"name" :"Abbrechen", "click": $.notification.clear },
@@ -66,7 +66,7 @@ $(document).ready(
             $.notification.warn("Wollen Sie wirklich den Benutzer \"" + user + "\" aus dem Chat entfernen?", false,
                                                                         [{"name" :"Ok",
                                                                             "click":function(){
-                                                                              $.get(chat_url + "/kickUser", { "user": $(e.target).attr("data-uname") }, function(data) { updateCheck(); });
+                                                                              $.post(ajax_url, {"method": "kickUser", "user": $(e.target).attr("data-uname") }, function(data) { updateCheck(); });
                                                                               $.notification.clear();
                                                                             }},
                                                                         {"name" :"Abbrechen", "click": $.notification.clear },
@@ -79,7 +79,7 @@ $(document).ready(
             $.notification.warn("Wollen Sie wirklich den Benutzer \"" + user + "\" aus dem Chat verbannen? <br/> <br/><form id='banUserForm'><label for='ban_reason'>Banngrund:</label> <input type='text' id='ban_reason'/></form>", false,
                                                                         [{"name" :"Ok",
                                                                             "click":function(){
-                                                                              $.get(chat_url + "/banUser", { "user": $(e.target).attr("data-uname"), "reason": $("#ban_reason").val() }, function(data) { updateCheck(); });
+                                                                              $.post(ajax_url, {"method": "banUser", "user": $(e.target).attr("data-uname"), "reason": $("#ban_reason").val() }, function(data) { updateCheck(); });
                                                                               $.notification.clear();
                                                                             }},
                                                                         {"name" :"Abbrechen", "click": $.notification.clear },
@@ -92,7 +92,7 @@ $(document).ready(
             $.notification.warn("Welche Verwarnung wollen Sie dem Benutzer \"" + user + "\" aussprechen? <br/> <br/><form id='warnUserForm'><label for='warning'>Warnung:</label> <input type='text' id='warning'/></form>", false,
                                                                         [{"name" :"Ok",
                                                                             "click":function(){
-                                                                              $.get(chat_url + "/warnUser", { "user": $(e.target).attr("data-uname"), "warning": $("#warning").val() }, function(data) { updateCheck(); });
+                                                                              $.post(ajax_url, {"method": "warnUser", "user": $(e.target).attr("data-uname"), "warning": $("#warning").val() }, function(data) { updateCheck(); });
                                                                               $.notification.clear();
                                                                             }},
                                                                         {"name" :"Abbrechen", "click": $.notification.clear },
@@ -110,5 +110,5 @@ $(document).ready(
             }
         });
 
-	}
+    }
 );

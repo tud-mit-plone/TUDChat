@@ -15,7 +15,7 @@
 
               $("input[type='submit']").attr("disabled", "disabled");
 
-              $.getJSON(chat_url + "/registerMe", { user: $("input[name='username']").val(), agreement: $("[name='agreement']").prop("checked"), password: $("#password").val() }, function(response) {
+              $.getJSON(chat_url + "/@@ajax", {method: 'registerMe', user: $("input[name='username']").val(), agreement: $("[name='agreement']").prop("checked"), password: $("#password").val() }, function(response) {
 
                 $.doTimeout( 'enableSubmitButton', 2000, function(){
                     $("input[type='submit']").removeAttr("disabled");
