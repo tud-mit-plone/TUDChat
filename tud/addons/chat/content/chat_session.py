@@ -102,12 +102,6 @@ class ChatSession(base.ATCTContent):
     #: Archetype schema
     schema = ChatSessionSchema
 
-    # Data
-    ## @brief collection of timestamps to call methods in certain intervals
-    timestamps               = {}
-    ## @brief chat room container with userlist, kicked_users, banned_users and timestamps
-    chat_rooms               = {}
-
     def getChatStorage(self):
         chat = self.getParentNode()
         return chat.chat_storage

@@ -2,10 +2,15 @@
 import re
 import simplejson
 
+from zope.component import getUtility
 from DateTime import DateTime
 from AccessControl import getSecurityManager
 
 from Products.Five import BrowserView
+
+from plone.uuid.interfaces import IUUID
+
+from collective.beaker.interfaces import ICacheManager
 
 class UserStatus:
     OK, NOT_AUTHORIZED, KICKED, BANNED, LOGIN_ERROR, WARNED, CHAT_WARN = range(7)
@@ -37,6 +42,25 @@ class ChatSessionBaseView(BrowserView):
 class ChatSessionAjaxView(ChatSessionBaseView):
     ## @brief replacements for special html chars (char "&" is in function included)
     htmlspecialchars         = {'"':'&quot;', '\'':'&#039;', '<':'&lt;', '>':'&gt;'} # {'"':'&quot;'} this comment is needed, because there is a bug in doxygen
+
+    def __init__(self, context, request):
+        super(ChatSessionAjaxView, self).__init__(context, request)
+
+        cacheManager = getUtility(ICacheManager)
+
+        cache_name = "chat_{}".format(IUUID(self.context))
+        self.cache = cacheManager.get_cache(cache_name, expire=18000)
+
+        if not self.cache.has_key('chat_users'):
+            self.cache.set_value('chat_users', {})
+        if not self.cache.has_key('kicked_chat_users'):
+            self.cache.set_value('kicked_chat_users', [])
+        if not self.cache.has_key('warned_chat_users'):
+            self.cache.set_value('warned_chat_users', {})
+        if not self.cache.has_key('banned_chat_users'):
+            self.cache.set_value('banned_chat_users', {})
+        if not self.cache.has_key('check_timestamp'):
+            self.cache.set_value('check_timestamp', DateTime().timeTime())
 
     def __call__(self):
         self.request.response.setHeader("Content-type", "application/json")
@@ -103,8 +127,9 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         session = self.request.SESSION
         user_properties = session.get('user_properties')
         name = user_properties.get('name')
-        chat_id = user_properties.get('chat_room')
-        self.context.chat_rooms[chat_id]['chat_users'][name]['date'] = DateTime().timeTime()
+        chat_users = self.cache['chat_users']
+        chat_users[name]['date'] = DateTime().timeTime()
+        self.cache['chat_users'] = chat_users
 
     ## @brief this function removes users who doesn't call the heart beat method for a defined timeout time
     def checkForInactiveUsers(self):
@@ -113,12 +138,11 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         timeout = chat.getField('timeout').get(chat)
 
         now = DateTime().timeTime()
-        if now - self.context.timestamps.setdefault('userHeartbeat', 0) > 5: # Perform this check every 5 seconds
-            for chat_id in self.context.chat_rooms.keys():
-                for user in self.context.chat_rooms[chat_id]['chat_users'].keys():
-                    if now - self.context.chat_rooms[chat_id]['chat_users'][user].get('date') > timeout: # timeout
-                        self.removeUser(user, chat_id)
-            self.context.timestamps['userHeartbeat'] = now
+        if now - self.cache['check_timestamp'] > 5: # Perform this check every 5 seconds
+            for user in self.cache['chat_users'].keys():
+                if now - self.cache['chat_users'][user].get('date') > timeout: # timeout
+                    self.removeUser(user)
+            self.cache['check_timestamp'] = now
 
     ## @brief Check, if a user is registered to a chat session
     #  @return bool True, if user is registered, otherwise False
@@ -127,10 +151,8 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         session = self.request.SESSION
 
         if session.get('user_properties'):
-            chat_id = session.get('user_properties').get('chat_room')
-            if chat_id in self.context.chat_rooms.keys():
-                if self.hasUser(session.get('user_properties').get('name'), chat_id):
-                    return True
+            if self.hasUser(session.get('user_properties').get('name')):
+                return True
             else:
                 session.clear()
         return False
@@ -145,34 +167,32 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         session = self.request.SESSION
         user_properties=session.get('user_properties')
-        if user_properties:
-            chat_id=user_properties.get('chat_room')
-        else:
-            chat_id=None
+
+        banned_chat_users = self.cache['banned_chat_users']
 
         # Existing cookie
         if BanStrategy.COOKIE in ban_strategy and self.request.get('tudchat_is_banned') == 'true':
             return True
 
         """
-        # Check by IP address in all chat rooms
+        # Check by IP address
         if BanStrategy.IP in ban_strategy:
-            for chat_id in self.context.chat_rooms.keys():
-                banEntry = dict((user,baninfo) for user,baninfo in self.context.chat_rooms[chat_id]['banned_chat_users'].iteritems() if baninfo.get('ip_address') == ip_address)
+            banEntry = dict((user,baninfo) for user,baninfo in banned_chat_users.iteritems() if baninfo.get('ip_address') == ip_address)
                 if len(banEntry) > 0:
                     return True
         """
 
-        if not self.context.chat_rooms.get(chat_id):
+        if not user_properties:
             return False
 
         # Is in ban list? Add cookie
-        if BanStrategy.COOKIE in ban_strategy and chat_id and user_properties.get('name') in self.context.chat_rooms[chat_id]['banned_chat_users'].keys():
+        if BanStrategy.COOKIE in ban_strategy and user_properties.get('name') in banned_chat_users.keys():
             self.request.RESPONSE.setCookie('tudchat_is_banned', 'true', expires=DateTime(int(DateTime()) + 365 * 24 * 60 * 60, 'US/Pacific').toZone('GMT').strftime('%A, %d-%b-%y %H:%M:%S ') + 'GMT' )
-            self.request.RESPONSE.setCookie('tudchat_ban_reason', self.context.chat_rooms[chat_id]['banned_chat_users'][user_properties.get('name')].get('reason'), expires=DateTime(int(DateTime()) + 365 * 24 * 60 * 60, 'US/Pacific').toZone('GMT').strftime('%A, %d-%b-%y %H:%M:%S ') + 'GMT' )
+            self.request.RESPONSE.setCookie('tudchat_ban_reason', banned_chat_users[user_properties.get('name')].get('reason'), expires=DateTime(int(DateTime()) + 365 * 24 * 60 * 60, 'US/Pacific').toZone('GMT').strftime('%A, %d-%b-%y %H:%M:%S ') + 'GMT' )
             # Free that username to be used by others
             if not BanStrategy.IP in ban_strategy:
-                del self.context.chat_rooms[chat_id]['banned_chat_users'][user_properties.get('name')]
+                del banned_chat_users[user_properties.get('name')]
+                self.cache['banned_chat_users'] = banned_chat_users
             return True
 
         return False
@@ -195,9 +215,8 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         """
         if BanStrategy.IP in ban_strategy:
-            # Check by IP-Address in all chat rooms
-            for chat_id in self.context.chat_rooms.keys():
-                banEntry = dict((user,baninfo) for user,baninfo in self.context.chat_rooms[chat_id]['banned_chat_users'].iteritems() if baninfo.get('ip_address') == ip_address)
+            # Check by IP-Address
+            banEntry = dict((user,baninfo) for user,baninfo in self.cache['banned_chat_users'].iteritems() if baninfo.get('ip_address') == ip_address)
                 if len(banEntry) > 0:
                     return banEntry[banEntry.keys()[0]].get('reason')
             return 'Not banned'
@@ -206,92 +225,89 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
     ## @brief this function adds an user to an existing chat session
     #  @param user str user name to add
-    #  @param chat_id int id of the room, where the user want to join
     #  @param is_admin bool true if the user has admin privileges
     #  @return bool true on success or false if the user is already in the room
-    def addUser(self, user, chat_id, is_admin):
+    def addUser(self, user, is_admin):
         """ Add yourself to the user list. """
-        if not self.context.chat_rooms[chat_id]['chat_users'].has_key(user):
-            self.context.chat_rooms[chat_id]['chat_users'][user] = {'date': DateTime().timeTime(), 'last_message_sent' : 0, 'is_admin' : is_admin }
-            self._p_changed = 1
+        chat_users = self.cache['chat_users']
+        if not chat_users.has_key(user):
+            chat_users[user] = {'date': DateTime().timeTime(), 'last_message_sent' : 0, 'is_admin' : is_admin }
+            self.cache['chat_users'] = chat_users
             return True
         return False
 
     ## @brief this function checks if an user is in a specific room
     #  @param user str user name to check
-    #  @param chat_id int id of the room to check
     #  @return bool true if the user in the room, otherwise false
-    def hasUser(self, user, chat_id):
+    def hasUser(self, user):
         """ Check for the existence of a user. """
-        return user in self.context.chat_rooms[chat_id]['chat_users'].keys()
+        return user in self.cache['chat_users'].keys()
 
     ## @brief this function removes an user from a specific room
     #  @param user str user name to remove
-    #  @param chat_id int id of the room where the user is inside
-    def removeUser(self, user, chat_id):
+    def removeUser(self, user):
         """ Remove a single user by its name. """
-        if self.context.chat_rooms[chat_id]['chat_users'].has_key(user):
-            del self.context.chat_rooms[chat_id]['chat_users'][user]
-            self._p_changed = 1
-        #remove chatroom if there no real entries
-        if len(self.context.chat_rooms[chat_id]['chat_users'])==0 and len(self.context.chat_rooms[chat_id]['kicked_chat_users'])==0 and len(self.context.chat_rooms[chat_id]['banned_chat_users'])==0:
-            del self.context.chat_rooms[chat_id]
+        chat_users = self.cache['chat_users']
+        if chat_users.has_key(user):
+            del chat_users[user]
+            self.cache['chat_users'] = chat_users
 
     ## @brief this function returns all users of a specific room
-    #  @param chat_id int id of the room
     #  @return list users of the chat room
-    def getUsers(self, chat_id):
+    def getUsers(self):
         """ Return the list of all user names in a chat room. """
-        return self.context.chat_rooms[chat_id]['chat_users'].keys()
+        return self.cache['chat_users'].keys()
 
     ## @brief this function returns all users of a specific room
     #  @param user str user name to be banned
     #  @param reason str reason for banning the user
-    #  @param chat_id int id of the room where the user is inside
     #  @return bool true if the user was banned succesfully, otherwise false
-    def addBannedUser(self, user, reason, chat_id):
+    def addBannedUser(self, user, reason):
         """ Ban a user with a given reason. """
-        if not user in self.context.chat_rooms[chat_id]['banned_chat_users'].keys() and user in self.context.chat_rooms[chat_id]['chat_users'].keys():
-            self.context.chat_rooms[chat_id]['banned_chat_users'][user] = { 'reason': reason }
-            self.removeUser(user, chat_id)
+        banned_chat_users = self.cache['banned_chat_users']
+        if not user in banned_chat_users.keys() and user in self.cache['chat_users'].keys():
+            banned_chat_users[user] = {'reason': reason}
+            self.cache['banned_chat_users'] = banned_chat_users
+            self.removeUser(user)
             return True
         return False
 
     ## @brief this function removes a user from the list of banned users
     #  @param user str user name to remove from the banned user list
-    #  @param chat_id int id of the room where the user was banned
     #  @return bool true if the user was removed from the banned user list, otherwise false (the user wasn't in the list of banned users of the given room)
-    def removeBannedUser(self, user, chat_id):
+    def removeBannedUser(self, user):
         """ Unban a user. """
-
-        if user in self.context.chat_rooms[chat_id]['banned_chat_users'].keys():
-            del self.context.chat_rooms[chat_id]['banned_chat_users'][user]
+        banned_chat_users = self.cache['banned_chat_users']
+        if user in banned_chat_users.keys():
+            del banned_chat_users[user]
+            self.cache['banned_chat_users'] = banned_chat_users
             return True
         return False
 
     ## @brief this function stores a warning message for a given user in a given chat room
     #  @param user str user name to be warned
     #  @param warning str message which would send to the user
-    #  @param chat_id int id of the room where the user is inside
     #  @return bool true if the user was found in the given room and if there is no other warning message for the user, otherwise false
-    def addWarnedUser(self, user, warning, chat_id):
+    def addWarnedUser(self, user, warning):
         """ Warn a user with a given text.
             The user gets the message after calling the getActions method. """
-        if not user in self.context.chat_rooms[chat_id]['warned_chat_users'].keys() and user in self.context.chat_rooms[chat_id]['chat_users'].keys():
-            self.context.chat_rooms[chat_id]['warned_chat_users'][user] = { 'warning': warning }
+        warned_chat_users = self.cache['warned_chat_users']
+        if not user in warned_chat_users.keys() and user in self.cache['chat_users'].keys():
+            warned_chat_users[user] = { 'warning': warning }
+            self.cache['warned_chat_users'] = warned_chat_users
             return True
         return False
 
     ## @brief this function removes a warning message for a given user in a given chat room
     #  @param user str user name of the warned user
-    #  @param chat_id int id of the room where the user is inside
     #  @return bool true if the warning message was found in the given room, otherwise false
-    def removeWarnedUser(self, user, chat_id):
+    def removeWarnedUser(self, user):
         """ Remove the warning message for a given user.
             This is usually done in the message sending process. """
-
-        if user in self.context.chat_rooms[chat_id]['warned_chat_users'].keys():
-            del self.context.chat_rooms[chat_id]['warned_chat_users'][user]
+        warned_chat_users = self.cache['warned_chat_users']
+        if user in warned_chat_users.keys():
+            del warned_chat_users[user]
+            self.cache['warned_chat_users'] = warned_chat_users
             return True
         return False
 
@@ -301,7 +317,6 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         now = DateTime()
         return now > chat_start and now < chat_end
 
-
     ## @brief this function removes an user from a chat room
     #  @return bool true if the user was successfully removed from the room, otherwise false
     def logout(self):
@@ -310,11 +325,10 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         session=self.request.SESSION
         if session.get('user_properties'):
             user = session.get('user_properties').get('name')
-            chat_id = session.get('user_properties').get('chat_room')
             session.set('user_properties', None)
             session.invalidate()
 
-            self.removeUser(user, chat_id)
+            self.removeUser(user)
         return True
 
     ## @brief this function registers an user to a chat room
@@ -330,7 +344,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         context = self.context
 
-        chatroom = context.getField('chat_id').get(context)
+        chat_id = context.getField('chat_id').get(context)
         user = user.strip()
 
         if agreement == "false":
@@ -341,7 +355,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das eingegebene Passwort ist nicht korrekt.'}}
 
         chat_max_users = context.getField('max_users').get(context)
-        if chat_max_users and self.context.chat_rooms.get(chatroom) and chat_max_users <= len(self.context.chat_rooms[chatroom]['chat_users']):
+        if chat_max_users and chat_max_users <= len(self.cache['chat_users']):
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das Benutzerlimit für diese Chat-Session ist bereits erreicht.'}}
 
         if len(re.findall(r"[a-zA-ZäöüÄÖÜ]",user))<3:
@@ -359,31 +373,24 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         if not self.isActive():
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der gewählte Chat-Raum ist zurzeit nicht aktiv.'}}
 
-        if self.context.chat_rooms.has_key(chatroom) and user.lower() in [chat_user.lower() for chat_user in self.context.chat_rooms[chatroom]['chat_users'].keys()]:
+        if user.lower() in [chat_user.lower() for chat_user in self.cache['chat_users'].keys()]:
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der Benutzername ist bereits belegt.'}}
 
         if self.isBanned():
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Sie wurden dauerhaft des Chats verwiesen. <br/> <br/> Grund: ' + str(self.getBanReason())}}
 
         session = self.request.SESSION
-        start_action_id = self.context.getChatStorage().getLastChatAction(chatroom)
+        start_action_id = self.context.getChatStorage().getLastChatAction(chat_id)
         self.checkForInactiveUsers()
 
         # Clean username
         user = self.html_escape(user)
 
-        if chatroom not in self.context.chat_rooms.keys(): # TODO Check hinzufügen, ob der Raum verfügbar ist.
-            self.context.chat_rooms[chatroom] = {'chat_users'  : {},
-                                    'kicked_chat_users' : [],
-                                    'warned_chat_users': {},
-                                    'banned_chat_users' : {}
-                                    }
-        if not self.isBanned() and user and self.addUser(user, chatroom, self.isAdmin()):
+        if not self.isBanned() and user and self.addUser(user, self.isAdmin()):
             session.set('user_properties', {'name': user,
                                             'start_action' : start_action_id,
                                             'last_action': start_action_id,
                                             'user_list': [],
-                                            'chat_room': chatroom,
                                             'chat_room_check': 0
                                             })
             return True
@@ -428,13 +435,15 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         show_date = chat.getField('showDate').get(chat)
         chat_date_format = chat.getField('chatDateFormat').get(chat)
 
-        if user in self.context.chat_rooms[chat_id]['warned_chat_users']:
-            warning = self.context.chat_rooms[chat_id]['warned_chat_users'][user]['warning']
-            self.removeWarnedUser(user, chat_id)
+        if user in self.cache['warned_chat_users']:
+            warning = self.cache['warned_chat_users'][user]['warning']
+            self.removeWarnedUser(user)
             return {'status': {'code': UserStatus.WARNED, 'message': warning}}
 
-        if user in self.context.chat_rooms[chat_id]['kicked_chat_users']:
-            self.context.chat_rooms[chat_id]['kicked_chat_users'].remove(user)
+        kicked_chat_users = self.cache['kicked_chat_users']
+        if user in kicked_chat_users:
+            kicked_chat_users.remove(user)
+            self.cache['kicked_chat_users'] = kicked_chat_users
             self.logout()
             return {'status': {'code': UserStatus.KICKED, 'message': ''}}
 
@@ -446,7 +455,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         if now - user_properties.get('chat_room_check') > 60: # Perform this check every 60 seconds
             user_properties['chat_room_check'] = now
             if not self.isActive():
-                self.removeUser(user, chat_id)
+                self.removeUser(user)
                 session.set('user_properties', user_properties)
                 return {'status': {'code': UserStatus.KICKED, 'message': 'Die Chat-Sitzung ist abgelaufen.'}}
             if not user_properties.get('chatInactiveWarning') and context.getField('end_date').get(context).timeTime() - now < 300: # warn user 5 minutes before the chat will close
@@ -492,8 +501,8 @@ class ChatSessionAjaxView(ChatSessionBaseView):
                         'users':
                             {
                                 'new':       [ { 'name' : person,
-                                                 'is_admin' :  self.context.chat_rooms[chat_id]['chat_users'][person]['is_admin']} for person in self.getUsers(chat_id) if person not in session.get('user_properties').get('user_list')],
-                                'to_delete': [ person for person in session.get('user_properties').get('user_list') if person not in self.getUsers(chat_id) ]
+                                                 'is_admin' :  self.cache['chat_users'][person]['is_admin']} for person in self.getUsers() if person not in session.get('user_properties').get('user_list')],
+                                'to_delete': [ person for person in session.get('user_properties').get('user_list') if person not in self.getUsers() ]
                             },
                         'status':
                             {
@@ -506,7 +515,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         if len(list_actions) > 1:
             user_properties['last_action'] = list_actions[len(list_actions)-1].get('id')
         # Update persons
-        user_properties['user_list'] = self.getUsers(chat_id)
+        user_properties['user_list'] = self.getUsers()
 
         # Update session only if necessary
         if old_user_properties['last_action'] != user_properties['last_action'] or old_user_properties['user_list'] != user_properties['user_list'] or old_user_properties['chat_room_check'] != user_properties['chat_room_check']:
@@ -531,16 +540,18 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         chat_id = self.context.getField('chat_id').get(self.context)
         user = session.get('user_properties').get('name')
 
+        chat_users = self.cache['chat_users']
+
         block_time = chat.getField('blockTime').get(chat)
         max_message_length = chat.getField('maxMessageLength').get(chat)
 
         self.userHeartbeat()
         if not message:
             return
-        if (now - self.context.chat_rooms[chat_id]['chat_users'][user].get('last_message_sent')) < block_time: # Block spamming messages
+        if (now - chat_users[user].get('last_message_sent')) < block_time: # Block spamming messages
             return
         else:
-            self.context.chat_rooms[chat_id]['chat_users'][user]['last_message_sent'] = now
+            chat_users[user]['last_message_sent'] = now
 
         #filter invalid utf8
         if not self.checkUTF8(message):
@@ -552,6 +563,8 @@ class ChatSessionAjaxView(ChatSessionBaseView):
                             user = user,
                             action = self.isAdmin() and 'mod_add_message' or 'user_add_message',
                             content = self.html_escape(message))
+
+        self.cache['chat_users'] = chat_users
 
     ## @brief this function edits an already sent message
     #  @param message int id of the message to edit
@@ -583,7 +596,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return
         self.userHeartbeat()
 
-        self.context.getChatStorage().sendAction(chat_id = session.get('user_properties').get('chat_room'),
+        self.context.getChatStorage().sendAction(chat_id = self.context.getField('chat_id').get(self.context),
                                     user = session.get('user_properties').get('name'),
                                     action = 'mod_delete_message',
                                     target = message_id)
@@ -602,7 +615,9 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return
 
         self.userHeartbeat()
-        self.context.chat_rooms[session.get('user_properties').get('chat_room')]['kicked_chat_users'].append(user)
+        kicked_chat_users = self.cache['kicked_chat_users']
+        kicked_chat_users.append(user)
+        self.cache['kicked_chat_users'] = kicked_chat_users
 
     ## @brief this function warns an user in the chat room where the admin is inside
     #  @param user str name of the user to warn
@@ -621,9 +636,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         self.userHeartbeat()
 
-        chat_id = session.get('user_properties').get('chat_room')
-
-        return self.addWarnedUser(user, warning, chat_id)
+        return self.addWarnedUser(user, warning)
 
     ## @brief this function bans an user from the chat room where the admin is inside
     #  @param user str name of the user to ban
@@ -642,9 +655,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         self.userHeartbeat()
 
-        chat_id = session.get('user_properties').get('chat_room')
-
-        return self.addBannedUser(user, reason, chat_id)
+        return self.addBannedUser(user, reason)
 
 class ChatSessionView(ChatSessionBaseView):
     """Default chat session view

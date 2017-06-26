@@ -28,6 +28,7 @@ setup(name='tud.addons.chat',
           'plone.api',
           'Products.ZMySQLDA',
           'simplejson',
+          'collective.beaker'
           # -*- Extra requirements: -*-
       ],
       extras_require={'test': ['plone.app.robotframework']},

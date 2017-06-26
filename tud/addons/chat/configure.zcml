@@ -8,6 +8,8 @@
             package         = "."
             initialize      = ".initialize"/>
 
+    <include package="collective.beaker" />
+
     <include package=".adapter"/>
     <include package=".content"/>
     <include package=".browser"/>
