@@ -53,6 +53,16 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             );
             """ % (prefix))
 
+        self.getPreviousAction = SQL('getPreviousAction', 'get id of previous action',
+            sql_connector_id, 'action_id',
+            """
+            SELECT MAX(`id`)
+            FROM `%s_action`
+            WHERE `id` < <dtml-sqlvar action_id type="int"> AND `chat_id` = (SELECT `chat_id`
+                                                                             FROM `%s_action`
+                                                                             WHERE `id` = <dtml-sqlvar action_id type="int">)
+            """ % (prefix, prefix))
+
         self.getMaxSessionId = SQL('getMaxSessionId', 'get max session id',
             sql_connector_id, '',
             """
@@ -63,8 +73,30 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             sql_connector_id, 'chat_id',
             """
             SELECT      MAX(id) AS action_id
-            FROM        `%s_action`
+            FROM `%s_action`
             WHERE       chat_id = <dtml-sqlvar chat_id type="int">
+            """ % (prefix))
+
+        self.getStartAction = SQL('getStartAction', 'get the start action so that a given number of old messages will be shown',
+            sql_connector_id, 'chat_id old_messages_count',
+            """
+            SELECT MIN(id)
+            FROM (SELECT id
+                  FROM `%s_action`
+                  WHERE chat_id = <dtml-sqlvar chat_id type="int"> AND action LIKE '%%_add_message'
+                  ORDER BY id DESC
+                  LIMIT <dtml-sqlvar old_messages_count type="int">) AS action
+            """ % (prefix))
+
+        self.getStartActionTimeLimit = SQL('getStartActionTimeLimit', 'get the start action so that a given number of old messages with a given maximum age will be shown',
+            sql_connector_id, 'chat_id old_messages_count old_messages_minutes',
+            """
+            SELECT MIN(id)
+            FROM (SELECT id
+                  FROM `%s_action`
+                  WHERE chat_id = <dtml-sqlvar chat_id type="int"> AND `date` > DATE_SUB(NOW(), INTERVAL <dtml-sqlvar old_messages_minutes type="int"> MINUTE) AND action LIKE '%%_add_message'
+                  ORDER BY id DESC
+                  LIMIT <dtml-sqlvar old_messages_count type="int">) AS action
             """ % (prefix))
 
         self.getActions = SQL('getActions', 'get actions of a chat',
@@ -194,10 +226,31 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
             result = int(result)
         return result
 
-    def getLastChatAction(self, chat_id):
-        result = self.sql_methods.getLastChatAction(chat_id = chat_id)
-        result_dict = self.dictFromSql(result, ('action_id',))
-        return result_dict[0]['action_id'] or 0
+    def getStartAction(self, chat_id, old_messages_count = 0, old_messages_minutes = 0):
+        if old_messages_count != 0:
+            if old_messages_minutes == 0:
+                result = self.sql_methods.getStartAction(chat_id = chat_id, old_messages_count = old_messages_count)
+            else:
+                result = self.sql_methods.getStartActionTimeLimit(chat_id = chat_id, old_messages_count = old_messages_count, old_messages_minutes = old_messages_minutes)
+            action = result.tuples()[0][0]
+            if action is None:
+                start_action = None
+            else:
+                result = self.sql_methods.getPreviousAction(action_id = action)
+                if result.tuples()[0][0] is None:
+                    start_action = 0
+                else:
+                    start_action = result.tuples()[0][0]
+        else:
+            start_action = None
+
+        if start_action is None:
+            result = self.sql_methods.getLastChatAction(chat_id = chat_id)
+            start_action = result.tuples()[0][0]
+            if start_action is None:
+                start_action = 0
+
+        return start_action
 
     def getActions(self, chat_id, last_action, start_action, limit = 0):
         results = self.sql_methods.getActions(chat_id = chat_id,

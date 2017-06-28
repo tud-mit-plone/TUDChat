@@ -343,6 +343,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         self.request.SESSION.set('user_properties', None)
 
         context = self.context
+        chat = context.getParentNode()
 
         chat_id = context.getField('chat_id').get(context)
         user = user.strip()
@@ -380,7 +381,9 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Sie wurden dauerhaft des Chats verwiesen. <br/> <br/> Grund: ' + str(self.getBanReason())}}
 
         session = self.request.SESSION
-        start_action_id = self.context.getChatStorage().getLastChatAction(chat_id)
+        old_messages_count = chat.getField('oldMessagesCount').get(chat)
+        old_messages_minutes = chat.getField('oldMessagesMinutes').get(chat)
+        start_action_id = self.context.getChatStorage().getStartAction(chat_id, old_messages_count, old_messages_minutes)
         self.checkForInactiveUsers()
 
         # Clean username

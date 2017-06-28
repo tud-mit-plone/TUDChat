@@ -17,6 +17,7 @@ from Products.Archetypes.atapi import Schema
 from Products.Archetypes.atapi import StringField, BooleanField, IntegerField
 from Products.Archetypes.public import StringWidget, SelectionWidget, BooleanWidget, IntegerWidget
 from Products.Archetypes.public import DisplayList
+from Products.validation.validators import ExpressionValidator
 
 try:
     from raptus.multilanguagefields import fields
@@ -148,6 +149,24 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             label        = u"Ban-Strategie",
             description  = u"Bitte waehlen Sie mit welchen Mitteln gebannte Benutzer markiert werden. ",
             format       = "select"
+        )
+    ),
+    IntegerField('oldMessagesCount',
+        required           = True,
+        default            = 20,
+        validators         = (ExpressionValidator('python: int(value) >= 0', u'Die Anzahl muss 0 oder groesser 0 sein.'), ),
+        widget             = IntegerWidget(
+            label        = u"Maximale Anzahl anzuzeigender vorangegangener Nachrichten beim Betreten eines Chat-Raums",
+            description  = u"Bitte geben Sie die maximale Anzahl der vorangegangenen Nachrichten, die dem Benutzer beim Betreten eines Chat-Raums angezeigt werden sollen, an. (0 bedeutet, dass keine vorangegangenen Nachrichten angezeigt werden)"
+        )
+    ),
+    IntegerField('oldMessagesMinutes',
+        required           = True,
+        default            = 0,
+        validators         = (ExpressionValidator('python: int(value) >= 0', u'Die Minutenanzahl muss 0 oder groesser 0 sein.'), ),
+        widget             = IntegerWidget(
+            label        = u"Maximales Alter der vorangegangenen Nachrichten beim Betreten eines Chat-Raums (in Minuten)",
+            description  = u"Diese Einstellung findet nur Anwendung, wenn die maximale Anzahl anzuzeigender vorangegangener Nachrichten groesser als 0 ist. Bitte geben Sie das maximale Alter der vorangegangenen Nachrichten, die dem Benutzer beim Betreten eines Chat-Raums angezeigt werden sollen, in Minuten an. (0 bedeutet, dass keine zeitliche Beschraenkung aktiv ist)"
         )
     ),
 ),
