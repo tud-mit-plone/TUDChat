@@ -673,6 +673,9 @@ class ChatSessionView(ChatSessionBaseView):
 
         return result
 
+    def getWelcomeMessage(self):
+        return self.context.getField('welcome_message').get(self.context)
+
 class ChatSessionLogView(ChatSessionBaseView):
     """Chat session log view
     """

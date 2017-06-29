@@ -54,6 +54,14 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = u"Bitte geben Sie das Ende der Chat-Sitzung an."
         )
     ),
+    fields.StringField('welcome_message',
+        required           = False,
+        default            = '',
+        widget             = widgets.StringWidget(
+            label        = u"Willkommensnachricht",
+            description  = u"Bitte machen Sie eine Eingabe, falls eine Willkommensnachricht gewuenscht ist. Diese Nachricht sieht dann jeder nach dem Betreten des Chat-Raums."
+        )
+    ),
     StringField('password',
         required           = False,
         default            = '',

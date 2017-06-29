@@ -44,7 +44,7 @@
             </p>
         </tal:block>
     </tal:block>
-    <div id="chat">
+    <div id="chat" tal:attributes="data-welcome_message view/getWelcomeMessage">
         <div id="chatUser">
             <ul id="userContainer">
             </ul>

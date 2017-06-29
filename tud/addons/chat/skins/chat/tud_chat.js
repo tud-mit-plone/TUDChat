@@ -46,7 +46,7 @@ var sortByRoleName = function(object1, object2){
   return [!object1.is_admin, object1.name] >= [!object2.is_admin, object2.name] ? 1 : -1;
 }
 
-var updateCheck = function(){
+var updateCheck = function(welcome_message = null){
 
     if (updateCheckBlock) // temporary workaround
         return;
@@ -190,6 +190,11 @@ var updateCheck = function(){
             }
         }
 
+    if(welcome_message){
+        var $message = $("<li id='welcome_message'></li>").append($("<span class='message_content'></span>").text(welcome_message));
+        $("#chatContainer").append($message);
+    }
+
     firstGetActions = false;
     updateCheckBlock = false;
 
@@ -198,8 +203,18 @@ var updateCheck = function(){
     });
 };
 
-var updateCheckTimeout = function(){
-    updateCheck();
+var updateCheckTimeout = function(first_run = false){
+    if(first_run){
+        var welcome_message = $('#chat').data('welcome_message');
+        if(welcome_message){
+            welcome_message = 'Willkommensnachricht: ' + welcome_message;
+            updateCheck(welcome_message);
+        }else{
+            updateCheck();
+        }
+    }else{
+        updateCheck();
+    }
     $.doTimeout( 'updateCheck', refreshRate, updateCheckTimeout);
 };
 
@@ -265,7 +280,7 @@ $(document).ready(
     $("#chatMsgForm").submit(sendMessage);
 
         $.post(ajax_url, {'method': 'resetLastAction'}, function(data){
-        updateCheckTimeout();
+        updateCheckTimeout(true);
         });
 
         $("#logout").click(function() {
