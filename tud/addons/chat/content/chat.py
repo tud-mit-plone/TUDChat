@@ -45,6 +45,12 @@ BAN_STRATEGIES = DisplayList((
     ('COOKIE_AND_IP', 'Cookie und IP-Adresse (restriktiv)'),
     ))
 
+WHISPER_OPTIONS = DisplayList((
+    ('off', 'Deaktiviert'),
+    ('restricted', 'Eingeschraenkt aktiviert'),
+    ('on', 'Aktiviert'),
+    ))
+
 ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
     fields.TextField('introduction',
         required           = False,
@@ -167,6 +173,16 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         widget             = IntegerWidget(
             label        = u"Maximales Alter der vorangegangenen Nachrichten beim Betreten eines Chat-Raums (in Minuten)",
             description  = u"Diese Einstellung findet nur Anwendung, wenn die maximale Anzahl anzuzeigender vorangegangener Nachrichten groesser als 0 ist. Bitte geben Sie das maximale Alter der vorangegangenen Nachrichten, die dem Benutzer beim Betreten eines Chat-Raums angezeigt werden sollen, in Minuten an. (0 bedeutet, dass keine zeitliche Beschraenkung aktiv ist)"
+        )
+    ),
+    StringField('whisper',
+        required           = True,
+        default            = 'on',
+        vocabulary         = WHISPER_OPTIONS,
+        widget             = SelectionWidget(
+            label        = u"Fluestern",
+            description  = u"Wenn Fluestern aktiviert ist, kann jeder Benutzer einem anderen Benutzer direkt eine Nachricht uebermitteln. Bei einer eingeschraenkten Aktivierung koennen zwei Benutzer, die beide keine Moderatoren sind, nicht miteinander fluestern.",
+            format       = "select",
         )
     ),
 ),

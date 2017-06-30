@@ -384,6 +384,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         old_messages_count = chat.getField('oldMessagesCount').get(chat)
         old_messages_minutes = chat.getField('oldMessagesMinutes').get(chat)
         start_action_id = self.context.getChatStorage().getStartAction(chat_id, old_messages_count, old_messages_minutes)
+        start_action_whisper_id = self.context.getChatStorage().getLastAction(chat_id)
         self.checkForInactiveUsers()
 
         # Clean username
@@ -392,6 +393,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         if not self.isBanned() and user and self.addUser(user, self.isAdmin()):
             session.set('user_properties', {'name': user,
                                             'start_action' : start_action_id,
+                                            'start_action_whisper' : start_action_whisper_id,
                                             'last_action': start_action_id,
                                             'user_list': [],
                                             'chat_room_check': 0
@@ -468,13 +470,14 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         # Lookup last action
         start_action = user_properties.get('start_action')
+        start_action_whisper = user_properties.get('start_action_whisper')
         last_action = user_properties.get('last_action')
         #limit message count for users who get normally all messages since start action
         if start_action==last_action:
             limit = 30
         else:
             limit = 0
-        list_actions = chat_storage.getActions(chat_id = chat_id, last_action = last_action, start_action = start_action, limit = limit)
+        list_actions = chat_storage.getActions(chat_id = chat_id, last_action = last_action, start_action = start_action, start_action_whisper = start_action_whisper, user = user, limit = limit)
         # build a list of extra attributes
         for i in range(len(list_actions)):
             list_actions[i]['attr'] = []
@@ -482,6 +485,8 @@ class ChatSessionAjaxView(ChatSessionBaseView):
                 list_actions[i]['attr'].append({'a_action':list_actions[i]['a_action'], 'a_name':list_actions[i]['a_name']})
             if list_actions[i]['action'] == 'mod_add_message' or list_actions[i]['u_action'] == 'mod_add_message':
                 list_actions[i]['attr'].append({'admin_message':True})
+            if list_actions[i]['whisper'] == '1':
+                list_actions[i]['attr'].append({'whisper':True})
 
         return_dict = {
                         'messages':
@@ -528,7 +533,8 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
     ## @brief this function adds a message to the chat room of the user
     #  @param message str message to send
-    def ajaxSendMessage(self, message):
+    #  @param target str optional whisper target
+    def ajaxSendMessage(self, message, target = None):
         """ Send a message to the chat room of the user.
             If the user sends to many messages in a pre-defined interval, the message will be ignored.
             The maximum message length will be also checked (if the message length is to high, it will be truncated). """
@@ -549,6 +555,20 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         max_message_length = chat.getField('maxMessageLength').get(chat)
 
         self.userHeartbeat()
+
+        if target is not None:
+            whisper = chat.getField('whisper').get(chat)
+
+            if whisper == 'off':
+                return
+            if not chat_users.get(target):
+                return
+            if whisper == 'restricted' and not chat_users[user]['is_admin'] and not chat_users[target]['is_admin']:
+                return
+            if user == target:
+                # can't whisper with yourself
+                return
+
         if not message:
             return
         if (now - chat_users[user].get('last_message_sent')) < block_time: # Block spamming messages
@@ -565,7 +585,8 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         msgid = self.context.getChatStorage().sendAction(chat_id = chat_id,
                             user = user,
                             action = self.isAdmin() and 'mod_add_message' or 'user_add_message',
-                            content = self.html_escape(message))
+                            content = self.html_escape(message),
+                            whisper_target = target)
 
         self.cache['chat_users'] = chat_users
 
@@ -676,6 +697,10 @@ class ChatSessionView(ChatSessionBaseView):
     def getWelcomeMessage(self):
         return self.context.getField('welcome_message').get(self.context)
 
+    def getWhisperOption(self):
+        chat = self.context.getParentNode()
+        return chat.getField('whisper').get(chat)
+
 class ChatSessionLogView(ChatSessionBaseView):
     """Chat session log view
     """
@@ -685,4 +710,4 @@ class ChatSessionLogView(ChatSessionBaseView):
     def getLogs(self, REQUEST = None):
         """ Retrieve the whole and fully parsed chat log """
         chat_id = self.context.getField('chat_id').get(self.context)
-        return self.context.getChatStorage().getActions(chat_id, 0, 0)[:-1]
+        return self.context.getChatStorage().getActions(chat_id, 0, 0, 0, '')[:-1]

@@ -43,7 +43,8 @@
             </p>
         </tal:block>
     </tal:block>
-    <div id="chat" tal:attributes="data-welcome_message view/getWelcomeMessage">
+    <div id="chat" tal:attributes="data-welcome_message view/getWelcomeMessage;
+                                   data-whisper view/getWhisperOption">
         <div id="chatUser">
             <ul id="userContainer">
             </ul>

@@ -48,6 +48,7 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
                 `action` ENUM('user_add_message', 'mod_add_message', 'mod_edit_message', 'mod_delete_message') NOT NULL,
                 `content`         TEXT                 NOT NULL,
                 `target`          INT                      NULL DEFAULT NULL,
+                `whisper_target`  VARCHAR( 255 )           NULL DEFAULT NULL,
             PRIMARY KEY (`id` ),
             INDEX ( `chat_id` )
             );
@@ -100,9 +101,9 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             """ % (prefix))
 
         self.getActions = SQL('getActions', 'get actions of a chat',
-            sql_connector_id, 'chat_id last_action start_action',
+            sql_connector_id, 'chat_id last_action start_action start_action_whisper user',
             """
-            SELECT id, action, date, user, content AS message, NULL AS target, '' AS a_action, '' AS a_name, '' AS u_action
+            SELECT id, action, date, user, content AS message, NULL AS target, '' AS a_action, '' AS a_name, '' AS u_action, NULL AS whisper
             FROM `%s_action`
             WHERE id NOT IN
               (SELECT target
@@ -111,8 +112,18 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
               AND chat_id = <dtml-sqlvar chat_id type="int">
               AND id > <dtml-sqlvar last_action type="int">
               AND action LIKE '%%add_message'
+              AND whisper_target IS NULL
             UNION ALL
-            SELECT action.a_id AS 'id', a_action.action AS action, u_action.date AS date, u_action.user AS user, a_action.content AS content, action.u_id as target, a_action.action AS a_action, a_action.user AS a_name, u_action.action AS u_action
+            SELECT id, action, date, user, content AS message, NULL AS target, '' AS a_action, '' AS a_name, '' AS u_action, '1' AS whisper
+            FROM `%s_action`
+            WHERE chat_id = <dtml-sqlvar chat_id type="int">
+              AND id > <dtml-sqlvar last_action type="int">
+              AND id > <dtml-sqlvar start_action_whisper type="int">
+              AND action LIKE '%%add_message'
+              AND whisper_target IS NOT NULL
+              AND (whisper_target = <dtml-sqlvar user type="string"> OR user = <dtml-sqlvar user type="string">)
+            UNION ALL
+            SELECT action.a_id AS 'id', a_action.action AS action, u_action.date AS date, u_action.user AS user, a_action.content AS content, action.u_id as target, a_action.action AS a_action, a_action.user AS a_name, u_action.action AS u_action, NULL AS whisper
             FROM (SELECT target AS 'u_id', MAX(id) AS 'a_id'
                   FROM `%s_action`
                   WHERE (action='mod_delete_message' OR action='mod_edit_message')
@@ -124,7 +135,7 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             INNER JOIN `%s_action` AS a_action ON action.a_id = a_action.id
             INNER JOIN `%s_action` AS u_action ON action.u_id = u_action.id
             UNION ALL
-            SELECT action.u_id AS 'id', u_action.action AS action, u_action.date AS date, u_action.user AS user, a_action.content AS content, NULL as target, a_action.action AS a_action, a_action.user AS a_name, '' AS u_action
+            SELECT action.u_id AS 'id', u_action.action AS action, u_action.date AS date, u_action.user AS user, a_action.content AS content, NULL as target, a_action.action AS a_action, a_action.user AS a_name, '' AS u_action, NULL AS whisper
             FROM (SELECT target AS 'u_id', MAX(id) AS 'a_id'
                   FROM `%s_action`
                   WHERE (action='mod_delete_message' OR action='mod_edit_message')
@@ -136,11 +147,11 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
             INNER JOIN `%s_action` AS a_action ON action.a_id = a_action.id
             INNER JOIN `%s_action` AS u_action ON action.u_id = u_action.id
             UNION ALL
-            SELECT MAX(id) AS 'ID', '' AS 'action', NOW() AS 'date', '' AS 'user', '' AS 'message', '' AS 'target', '' AS 'a_action', '' AS 'a_name', '' AS u_action
+            SELECT MAX(id) AS 'ID', '' AS 'action', NOW() AS 'date', '' AS 'user', '' AS 'message', '' AS 'target', '' AS 'a_action', '' AS 'a_name', '' AS u_action, '' AS whisper
             FROM `%s_action`
             WHERE chat_id=<dtml-sqlvar chat_id type="int">
             ORDER BY `ID` ASC
-            """ % (prefix, prefix, prefix, prefix, prefix, prefix, prefix, prefix, prefix))
+            """ % (prefix, prefix, prefix, prefix, prefix, prefix, prefix, prefix, prefix, prefix))
         self.getActions.max_rows_ = 0
 
         self.getRawActionContents = SQL('getRawActionContents', 'get raw actions of a chat session',
@@ -153,17 +164,18 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
         self.getRawActionContents.max_rows_ = 0
 
         self.sendAction = SQL('sendAction', 'send an action',
-            sql_connector_id, 'chat_id user action content target',
+            sql_connector_id, 'chat_id user action content target whisper_target',
             """
             INSERT INTO `%s_action` (
-                `chat_id`, `date`, `user`, `action`, `content`, `target`  )
+                `chat_id`, `date`, `user`, `action`, `content`, `target`, `whisper_target`)
             VALUES (
                 <dtml-sqlvar chat_id type="int">,
                 NOW(),
                 <dtml-sqlvar user type="string">,
                 <dtml-sqlvar action type="string">,
                 <dtml-sqlvar content type="string">,
-                <dtml-sqlvar target type="int">
+                <dtml-sqlvar target type="int">,
+                <dtml-sqlvar whisper_target type="string">
             );
             <dtml-var sql_delimiter>
             SELECT LAST_INSERT_ID() AS newid
@@ -226,6 +238,14 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
             result = int(result)
         return result
 
+    def getLastAction(self, chat_id):
+        result = self.sql_methods.getLastChatAction(chat_id = chat_id)
+        last_action = result.tuples()[0][0]
+        if last_action is None:
+            last_action = 0
+
+        return last_action
+
     def getStartAction(self, chat_id, old_messages_count = 0, old_messages_minutes = 0):
         if old_messages_count != 0:
             if old_messages_minutes == 0:
@@ -245,19 +265,18 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
             start_action = None
 
         if start_action is None:
-            result = self.sql_methods.getLastChatAction(chat_id = chat_id)
-            start_action = result.tuples()[0][0]
-            if start_action is None:
-                start_action = 0
+            start_action = self.getLastAction(chat_id)
 
         return start_action
 
-    def getActions(self, chat_id, last_action, start_action, limit = 0):
+    def getActions(self, chat_id, last_action, start_action, start_action_whisper, user, limit = 0):
         results = self.sql_methods.getActions(chat_id = chat_id,
                                                 last_action = last_action,
-                                                start_action = start_action)
+                                                start_action = start_action,
+                                                start_action_whisper = start_action_whisper,
+                                                user = user)
         if results:
-            results = self.dictFromSql(results, names=["id", "action", "date", "user", "message", "target", "a_action", "a_name", "u_action"])
+            results = self.dictFromSql(results, names=["id", "action", "date", "user", "message", "target", "a_action", "a_name", "u_action", "whisper"])
             if limit:
                 results = results[-limit-1:]
             return results
@@ -271,12 +290,13 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
         else:
             return []
 
-    def sendAction(self, chat_id, user, action, content = "", target = None):
+    def sendAction(self, chat_id, user, action, content = "", target = None, whisper_target = None):
         newid = self.sql_methods.sendAction(chat_id = chat_id,
                                     user = user,
                                     action = action,
                                     content = content,
-                                    target = target)
+                                    target = target,
+                                    whisper_target = whisper_target)
         return int(self.dictFromSql(newid, names=('newid',))[0]['newid'])
 
     def getUsersBySessionId(self, chat_id):
