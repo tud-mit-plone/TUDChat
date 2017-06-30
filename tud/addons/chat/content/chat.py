@@ -14,8 +14,8 @@ from Products.CMFCore import permissions
 from Products.Archetypes import atapi
 from Products.ATContentTypes.content import base, schemata
 from Products.Archetypes.atapi import Schema
-from Products.Archetypes.atapi import StringField, BooleanField, IntegerField
-from Products.Archetypes.public import StringWidget, SelectionWidget, BooleanWidget, IntegerWidget
+from Products.Archetypes.atapi import StringField, IntegerField
+from Products.Archetypes.public import StringWidget, SelectionWidget, IntegerWidget
 from Products.Archetypes.public import DisplayList
 from Products.validation.validators import ExpressionValidator
 
@@ -31,13 +31,6 @@ from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
 from tud.addons.chat.interfaces import IChat
 
 logger = logging.getLogger('tud.addons.chat')
-
-TIME_FORMATS = DisplayList((
-    ('%H:%M:%S', 'Uhrzeit'),
-    ('%H:%M', 'Uhrzeit (ohne Sekunden)'),
-    ('%d.%m.%Y %H:%M:%S', 'Datum und Uhrzeit'),
-    ('%d.%m.%Y %H:%M', 'Datum und Uhrzeit (ohne Sekunden)'),
-    ))
 
 BAN_STRATEGIES = DisplayList((
     ('COOKIE', 'Nur Cookie (empfohlen)'),
@@ -86,24 +79,6 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         widget             = StringWidget(
             label        = u"Datenbank-Praefix",
             description  = u"Bitte geben Sie einen Praefix fuer Tabellen in der Datebank an; z.B.: 'institutionsname'"
-        )
-    ),
-    BooleanField('showDate',
-        required           = True,
-        default            = True,
-        widget             = BooleanWidget(
-            label        = u"Zeitstempel an Chatnachrichten?",
-            description  = u"Bitte geben Sie an, ob die Chatnachricht mit einem Zeitstempel begleitet werden soll."
-        )
-    ),
-    StringField('chatDateFormat',
-        required           = False,
-        default            = '%H:%M:%S',
-        vocabulary         = TIME_FORMATS,
-        widget             = SelectionWidget(
-            label        = u"Format des Zeitstempels",
-            description  = u"Bitte geben Sie das Format des Zeitstempels an.",
-            format       = "select",
         )
     ),
     StringField('adminColor',

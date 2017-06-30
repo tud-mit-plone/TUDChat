@@ -437,9 +437,6 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         user = user_properties.get('name')
         chat_id = context.getField('chat_id').get(context)
 
-        show_date = chat.getField('showDate').get(chat)
-        chat_date_format = chat.getField('chatDateFormat').get(chat)
-
         if user in self.cache['warned_chat_users']:
             warning = self.cache['warned_chat_users'][user]['warning']
             self.removeWarnedUser(user)
@@ -492,16 +489,16 @@ class ChatSessionAjaxView(ChatSessionBaseView):
                         'messages':
                             {
                                 'new': [ {  'id': action['id'],
-                                            'date': show_date and action['date'].strftime(chat_date_format) or "",
+                                            'date': int(action['date'].timeTime()),
                                             'name': action['user'],
                                             'message': action['message'],
                                             'attributes': action['attr'] } for action in list_actions if (action['action'] == "user_add_message" or action['action'] == "mod_add_message")],
                                 'to_delete': [ { 'id': action['target'],
-                                                  'date': show_date and action['date'].strftime(chat_date_format) or "",
+                                                  'date': int(action['date'].timeTime()),
                                                   'name': action['user'],
                                                   'attributes': action['attr'] } for action in list_actions if action['action'] == "mod_delete_message" ],
                                 'to_edit': [ {  'id': action['target'],
-                                                'date': show_date and action['date'].strftime(chat_date_format) or "",
+                                                'date': int(action['date'].timeTime()),
                                                 'name': action['user'],
                                                 'message': action['message'],
                                                 'attributes': action['attr'] } for action in list_actions if action['action'] == "mod_edit_message" ],
