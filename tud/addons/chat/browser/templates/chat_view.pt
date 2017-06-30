@@ -64,11 +64,12 @@
 
 <h2 tal:content="view/getTitle"> Title of chat </h2>
 
-<div class="chat_introduction" tal:content="view/getIntroduction"> Introduction </div>
+<p tal:content="view/getIntroduction"> Introduction </p>
 
-<div class="chat_explanation"><span class="introduction">Datenschutzhinweis:</span>
+<h3>Datenschutzhinweis</h3>
+<p class="chat_explanation">
     Um an einem Chat teilnehmen zu können, wählen Sie bitte unten einen Chat-Raum aus, tragen Ihren gewünschten Benutzernamen ein und bestätigen, dass Sie diesen Datenschutzhinweis zur Kenntnis genommen haben. Um anonym zu bleiben, nutzen Sie bitte einen Nickname als Benutzernamen. Er muss zwischen 3 und 20 Zeichen lang sein und mindestens 3 Buchstaben enthalten. Wenn Sie eine Nachricht im Chat verschicken, können alle Teilnehmer den von Ihnen gewählten Benutzernamen und die Nachricht sehen. Die Nachrichten werden zusammen mit einem Zeitstempel über die Chatlaufzeit hinaus anonymisiert gespeichert. Bitte beachten Sie, dass persönliche Angaben in den Chatnachrichten nicht anonymisiert werden können. Die Moderatoren können die Chats im Nachhinein  ausschließlich  zur Verbesserung der FAQ-Angebote auswerten. Die Löschung der Daten erfolgt spätestens nach 3 Monaten. Die Räume sind zeitlich befristet und werden moderiert. Bei Fehlverhalten von Chatnutzern können Konsequenzen in Form von einer Verwarnung und permanenter Verweisung des Chatraums folgen. Zur Realisierung der Verweisung wird in diesem Fall ein Cookie in Ihrem Browser gesetzt. Private Nachrichten können aktuell im Chat nicht verschickt werden. Sollten Sie vertrauliche Informationen übertragen wollen, nutzen Sie bitte die E-Mail-Kontaktdaten auf den Webseiten.
-</div>
+</p>
 
 <tal:block condition="python:active_sessions is not None">
 
@@ -99,13 +100,8 @@
         </div>
 
         <div class="agreement_field">
-          <div class="left">
-            <label for="agreement">Ich habe den Datenschutzhinweis gelesen und verstanden und möchte unter den darin genannten Bedingungen teilnehmen.</label>
-          </div>
-          <div class="left">
-            <input type="checkbox" name="agreement" id="agreement" />
-          </div>
-          <div class="clear"></div>
+          <input type="checkbox" name="agreement" id="agreement" />
+          <label for="agreement">Ich habe den Datenschutzhinweis gelesen und verstanden und möchte unter den darin genannten Bedingungen teilnehmen.</label>
         </div>
 
         <div>
@@ -115,11 +111,11 @@
     </form>
 
     <tal:block condition="python: not active_sessions">
-      <div class="chat_nosession">
+      <p class="chat_nosession">
         Es existiert derzeit keine aktive Chatsitzung.
         <span tal:condition="python: next_sessions">Es werden allerdings welche stattfinden.</span>
         <span tal:condition="python: not next_sessions">Es befindet sich auch keine Chatsitzung in Planung.</span>
-      </div>
+      </p>
     </tal:block>
 
 

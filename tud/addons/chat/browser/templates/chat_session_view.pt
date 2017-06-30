@@ -58,7 +58,7 @@
             <form id="chatMsgForm">
                 <input type="text" name="msg" id="chatMsgValue" autocomplete="off" placeholder="Bitte geben Sie hier ihre Nachricht ein." tal:attributes="maxlength python: max_msg_length > 0 and max_msg_length or None; style python: max_msg_length > 0 and 'padding-right: 80px' or None"/>
                 <span id="counter" tal:condition="python: max_msg_length > 0"></span>
-                <button id="chatMsgSubmit" type="submit" class="simpleButton" title="Zum Absenden hier klicken oder 'Enter' drücken.">Absenden</button>
+                <button id="chatMsgSubmit" type="submit" title="Zum Absenden hier klicken oder 'Enter' drücken.">Absenden</button>
             </form>
         </div>
         <div class="clear"></div>
@@ -66,10 +66,10 @@
     <div id="chatAppendix">
 
         <h3>Hinweise zur Benutzung:</h3>
-        <div tal:define="chat_end session_info/end_date;
+        <p tal:define="chat_end session_info/end_date;
                          chat_end python: chat_end.strftime('%d.%m.%Y, %H:%M Uhr')">
             Die Chaträume werden <em class='admin'>moderiert</em> und es können bei Fehlverhalten Konsequenzen in Form von einer Verwarnung und permanenter Verweisung des Chatraums folgen. <span class="chatDuration" tal:content="string: Dieser Chat ist bis zum ${chat_end} aktiv und wird anschließend automatisch geschlossen."></span>
-        </div>
+        </p>
 
         <h3>Chat verlassen:</h3>
         <div>
