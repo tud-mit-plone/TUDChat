@@ -32,6 +32,12 @@ from tud.addons.chat.interfaces import IChat
 
 logger = logging.getLogger('tud.addons.chat')
 
+DATE_FREQUENCIES = DisplayList((
+    ('off', 'Deaktiviert'),
+    ('minute', 'Aktiviert (maximal jede Minute)'),
+    ('message', 'Aktiviert (bei jeder Nachricht)'),
+    ))
+
 BAN_STRATEGIES = DisplayList((
     ('COOKIE', 'Nur Cookie (empfohlen)'),
     ('IP', 'Nur IP-Adresse'),
@@ -79,6 +85,16 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         widget             = StringWidget(
             label        = u"Datenbank-Praefix",
             description  = u"Bitte geben Sie einen Praefix fuer Tabellen in der Datebank an; z.B.: 'institutionsname'"
+        )
+    ),
+    StringField('date_frequency',
+        required           = True,
+        default            = 'minute',
+        vocabulary         = DATE_FREQUENCIES,
+        widget             = SelectionWidget(
+            label        = u"Haeufigkeit der Zeitangabe im Chat",
+            description  = u"Bitte geben Sie an, wie haeufig die Zeit bei den Nachrichten im Chat angegeben werden soll. Wenn keine Zeitangabe erfolgen soll, waehlen Sie 'Deaktiviert'. Wenn maximal jede Minute eine Zeitangabe erfolgen soll, waehlen Sie 'Aktiviert (maximal jede Minute)'. Wenn bei jeder Nachricht eine Zeitangabe erfolgen soll, waehlen Sie 'Aktiviert (bei jeder Nachricht)'.",
+            format       = "select",
         )
     ),
     StringField('adminColor',

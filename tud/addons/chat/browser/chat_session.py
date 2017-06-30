@@ -698,6 +698,10 @@ class ChatSessionView(ChatSessionBaseView):
         chat = self.context.getParentNode()
         return chat.getField('whisper').get(chat)
 
+    def getDateFrequencyOption(self):
+        chat = self.context.getParentNode()
+        return chat.getField('date_frequency').get(chat)
+
 class ChatSessionLogView(ChatSessionBaseView):
     """Chat session log view
     """
