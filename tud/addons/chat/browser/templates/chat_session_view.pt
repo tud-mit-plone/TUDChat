@@ -6,7 +6,6 @@
   <title>Chat</title>
 
 <metal:block metal:fill-slot="javascript_head_slot">
-    <script language="javascript" src="jquery-1.7.min.js"></script>
     <script language="javascript" src="jquery.ba-dotimeout.min.js"></script>
     <script language="javascript" src="hyperlink.js"></script>
     <script language="javascript" src="jquery.notification.js"></script>
