@@ -29,7 +29,7 @@
      />
      <browser:page
              for         = "tud.addons.chat.content.chat_session.ChatSession"
-             name        = "ajax"
+             name        = "chatajax"
              class       = ".chat_session.ChatSessionAjaxView"
              layer       = "tud.addons.chat.interfaces.IAddonInstalled"
              permission  = "zope2.View"
