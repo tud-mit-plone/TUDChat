@@ -4,6 +4,9 @@ var updateCheckBlock = false;
 var scrollBlock      = false;
 var firstGetActions = true;
 var currentUserNum  = 0;
+var dateFrequency   = "off";
+var dateLastMinute  = new Date(0).setSeconds(0, 0);
+var locale          = undefined;
 
 var sendMessage = function(){
     message = $("#chatMsgValue").val();
@@ -45,6 +48,45 @@ var goHierarchieUp = function(){
 var sortByRoleName = function(object1, object2){
   // Compare two objects by their 'role' and 'name' properties lexicographically
   return [!object1.is_admin, object1.name] >= [!object2.is_admin, object2.name] ? 1 : -1;
+}
+
+// function to format time strings
+var formatTimes = function(newTimesOnly = false) {
+  // make german times more nice
+  var timeStingSuffix = "";
+  if (locale.substring(0, 2) == "de") {
+    timeStingSuffix = " Uhr";
+  }
+
+  var now = new Date();
+  var strF = "2-digit";
+  var $toFormat = newTimesOnly ? $("#chatContent .chatdate:empty") : $("#chatContent .chatdate");
+  $toFormat.each(function(i, v) {
+    var $v = $(v);
+    var timestamp = $v.data("time");
+    var date = new Date(timestamp*1000);
+    var dateD = new Date(timestamp*1000);
+
+    // if we are on the same day, print without the date
+    if(dateD.setHours(0,0,0,0) == now.setHours(0,0,0,0)) {
+      $v.text(date.toLocaleTimeString(locale, { hour: strF, minute: strF } ) + timeStingSuffix );
+    } else {
+      $v.text(date.toLocaleString(locale, { year: strF, month: strF, day: strF, hour: strF, minute: strF }) + timeStingSuffix );
+    }
+  });
+}
+
+// Daemon that runs everytime a day changes to reformat all time strings
+var startReformatDaemon = function() {
+  var d = new Date();
+  var h = d.getHours();
+  var m = d.getMinutes();
+  var s = d.getSeconds();
+  var secondsUntilNextDay = (24*60*60)-(h*60*60)-(m*60)-s + 3;
+  window.setTimeout(function () {
+    formatTimes();
+    startReformatDaemon();
+  }, secondsUntilNextDay*1000);
 }
 
 var updateCheck = function(welcome_message = null){
@@ -176,28 +218,30 @@ var updateCheck = function(welcome_message = null){
             if(typeof(data.messages['new'])!="undefined"){
                 message = data.messages['new'];
                 for(var i in data.messages['new']) {
-                    if(message[i].date != "")
-                        message[i].date = message[i].date+" ";
+                    var mDate = new Date(message[i].date*1000).setSeconds(0, 0);
+                    if(dateFrequency == "minute" && mDate - dateLastMinute >= 60) {
+                      dateLastMinute = mDate;
+                      $("#chatContent").append("<div class='chat-info'><span class='chatdate' data-time='"+message[i].date+"'></span></div>");
+                    }
                     $("#chatContent").append(printMessage(message[i]));
                 }
             }
             if(typeof(data.messages.to_edit)!="undefined"){
                 message = data.messages.to_edit;
                 for(var i in data.messages.to_edit){
-                    if(message[i].date != "")
-                        message[i].date = message[i].date+" ";
                     $("#chatEntry"+message[i].id).replaceWith(printMessage(message[i]));
                 }
             }
             if(typeof(data.messages.to_delete)!="undefined"){
                 message = data.messages.to_delete;
                 for(var i in data.messages.to_delete){
-                    if(message[i].date != "")
-                        message[i].date = message[i].date+" ";
                     $("#chatEntry"+message[i].id).replaceWith(printMessage(message[i]));
                 }
             }
         }
+
+        // we potentially added new times, format them
+        formatTimes(true);
 
     if(welcome_message){
         var $message = $("<li id='welcome_message'></li>").append($("<span class='message_content'></span>").text(welcome_message));
@@ -282,6 +326,12 @@ var applyAttributes = function (message, attributes) {
 
 $(document).ready(
     function(){
+
+      // read the data-settings on the chat DOM-object
+      dateFrequency = $('#chat').data('date_frequency');
+
+      locale = $("html").attr("lang");
+
         jQuery.ajaxSetup({'cache':false});
 
     $("#chatMsgForm").submit(sendMessage);
@@ -373,6 +423,9 @@ $(document).ready(
           sendMessage();
         }
       });
+
+      // start the time reformat daemon
+      startReformatDaemon();
 
     }
 );

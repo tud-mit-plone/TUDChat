@@ -5,7 +5,12 @@ function printMessage(message) {
     entry_classes = changes.entry_classes + ((message.name == ownUsername) ? ' ownMessage' : '');
     additional_content = changes.additional_content;
 
-    return "<div id=chatEntry"+message.id+" class='"+entry_classes+"'><span class='meta-information'><span class='username'>"+message.name+"</span><span class='chatdate'>"+$.trim(message.date)+"</span></span> <div class='message_content'><span>"+parsed_message + (additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"</span></div> </div>";
+    var timeSpan = "";
+    if(dateFrequency == "message") {
+        timeSpan = "<span class='chatdate' data-time='"+message.date+"'></span>";
+    }
+
+    return "<div id=chatEntry"+message.id+" class='"+entry_classes+"'><span class='meta-information'><span class='username'>"+message.name+"</span>" + timeSpan + "</span> <div class='message_content'><span>"+parsed_message + (additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"</span></div> </div>";
 }
 
 function printNewUser(user, role) {
