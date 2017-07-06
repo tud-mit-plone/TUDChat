@@ -1,135 +1,172 @@
-
-div.clear{
-    clear:both;
-    width:0;
-    height:0;
-    padding:0;
-    margin:0;
-}
-
-div.left{
-	float: left;
-}
-
-div.left:nth-child(2){
-	padding-top: 10px;
-}
-
-div#chat{
-    border: 1px solid #acacac;
-}
-div#chatContent, div#chatUser{
-    min-height:400px;
-}
+/* chatContent
+ * the chat messages container
+*/
 div#chatContent{
     height:400px;
     overflow:auto;
     word-wrap:break-word;
+    padding-right: 1em;
 }
-    div#chatContent ul{
-        list-style:none;
-        padding:0;
-        margin:0;
 
-    }
-    div#chatContent ul li{
-        border-bottom:1px solid #efeded;
-        padding:0.35em;
-    }
-
-   div#chat li.hovered{
-        background-color: #ddd;
-    }
-
-   div#chat li.selected{
-        background-color: #FFF18F !important;
-    }
-
-    div#chatContent li.ownMessage span.username {
-        text-decoration:underline;
-    }
-
-div#chatUser{
-    float: right;
-    width: 20%;
-    border-left: 1px solid #acacac;
-    word-wrap: break-word;
-    height: 400px;
-    overflow-y: auto;
-    overflow-x: hidden;
+div#chatContent > div {
+    position: relative;
 }
-    div#chatUser ul{
-        list-style:none;
-        padding:0;
-        margin:0;
-    }
 
-    div#chatUser ul li{
-        border-bottom:1px solid #efeded;
-        padding:5px;
-        position:relative;
-    }
-
-    div#chatUser ul li.ownUsername{
-        font-weight:bold;
-        text-decoration:underline;
-    }
-
-
-div#chatMsg{
-    border-top: 1px solid #acacac;
+div#chatContent > div + div {
+    margin-top: 1em;
 }
-    div#chatMsg input[type="text"]{
-        width: 80%;
-        float: left;
-    }
 
-    #counter {
-        left: 80%;
-        bottom: 0px;
-        height:25px;
-        line-height: 25px;
-        text-align: right;
-        width: 100px;
-        margin-left: -105px;
-        color: #ccc;
-        background-color: transparent;
-        position: absolute;
-    }
+div#chatContent > div:last-child {
+    margin-bottom: 1em;
+}
 
-    button#chatMsgSubmit {
-        width: 20%;
-    }
+div#chatContent div.ownMessage {
+    text-align: right;
+}
+
+div#chatContent div.chat-info {
+    font-weight: 200;
+    text-align: center;
+}
+
+div#chatContent div.chat-info .username {
+    font-weight: normal;
+}
+
+div#chatContent div .meta-information {
+    margin: 0 2em;
+}
+
+div#chatContent div .meta-information .chatdate {
+    opacity: 0.6;
+    margin-left: 0.4em;
+    font-size: 0.8em;
+}
+
+div#chatContent div .message_content > span {
+    max-width: 80%;
+    display: inline-block;
+    text-align: left;
+    background-color: lightgray;
+    padding: 0.4em 0.6em;
+    min-width: 8em;
+    position: relative;
+    margin-top: 0.3em;
+}
+
+div#chatContent div .message_content > span::before {
+    content: "";
+    width: 0px;
+    height: 0px;
+    border-top: 1em solid transparent;
+    border-right: 1em solid lightgray;
+    position: absolute;
+    top: -1em;
+}
+
+div#chatContent div.ownMessage .message_content > span::before {
+    border-top: 1em solid transparent;
+    border-left: 1em solid #007bb1;
+    border-right: none;
+    right: 0.4em;
+}
 
 
-div#chatContent span.username{
+div#chatContent div.ownMessage .message_content > span {
+    background-color: #007bb1;
+    color: #fff;
+}
+
+div#chatContent div.ownMessage .message_content > span a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+div#chatContent span.additional_content{
+    display: block;
+    font-size: 0.8em;
+    font-weight: normal;
+}
+
+div#chatContent div.admin_delete  span.additional_content{
+    color: darkred;
+}
+
+div#chatContent div.admin_delete  div.adminActions{
+    display: none !important;
+}
+
+div#chatContent div.admin_edit span.additional_content {
+    opacity: 0.6;
+}
+
+div#chatContent .admin_message .message_content {
     font-weight: bold;
 }
 
-    div#chatContent span.chatdate{
-        color: #555;
-        font-size: 0.65em;
-    }
+/* breakpoint definition for chat message inputs and chatUser button */
+div#chatMsg textarea,
+button#chatMsgSubmit,
+div#chatUser {
+    display: inline-block;
+    width: calc((620px - 100%) * 620);
+    margin-bottom: 0.25em;
+}
 
-    div#chatContent li.admin_delete  span.additional_content{
-        color: darkred;
-    }
 
-    div#chatContent li.admin_delete  div.adminActions{
-        display: none !important;
-    }
+/* chatUser
+ * the user list container
+*/
+div#chatUser {
+    min-width: 15%;
+    max-width: 30%;
+    float: right;
+}
 
-    div#chatContent li.admin_edit span.additional_content {
-        color: darkgreen;
-    }
+div#chatUser button {
+    width: 100%;
+}
 
-    .hidden{
-        display: none;
-    }
+div#chatUser #userContainer{
+    display: none;
+    list-style:none;
+    padding:0;
+    margin:0;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid lightgray;
+    padding: 1em;
+    -moz-column-width: 11.5em;
+    -webkit-column-width: 11.5em;
+    column-width: 11em;
+}
 
-    div#chatContent .admin_message .message_content {
-        font-weight: bold;
-    }
+/*
+ * chat message inputs
+*/
+div#chatMsg {
+    position: relative;
+}
+
+#chatMsgForm {
+    display: inline;
+}
+
+div#chatMsg textarea {
+    min-width: 63%;
+    max-width: 100%;
+    min-height: 0;
+    resize: none;
+    vertical-align: top;
+}
+
+button#chatMsgSubmit {
+    min-width: 20%;
+    max-width: 68%;
+}
 
 
 .chat_explanation, .chat_nosession {

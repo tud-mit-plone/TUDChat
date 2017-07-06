@@ -5,7 +5,10 @@ function printMessage(message) {
     entry_classes = changes.entry_classes + ((message.name == ownUsername) ? ' ownMessage' : '');
     additional_content = changes.additional_content;
 
-    return "<li id=chatEntry"+message.id+" class='admin "+entry_classes+"'><span class='chatdate'>"+message.date+"</span><span class='username'>"+message.name+":</span> <span class='message_content'>"+parsed_message+"</span> "+(additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"<div class='adminActions hidden'><a href='#' class='edit' data-mid="+message.id+" title='Nachricht bearbeiten'>&nbsp;</a> <a href='#' class='delete' data-mid="+message.id+" title='Nachricht l&ouml;schen'>&nbsp;</a></div></li>";
+    return "<div id=chatEntry"+message.id+" class='admin "+entry_classes+"'>"
+        +"<span class='meta-information'><span class='username'>"+message.name+"</span><span class='chatdate'>"+$.trim(message.date)+"</span> <span class='adminActions'><a href='#' class='edit' data-mid="+message.id+" title='Nachricht bearbeiten'>&nbsp;</a> <a href='#' class='delete' data-mid="+message.id+" title='Nachricht l&ouml;schen'>&nbsp;</a></span></span>"
+        +"<div class='message_content'><span>"+parsed_message+""+(additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"</span></div>"
+        +"</div>";
 }
 
 function printNewUser(user, role) {
@@ -17,7 +20,7 @@ function printNewUser(user, role) {
     if (user == ownUsername || role == 'admin')
         return "<li class='chatUser"+entry_classes+"'>"+user+"</li>";
     else
-        return "<li class='chatUser"+entry_classes+"'>"+user+"<div class='adminActions hidden'><a href='#' data-uname='"+user+"' class='ban' title='Benutzer aus Chat verbannen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='kick' title='Benutzer aus Chat entfernen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='warn' title='Benutzer verwarnen'>&nbsp;</a></div></li>";
+        return "<li class='chatUser"+entry_classes+"'>"+user+"<div class='adminActions'><a href='#' data-uname='"+user+"' class='ban' title='Benutzer aus Chat verbannen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='kick' title='Benutzer aus Chat entfernen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='warn' title='Benutzer verwarnen'>&nbsp;</a></div></li>";
 }
 
 
@@ -98,16 +101,6 @@ $(document).ready(
                                                                         {"name" :"Abbrechen", "click": $.notification.clear },
                                                                          ]);
             e.preventDefault();
-        });
-
-        $("body").delegate("li", "mouseover mouseout", function(event) {
-            if (event.type == 'mouseover') {
-                $(this).addClass("hovered");
-                $(this).find(".adminActions").removeClass("hidden");
-            } else if (event.type == 'mouseout') {
-                $(this).removeClass("hovered");
-                $(this).find(".adminActions").addClass("hidden");
-            }
         });
 
     }

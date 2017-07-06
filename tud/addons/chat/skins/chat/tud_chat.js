@@ -3,6 +3,7 @@ var sendMessageBlock = false;
 var updateCheckBlock = false;
 var scrollBlock      = false;
 var firstGetActions = true;
+var currentUserNum  = 0;
 
 var sendMessage = function(){
     message = $("#chatMsgValue").val();
@@ -135,13 +136,21 @@ var updateCheck = function(welcome_message = null){
             element.appendTo($("#userContainer"));
 
         };
+
+        // Update the chat user counter
+        var newUserNum = $("#userContainer").children().length;
+        if(newUserNum != currentUserNum) {
+          $("#userCount").text( newUserNum );
+          currentUserNum = newUserNum;
+        }
+
           // Notification: User has entered the room
           if (!firstGetActions){
             if (usernames.length == 1)
-              $("#chatContainer").append("<li><span class='username'>"+usernames+"</span> hat den Raum betreten.</li>");
+              $("#chatContent").append("<div class='chat-info'><span class='username'>"+usernames+"</span> hat den Raum betreten.</div>");
             else if (usernames.length != 0) {
               last_user = usernames.pop();
-              $("#chatContainer").append("<li><span class='username'>"+usernames.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum betreten.</li>");
+              $("#chatContent").append("<div class='chat-info'><span class='username'>"+usernames.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum betreten.</div>");
             }
           }
         }
@@ -153,10 +162,10 @@ var updateCheck = function(welcome_message = null){
           // Notification: User has left the room
           if (!firstGetActions){
             if (user.length == 1)
-              $("#chatContainer").append("<li><span class='username'>"+user+"</span> hat den Raum verlassen.</li>");
+              $("#chatContent").append("<div class='chat-info'><span class='username'>"+user+"</span> hat den Raum verlassen.</div>");
             else if (user.length != 0) {
               last_user = user.pop();
-              $("#chatContainer").append("<li><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum verlassen.</li>");
+              $("#chatContent").append("<div class='chat-info'><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum verlassen.</div>");
             }
           }
         }
@@ -169,7 +178,7 @@ var updateCheck = function(welcome_message = null){
                 for(var i in data.messages['new']) {
                     if(message[i].date != "")
                         message[i].date = message[i].date+" ";
-                    $("#chatContainer").append(printMessage(message[i]));
+                    $("#chatContent").append(printMessage(message[i]));
                 }
             }
             if(typeof(data.messages.to_edit)!="undefined"){
@@ -192,7 +201,7 @@ var updateCheck = function(welcome_message = null){
 
     if(welcome_message){
         var $message = $("<li id='welcome_message'></li>").append($("<span class='message_content'></span>").text(welcome_message));
-        $("#chatContainer").append($message);
+        $("#chatContent").append($message);
     }
 
     firstGetActions = false;
@@ -226,7 +235,6 @@ var scrollMode = { 'normal': 0, 'alwaysBottom': 1 },
 
 var checkScrollMode = function() {
     var elem = $('#chatContent');
-    var inner = $('#chatContainer');
 
     if ( elem.scrollTop() + elem.innerHeight() >= elem[0].scrollHeight ) {
       currentScrollMode = scrollMode.alwaysBottom;
@@ -238,9 +246,8 @@ var checkScrollMode = function() {
 
 var performScrollMode = function() {
     var elem = $('#chatContent');
-    var inner = $('#chatContainer');
     if (currentScrollMode == scrollMode.alwaysBottom && !( elem.scrollTop() + elem.innerHeight() >= elem[0].scrollHeight ))
-      elem.scrollTop(inner.outerHeight());
+      elem.scrollTop(elem[0].scrollHeight);
 };
 
 /* This function returns the changes of a message-entry based upon its message's attributes.
@@ -257,7 +264,7 @@ var applyAttributes = function (message, attributes) {
     if(typeof(attributes)!="undefined"){
         for (var i = 0; i < attributes.length; i++) {
             if (attributes[i].a_action == 'mod_edit_message') {
-                additional_content += " (bearbeitet durch "+ attributes[i].a_name +")";
+                additional_content += " Bearbeitet durch "+ attributes[i].a_name;
                 entry_classes += " admin_edit";
             }
             if (attributes[i].a_action == 'mod_delete_message') {
@@ -299,6 +306,23 @@ $(document).ready(
               });
           });
 
+          // Hand the chatUser button clicks: Hide and unhide the chatUser list
+          $("#chatUser button").click(function() {
+            $("#chatUser #userContainer").toggle();
+            $("#chatUser .chatUsersArrow").toggleClass("icon-up").toggleClass("icon-down");
+
+            // If the chatUser list is visible now, make it closable by clicking anywhere on the page
+            if($("#userContainer:visible").length) {
+              $("body").on("click.chatUserContainer", function(e) {
+                if( $(e.target).closest("#userContainer, #chatUser button").length == 0 ) {
+                  $("#chatUser button").click();
+                }
+              });
+            } else {
+              $("body").off("click.chatUserContainer");
+            }
+          });
+
        // security information for user links
         $("#chatContent").delegate(".message_content a", "click", function(e) {
             if(!$(e.target.parentNode.parentNode).hasClass('admin_message')){
@@ -334,6 +358,21 @@ $(document).ready(
 
       $('#chatMsgValue').keypress();
     }
+
+    // auto resize the message input field
+    var $textInput = $("#chatMsgValue");
+    var textInputOffset = $textInput[0].offsetHeight - $textInput[0].clientHeight;
+    $textInput
+      .on('keyup input', function() {
+        $(this).css('height', '').css('height', this.scrollHeight + textInputOffset);
+      }).keypress(function (e) {
+        // prevent line breaks and send the message instead
+        var key = e.which;
+        if(key == 13) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
 
     }
 );

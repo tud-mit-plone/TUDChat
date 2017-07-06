@@ -3,28 +3,30 @@
     width: 475px !important;
 }
 
-div.adminActions{
-    bottom:0px;
-    right:0px;
-    position: absolute;
+.adminActions {
+    display: none;
 }
 
-div.adminActions > a{
+.chatUser:hover .adminActions,
+#chatContent > div.admin:hover .adminActions {
+    display: inline;
+}
+
+.adminActions > a{
     text-decoration: none;
     opacity: 0.5;
     border-bottom:none;
     height:20px;
     width:22px;
     padding:0px 4px 3px 4px;
-    display:block;
-    float:right;
+    display:inline-block;
 }
 
-div.adminActions a:hover {
+.adminActions a:hover {
     background-color:transparent;
 }
 
-div.adminActions > a:hover{
+.adminActions > a:hover{
     opacity: 1.0;
 }
 

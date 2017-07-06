@@ -5,7 +5,7 @@ function printMessage(message) {
     entry_classes = changes.entry_classes + ((message.name == ownUsername) ? ' ownMessage' : '');
     additional_content = changes.additional_content;
 
-    return "<li id=chatEntry"+message.id+" class='"+entry_classes+"'><span class='chatdate'>"+message.date+"</span><span class='username'>"+message.name+":</span> <span class='message_content'>"+parsed_message+"</span> "+(additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"</li>";
+    return "<div id=chatEntry"+message.id+" class='"+entry_classes+"'><span class='meta-information'><span class='username'>"+message.name+"</span><span class='chatdate'>"+$.trim(message.date)+"</span></span> <div class='message_content'><span>"+parsed_message + (additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"</span></div> </div>";
 }
 
 function printNewUser(user, role) {
