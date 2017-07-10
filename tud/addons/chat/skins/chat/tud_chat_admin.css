@@ -30,6 +30,36 @@
     opacity: 1.0;
 }
 
+button#chatMsgSubmit {
+    min-width: calc(20% - 25px);
+    max-width: calc(67% - 25px);
+    vertical-align: top;
+}
+
+#chatMsgMoreButtons {
+    position: relative;
+    vertical-align: top;
+    display: none;
+}
+
+#chatMsgMoreButtons .moreButtonsExpand {
+    width: 25px;
+    padding-right: 0;
+    padding-left: 0;
+}
+
+#chatMsgMoreButtons .buttonsWrapper {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    text-align: right;
+    width: 200px;
+    display: none;
+}
+#chatMsgMoreButtons .buttonsWrapper button {
+    display: inline-block;
+}
+
 a.edit {
     background-image: url('tud_chat_images/pen.png');
     background-repeat:

@@ -4,11 +4,17 @@ var updateCheckBlock = false;
 var scrollBlock      = false;
 var firstGetActions = true;
 var currentUserNum  = 0;
-var dateFrequency   = "off";
 var dateLastMinute  = new Date(0).setSeconds(0, 0);
 var locale          = undefined;
+var target          = null;
 
-var sendMessage = function(){
+var dateFrequency   = "off";
+var whisper         = "off";
+
+var sendMessage = function(method){
+    if(!method) {
+      method = 'sendMessage';
+    }
     message = $("#chatMsgValue").val();
 
     if (sendMessageBlock)
@@ -19,10 +25,14 @@ var sendMessage = function(){
 
     sendMessageBlock = true;
   $("#chatMsgSubmit").attr("disabled", "disabled");
-  $("#chatMsgValue").val("");
-  $('#chatMsgValue').keyup();
+  $("#chatMsgValue").val("").keyup();
 
-    $.post(ajax_url, {'method': 'sendMessage', 'message': message },
+  var targetData = target ? { 'target': target } : {};
+  removeTarget();
+
+  var data = $.extend({}, {'method': method, 'message': message }, targetData);
+
+    $.post(ajax_url, data,
         function(data) {                // Immediately update the chat, after sending the message
             currentScrollMode = scrollMode.alwaysBottom;
             updateCheck();
@@ -51,7 +61,7 @@ var sortByRoleName = function(object1, object2){
 }
 
 // function to format time strings
-var formatTimes = function(newTimesOnly = false) {
+var formatTimes = function(newTimesOnly) {
   // make german times more nice
   var timeStingSuffix = "";
   if (locale.substring(0, 2) == "de") {
@@ -89,7 +99,7 @@ var startReformatDaemon = function() {
   }, secondsUntilNextDay*1000);
 }
 
-var updateCheck = function(welcome_message = null){
+var updateCheck = function(welcome_message){
 
     if (updateCheckBlock) // temporary workaround
         return;
@@ -256,7 +266,7 @@ var updateCheck = function(welcome_message = null){
     });
 };
 
-var updateCheckTimeout = function(first_run = false){
+var updateCheckTimeout = function(first_run){
     if(first_run){
         var welcome_message = $('#chat').data('welcome_message');
         if(welcome_message){
@@ -301,9 +311,10 @@ var performScrollMode = function() {
     * entry_classes
 */
 var applyAttributes = function (message, attributes) {
-    message_content = typeof(message)!="undefined" ? message : '';
-    additional_content  = '';
-    entry_classes = ''
+    var message_content = typeof(message)!="undefined" ? message : '';
+    var additional_content  = '';
+    var entry_classes = '';
+    var whisper = false;
 
     if(typeof(attributes)!="undefined"){
         for (var i = 0; i < attributes.length; i++) {
@@ -318,10 +329,20 @@ var applyAttributes = function (message, attributes) {
             if (attributes[i].admin_message == true) {
                 entry_classes += " admin_message";
             }
+            if (attributes[i].whisper == true) {
+                whisper = true;
+            }
         }
     }
-    return { "entry_classes": entry_classes, "message_content": message_content, "additional_content": additional_content };
+    return { "entry_classes": entry_classes, "message_content": message_content, "additional_content": additional_content, 'whisper': whisper};
 };
+
+var removeTarget = function() {
+  target = null;
+  $('#chatMsgForm #chatMsgTarget').remove();
+  $('#chatMsgForm #chatMsgValue').css("padding-top", $('#chatMsgForm #chatMsgValue').data("padding-top")).trigger("keyup").focus();
+  $("#chatMsgMoreButtons").hide();
+}
 
 
 $(document).ready(
@@ -329,6 +350,7 @@ $(document).ready(
 
       // read the data-settings on the chat DOM-object
       dateFrequency = $('#chat').data('date_frequency');
+      whisper       = $('#chat').data('whisper');
 
       locale = $("html").attr("lang");
 
@@ -356,7 +378,7 @@ $(document).ready(
               });
           });
 
-          // Hand the chatUser button clicks: Hide and unhide the chatUser list
+          // Handle the chatUser button clicks: Hide and unhide the chatUser list
           $("#chatUser button").click(function() {
             $("#chatUser #userContainer").toggle();
             $("#chatUser .chatUsersArrow").toggleClass("icon-up").toggleClass("icon-down");
@@ -390,6 +412,35 @@ $(document).ready(
 
         });
 
+    // logic for choosing a chat user as message target
+    $('#chat').on('click', '#chatUser li a, #chatContent a.whisper-icon', function(e) {
+      e.preventDefault();
+
+      target = $(e.target).data("uname");
+      console.log(target);
+      var targetContent = '<span id="chatMsgTarget">Nachricht an: ' + target + ' <a href="#">X</a></span>';
+
+      $('#chatMsgForm #chatMsgTarget').remove();
+      $('#chatMsgForm #chatMsgValue').css("padding-top", $('#chatMsgForm #chatMsgValue').data("padding-top"));
+
+      $('#chatMsgForm').prepend(targetContent);
+
+      var targetContentHeight = $("#chatMsgTarget").outerHeight();
+      var chatMsgValuePaddingTop = $('#chatMsgForm #chatMsgValue').css("padding-top");
+      $('#chatMsgForm #chatMsgValue').data("padding-top", chatMsgValuePaddingTop);
+      $('#chatMsgForm #chatMsgValue').css("padding-top", "calc(" + chatMsgValuePaddingTop + " + " + chatMsgValuePaddingTop + " + " + targetContentHeight + "px)").trigger("keyup").focus();
+
+      $("#chatMsgMoreButtons").css("display", "inline-block");
+
+      $('#chatUser').click();
+    });
+
+    // logic for removing the message target
+    $('#chatMsgForm').on('click', '#chatMsgTarget a', function(e) {
+      e.preventDefault();
+      removeTarget();
+    });
+
     // Scrollbar movement
     $('#chatContent').bind('scrollstart',function(){
       scrollBlock = true;
@@ -413,7 +464,7 @@ $(document).ready(
     var $textInput = $("#chatMsgValue");
     var textInputOffset = $textInput[0].offsetHeight - $textInput[0].clientHeight;
     $textInput
-      .on('keyup input', function() {
+      .on('keyup', function() {
         $(this).css('height', '').css('height', this.scrollHeight + textInputOffset);
       }).keypress(function (e) {
         // prevent line breaks and send the message instead

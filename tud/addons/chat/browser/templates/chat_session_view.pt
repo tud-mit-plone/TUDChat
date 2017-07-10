@@ -51,8 +51,15 @@
         <div id="chatMsg">
             <form id="chatMsgForm">
                 <textarea type="text" name="msg" id="chatMsgValue" autocomplete="off" rows="1" placeholder="Bitte geben Sie hier ihre Nachricht ein." tal:attributes="maxlength python: max_msg_length > 0 and max_msg_length or None; style python: max_msg_length > 0 and 'padding-right: 80px' or None"></textarea>
-                <span id="counter" tal:condition="python: max_msg_length > 0"></span>
+                <span id="counter" tal:condition="python: max_msg_length > 0">0</span>
                 <button id="chatMsgSubmit" type="submit" title="Zum Absenden hier klicken oder 'Enter' drücken.">Absenden</button>
+                <span id='chatMsgMoreButtons' tal:condition="view/isAdmin"><button class='moreButtonsExpand icon-down'></button>
+                    <span class="buttonsWrapper">
+                        <button data-method="kickUser" class='chatMsgMoreButton'>Kick</button>
+                        <button data-method="banUser" class='chatMsgMoreButton'>Ban</button>
+                        <button data-method="warnUser" class='chatMsgMoreButton'>Warn</button>
+                    </span>
+                </span>
             </form>
             <div id="chatUser">
                 <button>

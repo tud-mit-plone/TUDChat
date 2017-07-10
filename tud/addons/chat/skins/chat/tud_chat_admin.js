@@ -10,22 +10,40 @@ function printMessage(message) {
         timeSpan = "<span class='chatdate' data-time='"+message.date+"'></span>";
     }
 
+    var adminSpan = "";
+    var whisperSpan = "";
+    var whisperIcon = "";
+    if(changes.whisper) {
+        entry_classes += " whisper";
+        whisperSpan = "<span class='additional_content'>Private Nachricht</span>";
+        // whisperIcon = (message.name == ownUsername) ? "<span class='whisper-icon'></span>" : "<a href='#' class='whisper-icon' title='Mit privater Nachricht antworten' data-uname='"+message.name+"'></a>";
+        whisperIcon = "<span class='whisper-icon'></span>";
+    } else {
+        adminSpan = " <span class='adminActions'><a href='#' class='edit' data-mid="+message.id+" title='Nachricht bearbeiten'>&nbsp;</a> <a href='#' class='delete' data-mid="+message.id+" title='Nachricht l&ouml;schen'>&nbsp;</a></span>";
+    }
+
     return "<div id=chatEntry"+message.id+" class='admin "+entry_classes+"'>"
-        +"<span class='meta-information'><span class='username'>"+message.name+"</span>" + timeSpan + " <span class='adminActions'><a href='#' class='edit' data-mid="+message.id+" title='Nachricht bearbeiten'>&nbsp;</a> <a href='#' class='delete' data-mid="+message.id+" title='Nachricht l&ouml;schen'>&nbsp;</a></span></span>"
-        +"<div class='message_content'><span>"+parsed_message+""+(additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"</span></div>"
+        +"<span class='meta-information'><span class='username'>"+message.name+"</span>" + timeSpan + adminSpan + "</span>"
+        + whisperIcon + "<div class='message_content'><span class='message'>"+whisperSpan+parsed_message+""+(additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"</span></div>"
         +"</div>";
 }
 
 function printNewUser(user, role) {
+    var liContent = user;
+
+    if(user != ownUsername) {
+      liContent = "<a href='#' class='icon-mail' title='Nachricht an " + user + " schreiben' data-uname='"+user+"'>" + user + "</a>";
+    }
+
     entry_classes = '';
     if (user == ownUsername)
         entry_classes += ' ownUsername';
     entry_classes += ' ' + role + 'role';
 
-    if (user == ownUsername || role == 'admin')
-        return "<li class='chatUser"+entry_classes+"'>"+user+"</li>";
-    else
-        return "<li class='chatUser"+entry_classes+"'>"+user+"<div class='adminActions'><a href='#' data-uname='"+user+"' class='ban' title='Benutzer aus Chat verbannen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='kick' title='Benutzer aus Chat entfernen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='warn' title='Benutzer verwarnen'>&nbsp;</a></div></li>";
+    // if (user == ownUsername || role == 'admin')
+        return "<li class='chatUser"+entry_classes+"'>"+liContent+"</li>";
+    // else
+        // return "<li class='chatUser"+entry_classes+"'>"+liContent+"<div class='adminActions'><a href='#' data-uname='"+user+"' class='ban' title='Benutzer aus Chat verbannen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='kick' title='Benutzer aus Chat entfernen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='warn' title='Benutzer verwarnen'>&nbsp;</a></div></li>";
 }
 
 
@@ -106,6 +124,22 @@ $(document).ready(
                                                                         {"name" :"Abbrechen", "click": $.notification.clear },
                                                                          ]);
             e.preventDefault();
+        });
+
+
+        $("#chatMsgMoreButtons .moreButtonsExpand").click(function(e) {
+            e.preventDefault();
+            $(e.target).toggleClass("icon-down icon-up");
+            $("#chatMsgMoreButtons .buttonsWrapper").toggle();
+        });
+
+        $("#chatMsgMoreButtons .chatMsgMoreButton").click(function(e) {
+            e.preventDefault();
+            var method = $(e.target).data("method");
+            if(method) {
+                sendMessage(method);
+                $("#chatMsgMoreButtons .moreButtonsExpand").click();
+            }
         });
 
     }

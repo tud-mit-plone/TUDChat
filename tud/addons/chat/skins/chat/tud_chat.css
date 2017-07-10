@@ -44,7 +44,7 @@ div#chatContent div .meta-information .chatdate {
     font-size: 0.8em;
 }
 
-div#chatContent div .message_content > span {
+div#chatContent div .message_content .message {
     max-width: 80%;
     display: inline-block;
     text-align: left;
@@ -55,7 +55,8 @@ div#chatContent div .message_content > span {
     margin-top: 0.3em;
 }
 
-div#chatContent div .message_content > span::before {
+
+div#chatContent div .message_content .message::before {
     content: "";
     width: 0px;
     height: 0px;
@@ -65,7 +66,7 @@ div#chatContent div .message_content > span::before {
     top: -1em;
 }
 
-div#chatContent div.ownMessage .message_content > span::before {
+div#chatContent div.ownMessage .message_content .message::before {
     border-top: 1em solid transparent;
     border-left: 1em solid #007bb1;
     border-right: none;
@@ -73,20 +74,41 @@ div#chatContent div.ownMessage .message_content > span::before {
 }
 
 
-div#chatContent div.ownMessage .message_content > span {
+div#chatContent div.ownMessage .message_content .message {
     background-color: #007bb1;
     color: #fff;
 }
 
-div#chatContent div.ownMessage .message_content > span a {
+div#chatContent div.ownMessage .message_content .message a {
     color: #fff;
     text-decoration: underline;
+}
+
+div#chatContent .whisper-icon {
+    display: inline-block;
+    float: left;
+    background-image: url("tud_chat_images/mail.png");
+    height: 30px;
+    width: 30px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin: 24px 5px;
+    opacity: 0.5;
+}
+
+div#chatContent a.whisper-icon:hover {
+    opacity: 1;
+}
+
+div#chatContent div.ownMessage .whisper-icon {
+    float: right;
 }
 
 div#chatContent span.additional_content{
     display: block;
     font-size: 0.8em;
     font-weight: normal;
+    opacity: 0.75;
 }
 
 div#chatContent div.admin_delete  span.additional_content{
@@ -156,17 +178,49 @@ div#chatMsg {
     display: inline;
 }
 
+#chatMsgForm #chatMsgTarget {
+    position: absolute;
+    padding: 0.3em 0.5em;
+    margin: 6px 12px;
+    color: white;
+    background-color: #007bb1;
+    padding-right: 2em;
+}
+
+#chatMsgForm #chatMsgTarget a {
+    color: white;
+    font-size: 0.75em;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0.5em;
+    opacity: 0.7;
+    text-decoration: none;
+}
+#chatMsgForm #chatMsgTarget a:hover {
+    opacity: 1;
+    text-decoration: none;
+}
+
 div#chatMsg textarea {
     min-width: 63%;
     max-width: 100%;
     min-height: 0;
     resize: none;
-    vertical-align: top;
+    vertical-align: middle;
+}
+
+#counter {
+    width: 80px;
+    margin-left: -80px;
+    text-align: center;
+    display: inline-block;
 }
 
 button#chatMsgSubmit {
     min-width: 20%;
     max-width: 68%;
+    vertical-align: top;
 }
 
 
