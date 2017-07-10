@@ -58,10 +58,6 @@
       tal:define="active_sessions view/getActiveChatSessions;
                   next_sessions view/getNextChatSessions">
 
-<tal:domain_check define="newurl python: view.checkURL(context.absolute_url());
-                          dummy python: newurl and request.RESPONSE.redirect(newurl) or None">
-</tal:domain_check>
-
 <h2 tal:content="view/getTitle"> Title of chat </h2>
 
 <p tal:content="view/getIntroduction"> Introduction </p>

@@ -52,13 +52,6 @@ class TUDChatTool(UniqueObject, SimpleItem, PropertyManager):
                       )
                      ) + PropertyManager.manage_options
 
-    chat_domain = "webchat.tu-dresden.de"
-    transfer_protocol = "https"
-    _properties = PropertyManager._properties + (
-                                                 {'id':'chat_domain', 'type':'string', 'mode':'w'},
-                                                 {'id':'transfer_protocol', 'type':'string', 'mode':'w'}
-                                                 )
-
     security.declareProtected(manage_properties, 'db_config')
     db_config = PageTemplateFile('../skins_tool/db_config.pt', globals())
     security.declareProtected(manage_properties, 'chat_list')
