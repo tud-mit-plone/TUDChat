@@ -337,10 +337,12 @@ var applyAttributes = function (message, attributes) {
     return { "entry_classes": entry_classes, "message_content": message_content, "additional_content": additional_content, 'whisper': whisper};
 };
 
+// remove the target chat user
 var removeTarget = function() {
   target = null;
+  var $chatMsgValue = $('#chatMsgForm #chatMsgValue');
   $('#chatMsgForm #chatMsgTarget').remove();
-  $('#chatMsgForm #chatMsgValue').css("padding-top", $('#chatMsgForm #chatMsgValue').data("padding-top")).trigger("keyup").focus();
+  $chatMsgValue.css("padding-top", $chatMsgValue.data("padding-top")).trigger("keyup").focus();
   $("#chatMsgMoreButtons").hide();
 }
 
@@ -413,25 +415,29 @@ $(document).ready(
         });
 
     // logic for choosing a chat user as message target
-    $('#chat').on('click', '#chatUser li a, #chatContent a.whisper-icon', function(e) {
+    $('#chat').on('click', '#chatUser li a', function(e) {
       e.preventDefault();
 
+      // cleanup the old target
+      removeTarget();
+
       target = $(e.target).data("uname");
-      console.log(target);
-      var targetContent = '<span id="chatMsgTarget">Nachricht an: ' + target + ' <a href="#">X</a></span>';
 
-      $('#chatMsgForm #chatMsgTarget').remove();
-      $('#chatMsgForm #chatMsgValue').css("padding-top", $('#chatMsgForm #chatMsgValue').data("padding-top"));
+      var $targetContent = $('<span id="chatMsgTarget">Nachricht an: ' + target + ' <a href="#">X</a></span>');
+      var $chatMsgValue = $('#chatMsgForm #chatMsgValue');
 
-      $('#chatMsgForm').prepend(targetContent);
+      $('#chatMsgForm').prepend($targetContent);
 
-      var targetContentHeight = $("#chatMsgTarget").outerHeight();
-      var chatMsgValuePaddingTop = $('#chatMsgForm #chatMsgValue').css("padding-top");
-      $('#chatMsgForm #chatMsgValue').data("padding-top", chatMsgValuePaddingTop);
-      $('#chatMsgForm #chatMsgValue').css("padding-top", "calc(" + chatMsgValuePaddingTop + " + " + chatMsgValuePaddingTop + " + " + targetContentHeight + "px)").trigger("keyup").focus();
+      // add some padding at the top of the textarea
+      var targetContentHeight = $targetContent.outerHeight();
+      var chatMsgValuePaddingTop = $chatMsgValue.css("padding-top");
+      $chatMsgValue.data("padding-top", chatMsgValuePaddingTop);
+      $chatMsgValue.css("padding-top", "calc(" + chatMsgValuePaddingTop + " + " + chatMsgValuePaddingTop + " + " + targetContentHeight + "px)").trigger("keyup").focus();
 
+      // show the admin-buttons (if they exist)
       $("#chatMsgMoreButtons").css("display", "inline-block");
 
+      // hide the chat user list
       $('#chatUser').click();
     });
 
