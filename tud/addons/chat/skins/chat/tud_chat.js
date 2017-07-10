@@ -358,7 +358,10 @@ $(document).ready(
 
         jQuery.ajaxSetup({'cache':false});
 
-    $("#chatMsgForm").submit(sendMessage);
+    $("#chatMsgForm").submit(function(e) {
+      e.preventDefault();
+      sendMessage();
+    });
 
         $.post(ajax_url, {'method': 'resetLastAction'}, function(data){
         updateCheckTimeout(true);
