@@ -530,8 +530,8 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
     ## @brief this function adds a message to the chat room of the user
     #  @param message str message to send
-    #  @param target str optional whisper target
-    def ajaxSendMessage(self, message, target = None):
+    #  @param target_user str user name of whisper target (optional)
+    def ajaxSendMessage(self, message, target_user = None):
         """ Send a message to the chat room of the user.
             If the user sends to many messages in a pre-defined interval, the message will be ignored.
             The maximum message length will be also checked (if the message length is to high, it will be truncated). """
@@ -553,16 +553,16 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         self.userHeartbeat()
 
-        if target is not None:
+        if target_user is not None:
             whisper = chat.getField('whisper').get(chat)
 
             if whisper == 'off':
                 return
-            if not chat_users.get(target):
+            if not chat_users.get(target_user):
                 return
-            if whisper == 'restricted' and not chat_users[user]['is_admin'] and not chat_users[target]['is_admin']:
+            if whisper == 'restricted' and not chat_users[user]['is_admin'] and not chat_users[target_user]['is_admin']:
                 return
-            if user == target:
+            if user == target_user:
                 # can't whisper with yourself
                 return
 
@@ -583,7 +583,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
                             user = user,
                             action = self.isAdmin() and 'mod_add_message' or 'user_add_message',
                             content = self.html_escape(message),
-                            whisper_target = target)
+                            whisper_target = target_user)
 
         self.cache['chat_users'] = chat_users
 
@@ -623,60 +623,60 @@ class ChatSessionAjaxView(ChatSessionBaseView):
                                     target = message_id)
 
     ## @brief this function removes an user from the chat room where the admin is inside
-    #  @param user str name of the user to kick
-    def ajaxKickUser(self, user):
+    #  @param target_user str name of the user to kick
+    def ajaxKickUser(self, target_user):
         """ Kick a user. """
-        user = self.html_escape(user)
+        target_user = self.html_escape(target_user)
         session=self.request.SESSION
 
         if not self.isAdmin():
             return
         # You can not kick yourself
-        if session.get('user_properties').get('name') == user:
+        if session.get('user_properties').get('name') == target_user:
             return
 
         self.userHeartbeat()
         kicked_chat_users = self.cache['kicked_chat_users']
-        kicked_chat_users.append(user)
+        kicked_chat_users.append(target_user)
         self.cache['kicked_chat_users'] = kicked_chat_users
 
     ## @brief this function warns an user in the chat room where the admin is inside
-    #  @param user str name of the user to warn
-    #  @param warning str message text which will be send to the user
+    #  @param target_user str name of the user to warn
+    #  @param message str message text which will be send to the user
     #  @return bool true if the warning message is stored otherwise false
-    def ajaxWarnUser(self, user, warning = ""):
+    def ajaxWarnUser(self, target_user, message = ""):
         """ Warn a user. """
-        user = self.html_escape(user)
+        target_user = self.html_escape(target_user)
         session=self.request.SESSION
 
         if not self.isAdmin():
             return
         # You can not warn yourself
-        if session.get('user_properties').get('name') == user:
+        if session.get('user_properties').get('name') == target_user:
             return
 
         self.userHeartbeat()
 
-        return self.addWarnedUser(user, warning)
+        return self.addWarnedUser(target_user, message)
 
     ## @brief this function bans an user from the chat room where the admin is inside
-    #  @param user str name of the user to ban
-    #  @param reason str reason text which will be displayed additionally to the ban
+    #  @param target_user str name of the user to ban
+    #  @param message str reason text which will be displayed additionally to the ban
     #  @return bool true if the ban is stored otherwise false
-    def ajaxBanUser(self, user, reason = ""):
+    def ajaxBanUser(self, target_user, message = ""):
         """ Ban a user. """
-        user = self.html_escape(user)
+        target_user = self.html_escape(target_user)
         session=self.request.SESSION
 
         if not self.isAdmin():
             return
         # You can not ban yourself
-        if session.get('user_properties').get('name') == user:
+        if session.get('user_properties').get('name') == target_user:
             return
 
         self.userHeartbeat()
 
-        return self.addBannedUser(user, reason)
+        return self.addBannedUser(target_user, message)
 
 class ChatSessionView(ChatSessionBaseView):
     """Default chat session view

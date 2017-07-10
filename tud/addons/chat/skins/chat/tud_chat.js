@@ -27,7 +27,7 @@ var sendMessage = function(method){
   $("#chatMsgSubmit").attr("disabled", "disabled");
   $("#chatMsgValue").val("").keyup();
 
-  var targetData = target ? { 'target': target } : {};
+  var targetData = target ? { 'target_user': target } : {};
   removeTarget();
 
   var data = $.extend({}, {'method': method, 'message': message }, targetData);
