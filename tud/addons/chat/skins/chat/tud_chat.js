@@ -120,10 +120,9 @@ var updateCheck = function(welcome_message){
         }
         if (data.status.code == 2) { // Kicked
             //$.doTimeout( 'updateCheck' ); // stop updateCheck
+            kickmessage = "Sie wurden von einem Moderator des Chats verwiesen!";
             if (data.status.message != "") {
-                kickmessage = data.status.message;
-            }else{
-                kickmessage = "Sie wurden von einem Moderator des Chats verwiesen!";
+                kickmessage += "<br/><br/>Grund: " + data.status.message;
             }
             $.notification.error(kickmessage, false, [{"name" :"Ok",
                                                                           "click":function(){

@@ -54,7 +54,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         if not self.cache.has_key('chat_users'):
             self.cache.set_value('chat_users', {})
         if not self.cache.has_key('kicked_chat_users'):
-            self.cache.set_value('kicked_chat_users', [])
+            self.cache.set_value('kicked_chat_users', {})
         if not self.cache.has_key('warned_chat_users'):
             self.cache.set_value('warned_chat_users', {})
         if not self.cache.has_key('banned_chat_users'):
@@ -311,6 +311,32 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return True
         return False
 
+    ## @brief this function stores the given user in the kicked users dict
+    #  @param user str name of user to be kicked
+    #  @param reason str reason for kicking the user
+    #  @return bool true if the user was added successfully, otherwise false
+    def addKickedUser(self, user, reason):
+        """ Kicks a user with given message.
+            The user gets the message after calling the getActions method. """
+        kicked_chat_users = self.cache['kicked_chat_users']
+        if not user in kicked_chat_users.keys() and user in self.cache['chat_users'].keys():
+            kicked_chat_users[user] = {'reason': reason}
+            self.cache['kicked_chat_users'] = kicked_chat_users
+            return True
+        return False
+
+    ## @brief this function removes the given user from the kicked users dict
+    #  @param user str user name to remove from the kicked users dict
+    #  @return bool true if the user was removed successfully, otherwise false (the user wasn't in the kicked users dict)
+    def removeKickedUser(self, user):
+        """ Removes user from kicked users dict. """
+        kicked_chat_users = self.cache['kicked_chat_users']
+        if user in kicked_chat_users.keys():
+            del kicked_chat_users[user]
+            self.cache['kicked_chat_users'] = kicked_chat_users
+            return True
+        return False
+
     def isActive(self):
         chat_start = self.context.getField('start_date').get(self.context)
         chat_end = self.context.getField('end_date').get(self.context)
@@ -442,12 +468,11 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             self.removeWarnedUser(user)
             return {'status': {'code': UserStatus.WARNED, 'message': warning}}
 
-        kicked_chat_users = self.cache['kicked_chat_users']
-        if user in kicked_chat_users:
-            kicked_chat_users.remove(user)
-            self.cache['kicked_chat_users'] = kicked_chat_users
+        if user in self.cache['kicked_chat_users']:
+            reason = self.cache['kicked_chat_users'][user]['reason']
+            self.removeKickedUser(user)
             self.logout()
-            return {'status': {'code': UserStatus.KICKED, 'message': ''}}
+            return {'status': {'code': UserStatus.KICKED, 'message': reason}}
 
         self.userHeartbeat()
         self.checkForInactiveUsers()
@@ -624,21 +649,22 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
     ## @brief this function removes an user from the chat room where the admin is inside
     #  @param target_user str name of the user to kick
-    def ajaxKickUser(self, target_user):
+    #  @param message str message text which will be send to the user
+    def ajaxKickUser(self, target_user, message = ""):
         """ Kick a user. """
         target_user = self.html_escape(target_user)
         session=self.request.SESSION
 
         if not self.isAdmin():
             return
+
         # You can not kick yourself
         if session.get('user_properties').get('name') == target_user:
             return
 
         self.userHeartbeat()
-        kicked_chat_users = self.cache['kicked_chat_users']
-        kicked_chat_users.append(target_user)
-        self.cache['kicked_chat_users'] = kicked_chat_users
+
+        self.addKickedUser(target_user, message)
 
     ## @brief this function warns an user in the chat room where the admin is inside
     #  @param target_user str name of the user to warn
