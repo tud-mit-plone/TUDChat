@@ -507,8 +507,8 @@ class ChatSessionAjaxView(ChatSessionBaseView):
                 list_actions[i]['attr'].append({'a_action':list_actions[i]['a_action'], 'a_name':list_actions[i]['a_name']})
             if list_actions[i]['action'] == 'mod_add_message' or list_actions[i]['u_action'] == 'mod_add_message':
                 list_actions[i]['attr'].append({'admin_message':True})
-            if list_actions[i]['whisper'] == '1':
-                list_actions[i]['attr'].append({'whisper':True})
+            if list_actions[i]['whisper_target'] is not None:
+                list_actions[i]['attr'].append({'whisper_target':list_actions[i]['whisper_target']})
 
         return_dict = {
                         'messages':

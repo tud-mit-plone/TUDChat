@@ -328,7 +328,7 @@ var applyAttributes = function (message, attributes) {
             if (attributes[i].admin_message == true) {
                 entry_classes += " admin_message";
             }
-            if (attributes[i].whisper == true) {
+            if (attributes[i].whisper_target != null) {
                 whisper = true;
             }
         }
