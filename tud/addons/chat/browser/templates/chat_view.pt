@@ -3,14 +3,13 @@
 <head>
 
 <metal:block metal:fill-slot="javascript_head_slot">
-
-    <script language="javascript" src="jquery-1.7.min.js"></script>
-    <script language="javascript" src="jquery.notification.js"></script>
     <script language="javascript" src="jquery.ba-dotimeout.min.js"></script>
     <script language="javascript">
     $(document).ready(
         function() {
-            $('#login').submit(function() {
+            $('#login').submit(function(e) {
+              $('.chatErrorMessage').remove();
+
               var chat_url = $("[name='chatroom']").val();
 
               $("input[type='submit']").attr("disabled", "disabled");
@@ -25,7 +24,9 @@
                     window.location = chat_url + "?" + new Date().getTime();
                 } else {
                     if (response.status.message != '')
-                        $.notification.error(response.status.message);
+                        $('#contentSlot').prepend('<dl class="chatErrorMessage portalMessage error"><dt>Fehler</dt><dd>' + response.status.message + '</dd></dl>');
+                        var top = $('#contentSlot')[0].offsetTop;
+                        window.scrollTo(0, top);
                 }
                });
               return false;
