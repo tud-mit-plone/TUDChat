@@ -93,6 +93,10 @@ $(document).ready(
             e.preventDefault();
             var method = $(e.target).data("method");
             if(method) {
+                // warnUser method is only allowed with text
+                if(method == "warnUser" && $("#chatMsgValue").val().trim() == "") {
+                    return;
+                }
                 sendMessage(method);
                 $("#chatMsgMoreButtons .moreButtonsExpand").click();
             }

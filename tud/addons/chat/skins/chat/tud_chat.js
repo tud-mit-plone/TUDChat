@@ -20,7 +20,8 @@ var sendMessage = function(method){
     if (sendMessageBlock)
         return false;
 
-    if (message == '')
+    // don't allow empty messages for the normal message sending method
+    if (message == '' && method =='sendMessage')
         return false;
 
     sendMessageBlock = true;
