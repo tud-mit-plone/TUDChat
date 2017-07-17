@@ -525,6 +525,14 @@ $(document).ready(
         }
       });
 
+      // Let chatContent have 0.7 of the websites height
+      var chatResize = function() {
+          var documentHeight = $(window).height();
+          $("#chatContent").height((documentHeight * 0.7));
+      }
+      $(window).resize(chatResize);
+      chatResize();
+
       // start the time reformat daemon
       startReformatDaemon();
 
