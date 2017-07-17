@@ -12,26 +12,22 @@ function printMessage(message) {
 
     var whisperSpan = "";
     var whisperIcon = "";
-    if(changes.whisper) {
+    if(changes.whisper_target) {
         entry_classes += " whisper";
-        whisperSpan = "<span class='additional_content'>Private Nachricht</span>";
-        // whisperIcon = (message.name == ownUsername) ? "<span class='whisper-icon'></span>" : "<a href='#' class='whisper-icon' title='Mit privater Nachricht antworten' data-uname='"+message.name+"'></a>";
+        whisperSpan = "<span class='additional_content'>" + getUnameLink(changes.whisper_target, { preText: "Private Nachricht an " }) + "</span>";
         whisperIcon = "<span class='whisper-icon'></span>";
     }
 
-    return "<div id=chatEntry"+message.id+" class='"+entry_classes+"'><span class='meta-information'><span class='username'>"+message.name+"</span>" + timeSpan + "</span> " + whisperIcon + "<div class='message_content'><span class='message'>"+whisperSpan+parsed_message + (additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"</span></div> </div>";
+    var userNameString = getUnameLink(message.name, { checkOnline: true, toAdmin: changes.admin_message });
+
+    return "<div id=chatEntry"+message.id+" class='"+entry_classes+"'>"
+            + "<span class='meta-information'>" + userNameString + timeSpan + "</span> "+ whisperIcon
+            + "<div><span class='message_content'>" + whisperSpan + "<span class='message'>" + parsed_message + "</span>" + (additional_content != '' ? "<span class='additional_content'>" + additional_content + "</span>" : "") + "</span></div>"
+        + "</div>";
 }
 
 function printNewUser(user, role) {
-    var liContent = user;
-
-    if(
-          whisper != "off"
-      &&  user != ownUsername
-      && (role == "admin" || whisper == "on")
-    ) {
-      liContent = "<a href='#' class='icon-mail' title='Nachricht an " + user + " schreiben' data-uname='"+user+"'>" + user + "</a>";
-    }
+    var liContent = getUnameLink(user, { afterStart: false, toAdmin: (role == "admin") });
 
     entry_classes = '';
     if (user == ownUsername)

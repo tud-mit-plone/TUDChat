@@ -13,37 +13,31 @@ function printMessage(message) {
     var adminSpan = "";
     var whisperSpan = "";
     var whisperIcon = "";
-    if(changes.whisper) {
+    if(changes.whisper_target) {
         entry_classes += " whisper";
-        whisperSpan = "<span class='additional_content'>Private Nachricht</span>";
-        // whisperIcon = (message.name == ownUsername) ? "<span class='whisper-icon'></span>" : "<a href='#' class='whisper-icon' title='Mit privater Nachricht antworten' data-uname='"+message.name+"'></a>";
+        whisperSpan = "<span class='additional_content'>" + getUnameLink(changes.whisper_target, { preText: "Private Nachricht an ", fromAdmin: true }) + "</span>";
         whisperIcon = "<span class='whisper-icon'></span>";
     } else {
         adminSpan = " <span class='adminActions'><a href='#' class='edit' data-mid="+message.id+" title='Nachricht bearbeiten'>&nbsp;</a> <a href='#' class='delete' data-mid="+message.id+" title='Nachricht l&ouml;schen'>&nbsp;</a></span>";
     }
 
+    var userNameString = getUnameLink(message.name, { fromAdmin: true, checkOnline: true, toAdmin: changes.admin_message });
+
     return "<div id=chatEntry"+message.id+" class='admin "+entry_classes+"'>"
-        +"<span class='meta-information'><span class='username'>"+message.name+"</span>" + timeSpan + adminSpan + "</span>"
-        + whisperIcon + "<div class='message_content'><span class='message'>"+whisperSpan+parsed_message+""+(additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"</span></div>"
+        +"<span class='meta-information'>" + userNameString + timeSpan + adminSpan + "</span>"
+        + whisperIcon + "<div><span class='message_content'>"+whisperSpan+"<span class='message'>"+parsed_message+"</span>"+""+(additional_content != '' ? "<span class='additional_content'>"+additional_content+"</span>" : "")+"</span></div>"
         +"</div>";
 }
 
 function printNewUser(user, role) {
-    var liContent = user;
-
-    if(user != ownUsername) {
-      liContent = "<a href='#' class='icon-mail' title='Nachricht an " + user + " schreiben' data-uname='"+user+"'>" + user + "</a>";
-    }
+    var liContent = getUnameLink(user, { afterStart: false, fromAdmin: true, toAdmin: (role == "admin") });
 
     entry_classes = '';
     if (user == ownUsername)
         entry_classes += ' ownUsername';
     entry_classes += ' ' + role + 'role';
 
-    // if (user == ownUsername || role == 'admin')
-        return "<li class='chatUser"+entry_classes+"'>"+liContent+"</li>";
-    // else
-        // return "<li class='chatUser"+entry_classes+"'>"+liContent+"<div class='adminActions'><a href='#' data-uname='"+user+"' class='ban' title='Benutzer aus Chat verbannen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='kick' title='Benutzer aus Chat entfernen'>&nbsp;</a> <a href='#' data-uname='"+user+"' class='warn' title='Benutzer verwarnen'>&nbsp;</a></div></li>";
+    return "<li class='chatUser"+entry_classes+"'>"+liContent+"</li>";
 }
 
 
@@ -51,7 +45,7 @@ $(document).ready(
     function(){
 
         $("body").delegate("a.edit", "click", function(e) {
-            var oldMsg = $("#chatEntry"+$(e.target).attr("data-mid")).children("span.message_content").text();
+            var oldMsg = $("#chatEntry"+$(e.target).attr("data-mid")).find(".message_content .message").text();
             var mId = $(e.target).attr("data-mid");
             // Deselect all messages
             $("li.selected").removeClass("selected");
@@ -87,44 +81,6 @@ $(document).ready(
             e.preventDefault();
         });
 
-        $("body").delegate("a.kick", "click", function(e) {
-            user = $(e.target).attr("data-uname");
-            $.notification.warn("Wollen Sie wirklich den Benutzer \"" + user + "\" aus dem Chat entfernen?", false,
-                                                                        [{"name" :"Ok",
-                                                                            "click":function(){
-                                                                              $.post(ajax_url, {"method": "kickUser", "user": $(e.target).attr("data-uname") }, function(data) { updateCheck(); });
-                                                                              $.notification.clear();
-                                                                            }},
-                                                                        {"name" :"Abbrechen", "click": $.notification.clear },
-                                                                         ]);
-            e.preventDefault();
-        });
-
-        $("body").delegate("a.ban", "click", function(e) {
-            user = $(e.target).attr("data-uname");
-            $.notification.warn("Wollen Sie wirklich den Benutzer \"" + user + "\" aus dem Chat verbannen? <br/> <br/><form id='banUserForm'><label for='ban_reason'>Banngrund:</label> <input type='text' id='ban_reason'/></form>", false,
-                                                                        [{"name" :"Ok",
-                                                                            "click":function(){
-                                                                              $.post(ajax_url, {"method": "banUser", "user": $(e.target).attr("data-uname"), "reason": $("#ban_reason").val() }, function(data) { updateCheck(); });
-                                                                              $.notification.clear();
-                                                                            }},
-                                                                        {"name" :"Abbrechen", "click": $.notification.clear },
-                                                                         ]);
-            e.preventDefault();
-        });
-
-        $("body").delegate("a.warn", "click", function(e) {
-            user = $(e.target).attr("data-uname");
-            $.notification.warn("Welche Verwarnung wollen Sie dem Benutzer \"" + user + "\" aussprechen? <br/> <br/><form id='warnUserForm'><label for='warning'>Warnung:</label> <input type='text' id='warning'/></form>", false,
-                                                                        [{"name" :"Ok",
-                                                                            "click":function(){
-                                                                              $.post(ajax_url, {"method": "warnUser", "user": $(e.target).attr("data-uname"), "warning": $("#warning").val() }, function(data) { updateCheck(); });
-                                                                              $.notification.clear();
-                                                                            }},
-                                                                        {"name" :"Abbrechen", "click": $.notification.clear },
-                                                                         ]);
-            e.preventDefault();
-        });
 
 
         $("#chatMsgMoreButtons .moreButtonsExpand").click(function(e) {

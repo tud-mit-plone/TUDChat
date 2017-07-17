@@ -15,14 +15,16 @@ request.RESPONSE.setHeader('Content-Type','text/css')
 
 css = """
 /* Admin text color */
-div#chatUser ul li.adminrole {
+#chatAppendix .admin::before,
+#chat .username.icon-view::before {
     color: %s;
 }
-#chatContent div.admin_message .username {
-    color: %s;
+#chatContent div.admin_message .message_content {
+    border-left: 0.5em solid %s;
 }
-#chatAppendix .admin {
-    color: %s;
+#chatContent div.admin_message.ownMessage .message_content {
+    border-right: 0.5em solid %s;
+    border-left: none;
 }
 """ % (context.adminColor, context.adminColor, context.adminColor)
 

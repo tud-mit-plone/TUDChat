@@ -4,11 +4,6 @@
 }
 
 .adminActions {
-    display: none;
-}
-
-.chatUser:hover .adminActions,
-#chatContent > div.admin:hover .adminActions {
     display: inline;
 }
 

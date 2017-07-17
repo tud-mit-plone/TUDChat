@@ -75,7 +75,7 @@
         <h3>Hinweise zur Benutzung:</h3>
         <p tal:define="chat_end session_info/end_date;
                          chat_end python: chat_end.strftime('%d.%m.%Y, %H:%M Uhr')">
-            Die Chaträume werden <em class='admin'>moderiert</em> und es können bei Fehlverhalten Konsequenzen in Form von einer Verwarnung und permanenter Verweisung des Chatraums folgen. <span class="chatDuration" tal:content="string: Dieser Chat ist bis zum ${chat_end} aktiv und wird anschließend automatisch geschlossen."></span>
+            Die Chaträume werden <span class='admin icon-view'>moderiert</span> und es können bei Fehlverhalten Konsequenzen in Form von einer Verwarnung und permanenter Verweisung des Chatraums folgen. <span class="chatDuration" tal:content="string: Dieser Chat ist bis zum ${chat_end} aktiv und wird anschließend automatisch geschlossen."></span>
         </p>
 
         <h3>Chat verlassen:</h3>

@@ -60,6 +60,40 @@ var sortByRoleName = function(object1, object2){
   return [!object1.is_admin, object1.name] >= [!object2.is_admin, object2.name] ? 1 : -1;
 }
 
+// get a username link for whispering or the plain username as fallback if whisper is not allowed
+var getUnameLink = function(username, options) {
+  var defaults = {
+    fromAdmin: false, // wether the sender is admin
+    toAdmin: false, // wether the target is admin
+    notSelf: true, // only print the link if the user is not the current user
+    afterStart: true, // only print the link if we are not in the firstGetActions phase
+    checkOnline: false, // check if the username is 'online'
+    linkTitle: "Private Nachricht an " + username + " schicken", // title of the link
+    preText: "", // text that will be prepended (before the link)
+    fallback: false // fallback as alternative to the link
+  };
+  options = $.extend({}, defaults, options);
+
+  var cssClass = "";
+  if(options.toAdmin) {
+    cssClass += " icon-view";
+  }
+  if(username == ownUsername) {
+    cssClass += " self";
+  }
+
+  if(
+    !(whisper == "on" || (whisper == "restricted" && options.toAdmin) || options.fromAdmin)
+    || (options.notSelf && username == ownUsername)
+    || (options.afterStart && firstGetActions)
+    || (options.checkOnline && !$("#userContainer a[data-uname='"+username+"']").length )
+  ) {
+    return (options.fallback) ? options.fallback : (options.preText + "<span class='username"+ cssClass +"'>" + username + "</span>");
+  }
+  var titleAttr = (options.linkTitle) ? " title='" + options.linkTitle + "'" : "";
+  return options.preText + "<a href='#'" + titleAttr + " class='username"+ cssClass +"' data-uname='" + username + "'>" + username + "</a>";
+}
+
 // function to format time strings
 var formatTimes = function(newTimesOnly) {
   // make german times more nice
@@ -188,13 +222,6 @@ var updateCheck = function(welcome_message){
 
         };
 
-        // Update the chat user counter
-        var newUserNum = $("#userContainer").children().length;
-        if(newUserNum != currentUserNum) {
-          $("#userCount").text( newUserNum );
-          currentUserNum = newUserNum;
-        }
-
           // Notification: User has entered the room
           if (!firstGetActions){
             if (usernames.length == 1)
@@ -209,7 +236,8 @@ var updateCheck = function(welcome_message){
         if(typeof(data.users['to_delete'])!="undefined"){
           user = data.users.to_delete.sort();
           for(var i in user)
-            $(".chatUser[data-uname='"+user[i]+"']").remove();
+            $("#chat .chatUser[data-uname='"+user[i]+"']").remove();
+            $("#chat a.username[data-uname='"+user[i]+"']").replaceWith( "<span class='" + $("#chat a.username[data-uname='"+user[i]+"']").attr("class") + "'>"+user[i]+"</span>" );
           // Notification: User has left the room
           if (!firstGetActions){
             if (user.length == 1)
@@ -219,6 +247,13 @@ var updateCheck = function(welcome_message){
               $("#chatContent").append("<div class='chat-info'><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum verlassen.</div>");
             }
           }
+        }
+
+        // Update the chat user counter
+        var newUserNum = $("#userContainer").children().length;
+        if(newUserNum != currentUserNum) {
+          $("#userCount").text( newUserNum );
+          currentUserNum = newUserNum;
         }
 
       }
@@ -308,32 +343,35 @@ var performScrollMode = function() {
     * message_content
     * additional_content
     * entry_classes
+    * whisper_target
 */
 var applyAttributes = function (message, attributes) {
     var message_content = typeof(message)!="undefined" ? message : '';
     var additional_content  = '';
     var entry_classes = '';
-    var whisper = false;
+    var whisper_target = null;
+    var admin_message = false;
 
     if(typeof(attributes)!="undefined"){
         for (var i = 0; i < attributes.length; i++) {
             if (attributes[i].a_action == 'mod_edit_message') {
-                additional_content += " Bearbeitet durch "+ attributes[i].a_name;
+                additional_content += getUnameLink(attributes[i].a_name, { preText: " Bearbeitet durch ", toAdmin: true });
                 entry_classes += " admin_edit";
             }
             if (attributes[i].a_action == 'mod_delete_message') {
-                additional_content = "Gel&ouml;scht durch "+ attributes[i].a_name;
+                additional_content = getUnameLink(attributes[i].a_name, { preText: "Gel&ouml;scht durch ", toAdmin: true });
                 entry_classes += " admin_delete";
             }
             if (attributes[i].admin_message == true) {
                 entry_classes += " admin_message";
+                admin_message = true;
             }
             if (attributes[i].whisper_target != null) {
-                whisper = true;
+                whisper_target = attributes[i].whisper_target;
             }
         }
     }
-    return { "entry_classes": entry_classes, "message_content": message_content, "additional_content": additional_content, 'whisper': whisper};
+    return { "entry_classes": entry_classes, "message_content": message_content, "additional_content": additional_content, "whisper_target": whisper_target, "admin_message": admin_message };
 };
 
 // remove the target chat user
@@ -401,7 +439,7 @@ $(document).ready(
 
        // security information for user links
         $("#chatContent").delegate(".message_content a", "click", function(e) {
-            if(!$(e.target.parentNode.parentNode).hasClass('admin_message')){
+            if(!$(this).hasClass("username") && !$(e.target.parentNode.parentNode).hasClass('admin_message')){
                 $.notification.warn("Dieser Link wurde von einem Chat-Nutzer geschrieben. Die TU-Dresden möchte sich an dieser Stelle ausdrücklich von dem Inhalt dieses Links distanzieren. <br/><br/> Soll der Link <tt>" + e.target.href + "</tt> wirklich geöffnet werden?", false,
                                                                         [{"name" :"Ja",
                                                                             "click":function(){
@@ -417,7 +455,7 @@ $(document).ready(
         });
 
     // logic for choosing a chat user as message target
-    $('#chat').on('click', '#chatUser li a', function(e) {
+    $('#chat').on('click', '#chatUser li a, a.username', function(e) {
       e.preventDefault();
 
       // cleanup the old target
@@ -425,7 +463,7 @@ $(document).ready(
 
       target = $(e.target).data("uname");
 
-      var $targetContent = $('<span id="chatMsgTarget">Nachricht an: ' + target + ' <a href="#">X</a></span>');
+      var $targetContent = $('<span id="chatMsgTarget">Nachricht an: ' + target + ' <a href="#" class="close"></a></span>');
       var $chatMsgValue = $('#chatMsgForm #chatMsgValue');
 
       $('#chatMsgForm').prepend($targetContent);
@@ -468,18 +506,22 @@ $(document).ready(
       $('#chatMsgValue').keypress();
     }
 
-    // auto resize the message input field
+    // auto resize the message input field and handle target deletion
     var $textInput = $("#chatMsgValue");
     var textInputOffset = $textInput[0].offsetHeight - $textInput[0].clientHeight;
     $textInput
       .on('keyup', function() {
         $(this).css('height', '').css('height', this.scrollHeight + textInputOffset);
-      }).keypress(function (e) {
+      }).keydown(function (e) {
+        var key = e.keyCode;
         // prevent line breaks and send the message instead
-        var key = e.which;
         if(key == 13) {
           e.preventDefault();
           sendMessage();
+        }
+        // remove the target on backspace if no text is left
+        if(key == 8 && $textInput.val().length == 0) {
+          removeTarget();
         }
       });
 

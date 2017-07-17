@@ -24,18 +24,36 @@ div#chatContent div.ownMessage {
     text-align: right;
 }
 
+
+/* chat-info information messages */
 div#chatContent div.chat-info {
     font-size: 0.9em;
     font-weight: 200;
     text-align: center;
 }
 
+
+/* username styles */
+div#chat a.username::before {
+    text-decoration: underline;
+}
+
+div#chat a.username::before,
+div#chat a.username:hover::before {
+    text-decoration: none;
+}
+
 div#chatContent div.chat-info .username {
     font-weight: normal;
 }
 
+/* meta-information of messages (username, time,...) */
 div#chatContent div .meta-information {
     margin: 0 2em;
+}
+
+div#chatContent div.admin_message .meta-information {
+    margin: 0 2.5em;
 }
 
 div#chatContent div .meta-information .chatdate {
@@ -44,7 +62,8 @@ div#chatContent div .meta-information .chatdate {
     font-size: 0.8em;
 }
 
-div#chatContent div .message_content .message {
+/* message content */
+div#chatContent div .message_content {
     max-width: 80%;
     display: inline-block;
     text-align: left;
@@ -56,7 +75,7 @@ div#chatContent div .message_content .message {
 }
 
 
-div#chatContent div .message_content .message::before {
+div#chatContent div .message_content::before {
     content: "";
     width: 0px;
     height: 0px;
@@ -66,7 +85,7 @@ div#chatContent div .message_content .message::before {
     top: -1em;
 }
 
-div#chatContent div.ownMessage .message_content .message::before {
+div#chatContent div.ownMessage .message_content::before {
     border-top: 1em solid transparent;
     border-left: 1em solid #007bb1;
     border-right: none;
@@ -74,16 +93,28 @@ div#chatContent div.ownMessage .message_content .message::before {
 }
 
 
-div#chatContent div.ownMessage .message_content .message {
+div#chatContent div.ownMessage .message_content {
     background-color: #007bb1;
     color: #fff;
 }
 
-div#chatContent div.ownMessage .message_content .message a {
+div#chatContent div.ownMessage .message_content a {
     color: #fff;
     text-decoration: underline;
 }
 
+div#chatContent .message_content span.additional_content {
+    display: block;
+    font-size: 0.8em;
+    font-weight: lighter;
+    opacity: 0.8;
+}
+
+div#chatContent .message_content span.additional_content .username {
+    font-weight: normal;
+}
+
+/* whisper icon besides private messages */
 div#chatContent .whisper-icon {
     display: inline-block;
     float: left;
@@ -102,29 +133,6 @@ div#chatContent a.whisper-icon:hover {
 
 div#chatContent div.ownMessage .whisper-icon {
     float: right;
-}
-
-div#chatContent span.additional_content{
-    display: block;
-    font-size: 0.8em;
-    font-weight: normal;
-    opacity: 0.75;
-}
-
-div#chatContent div.admin_delete  span.additional_content{
-    color: darkred;
-}
-
-div#chatContent div.admin_delete  div.adminActions{
-    display: none !important;
-}
-
-div#chatContent div.admin_edit span.additional_content {
-    opacity: 0.6;
-}
-
-div#chatContent .admin_message .message_content {
-    font-weight: bold;
 }
 
 /* breakpoint definition for chat message inputs and chatUser button */
@@ -167,6 +175,18 @@ div#chatUser #userContainer{
     column-width: 11em;
 }
 
+div#chatUser .username {
+    word-wrap: break-word;
+    display: inline-block;
+    max-width: 100%;
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+}
+
+div#chatUser .username.self {
+    font-weight: bold;
+}
+
 /*
  * chat message inputs
 */
@@ -188,16 +208,19 @@ div#chatMsg {
 }
 
 #chatMsgForm #chatMsgTarget a {
-    color: white;
-    font-size: 0.75em;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     right: 0.5em;
+}
+#chatMsgForm #chatMsgTarget a::before {
+    content: "X";
+    color: white;
     opacity: 0.7;
     text-decoration: none;
+    vertical-align: middle;
 }
-#chatMsgForm #chatMsgTarget a:hover {
+#chatMsgForm #chatMsgTarget a:hover::before {
     opacity: 1;
     text-decoration: none;
 }
