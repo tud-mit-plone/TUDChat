@@ -294,13 +294,12 @@ span.chat_option {
 }
 
 #notification_container hr {
-    margin-top: 10px;
-    padding-bottom: 10px;
+    visibility: hidden;
 }
 
 #notification_container tt {
+    font-family: monospace;
     font-weight: bold;
-    font-size: 1.2em;
     color: #555;
     padding: 0px 5px 0px 5px;
 }
@@ -321,32 +320,16 @@ span.chat_option {
     width           : 500px;
     padding         : 20px;
     margin          : 5px 0 5px 0;
-    border-radius   : 5px;
     border: 2px #555 solid;
     font-weight     : bold;
     background-color: #fff;
     z-index          : 300001;
 }
-.notification_error {
-    color           : #800000;
-}
-.notification_success {
-    color           : #33CC33;
-}
-.notification_warn {
-    color           : #FF5D00;
-}
-.notification_general {
-    color           : #FFCC00;
-}
 .notification_button_container{
     float: right;
 }
 .notification_button{
-    min-width: 100px;
     margin: 2px 10px 2px 10px;
-    padding: 2px 10px 2px 10px;
     float: left;
-    outline: none;
 }
 /* content from notification.css */
