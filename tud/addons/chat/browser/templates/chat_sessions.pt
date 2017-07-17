@@ -5,10 +5,6 @@
 
 <body>
 <metal:javascriptslot fill-slot="javascript_head_slot">
-  <script type="text/javascript" src="jquery-1.7.min.js"></script>
-  <script type="text/javascript" src="jquery-ui-1.8.19.custom.min.js"></script>
-  <script type="text/javascript" src="jquery-ui-timepicker-addon.js"></script>
-  <script type="text/javascript" src="jquery.ui.datepicker-de.js"></script>
 
   <script language="javascript">
 
@@ -24,8 +20,6 @@
 </metal:javascriptslot>
 
 <metal:cssslot fill-slot="style_slot">
-  <link rel="stylesheet" href="jquery-ui-timepicker-addon.css" type="text/css" media="screen" />
-  <link rel="stylesheet" href="tud_chat_css/ui-lightness/jquery-ui-1.8.19.custom.css" type="text/css" media="screen" />
 
   <style type="text/css">
   <!--
