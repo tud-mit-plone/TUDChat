@@ -55,9 +55,9 @@
                 <button id="chatMsgSubmit" type="submit" title="Zum Absenden hier klicken oder 'Enter' drücken.">Absenden</button>
                 <span id='chatMsgMoreButtons' tal:condition="view/isAdmin"><button class='moreButtonsExpand icon-down'></button>
                     <span class="buttonsWrapper">
+                      <button data-method="warnUser" class='chatMsgMoreButton'>Warn</button>
                         <button data-method="kickUser" class='chatMsgMoreButton'>Kick</button>
                         <button data-method="banUser" class='chatMsgMoreButton'>Ban</button>
-                        <button data-method="warnUser" class='chatMsgMoreButton'>Warn</button>
                     </span>
                 </span>
             </form>
