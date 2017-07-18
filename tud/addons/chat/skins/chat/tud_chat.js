@@ -189,7 +189,7 @@ var updateCheck = function(welcome_message){
     }
       if (data.status.code == 6) { // Warned (to show in chat)
         //$.doTimeout( 'updateCheck' ); // stop updateCheck
-        $("#chatContainer").append("<li>"+data.status.message+"</li>");
+        $("#chatContent").append("<div class='chat-info'>"+data.status.message+"</div>");
       }
 
 
@@ -289,7 +289,7 @@ var updateCheck = function(welcome_message){
         formatTimes(true);
 
     if(welcome_message){
-        var $message = $("<li id='welcome_message'></li>").append($("<span class='message_content'></span>").text(welcome_message));
+        var $message = $("<div id='welcome_message' class='chat-info'></div>").text(welcome_message);
         $("#chatContent").append($message);
     }
 
@@ -305,7 +305,6 @@ var updateCheckTimeout = function(first_run){
     if(first_run){
         var welcome_message = $('#chat').data('welcome_message');
         if(welcome_message){
-            welcome_message = 'Willkommensnachricht: ' + welcome_message;
             updateCheck(welcome_message);
         }else{
             updateCheck();
