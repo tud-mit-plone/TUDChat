@@ -352,7 +352,6 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         if session.get('user_properties'):
             user = session.get('user_properties').get('name')
             session.set('user_properties', None)
-            session.invalidate()
 
             self.removeUser(user)
         return True
@@ -451,8 +450,9 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         chat = context.getParentNode()
 
         if self.isBanned():
+            session['chat_ban_message'] = self.getBanReason()
             self.logout()
-            return {'status': {'code': UserStatus.BANNED, 'message': self.getBanReason()}}
+            return {'status': {'code': UserStatus.BANNED, 'message': ''}}
 
         if not self.isRegistered():
             return {'status': {'code': UserStatus.NOT_AUTHORIZED, 'message': 'NOT AUTHORIZED'}}
@@ -469,10 +469,10 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return {'status': {'code': UserStatus.WARNED, 'message': warning}}
 
         if user in self.cache['kicked_chat_users']:
-            reason = self.cache['kicked_chat_users'][user]['reason']
+            session['chat_kick_message'] = self.cache['kicked_chat_users'][user]['reason']
             self.removeKickedUser(user)
             self.logout()
-            return {'status': {'code': UserStatus.KICKED, 'message': reason}}
+            return {'status': {'code': UserStatus.KICKED, 'message': ''}}
 
         self.userHeartbeat()
         self.checkForInactiveUsers()

@@ -155,27 +155,13 @@ var updateCheck = function(welcome_message){
         }
         if (data.status.code == 2) { // Kicked
             //$.doTimeout( 'updateCheck' ); // stop updateCheck
-            kickmessage = "Sie wurden von einem Moderator des Chats verwiesen!";
-            if (data.status.message != "") {
-                kickmessage += "<br/><br/>Grund: " + data.status.message;
-            }
-            $.notification.error(kickmessage, false, [{"name" :"Ok",
-                                                                          "click":function(){
-                                                                              $.notification.clear();
-                                                                              goHierarchieUp();
-                                                                          }},
-                                                                         ]);
+            goHierarchieUp();
             return;
         }
 
         if (data.status.code == 3) { // Banned
             //$.doTimeout( 'updateCheck' ); // stop updateCheck
-            $.notification.error("Sie wurden dauerhaft des Chats verwiesen! <br/><br/>Grund: " + data.status.message, false, [{"name" :"Ok",
-                                                                          "click":function(){
-                                                                              $.notification.clear();
-                                                                              goHierarchieUp();
-                                                                          }},
-                                                                         ]);
+            goHierarchieUp();
             return;
         }
 

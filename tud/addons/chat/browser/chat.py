@@ -42,6 +42,31 @@ class ChatView(BrowserView):
             }
         return [brain.getObject() for brain in catalog(query)]
 
+    def getPortalMessage(self):
+        session = self.request.SESSION
+
+        if session.has_key("chat_kick_message"):
+            message = "Sie wurden von einem Moderator des Chats verwiesen!"
+
+            if session["chat_kick_message"]:
+                message += "<br /><br />Grund: {}".format(session["chat_kick_message"])
+
+            del session["chat_kick_message"]
+
+            return message
+
+        if session.has_key("chat_ban_message"):
+            message = "Sie wurden dauerhaft des Chats verwiesen!"
+
+            if session["chat_ban_message"]:
+                message += "<br /><br />Grund: {}".format(session["chat_ban_message"])
+
+            del session["chat_ban_message"]
+
+            return message
+
+        return None
+
 class ChatSessionsView(BrowserView):
     """Chat sessions view
     """

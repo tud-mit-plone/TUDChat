@@ -59,6 +59,14 @@
       tal:define="active_sessions view/getActiveChatSessions;
                   next_sessions view/getNextChatSessions">
 
+<div tal:define="message view/getPortalMessage"
+     tal:condition="message">
+    <dl id="portal-message" class="portalMessage warning">
+        <dt i18n:domain="plone" i18n:translate="Info"></dt>
+        <dd tal:content="structure message"></dd>
+    </dl>
+</div>
+
 <h2 tal:content="view/getTitle"> Title of chat </h2>
 
 <p tal:content="view/getIntroduction"> Introduction </p>
