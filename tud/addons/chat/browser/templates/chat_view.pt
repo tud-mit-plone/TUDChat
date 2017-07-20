@@ -90,9 +90,24 @@
         <div>
           <label for="chatroom">Raum</label>
           <tal:block condition="python: len(active_sessions) > 1">
-            <select name="chatroom">
+            <select tal:define="room request/form/room|nothing"
+                    name="chatroom">
                 <tal:block repeat="session active_sessions">
-                    <option tal:attributes="value session/absolute_url" class="chat_option" tal:content="session/title"> Chat session name </option>
+                    <tal:block define="session_id session/id">
+                        <option tal:condition="python: room != session_id"
+                                tal:attributes="value session/absolute_url"
+                                class="chat_option"
+                                tal:content="session/title">
+                            Chat session name
+                        </option>
+                        <option tal:condition="python: room == session_id"
+                                tal:attributes="value session/absolute_url"
+                                class="chat_option"
+                                tal:content="session/title"
+                                selected>
+                            Chat session name
+                        </option>
+                    </tal:block>
                 </tal:block>
             </select>
           </tal:block>

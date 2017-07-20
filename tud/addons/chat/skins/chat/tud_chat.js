@@ -52,8 +52,9 @@ var goHierarchieUp = function(){
     var url = window.location.href;
     if (url.substr(-1) == '/') url = url.substr(0, url.length - 2);
     url = url.split('/');
-    url.pop();
-    window.location = url.join('/');
+    room = /^[^\?]+/.exec(url.pop())[0];
+    target_url = url.join('/') + '?room=' + encodeURIComponent(room)
+    window.location = target_url;
 }
 
 var sortByRoleName = function(object1, object2){
