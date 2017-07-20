@@ -51,7 +51,7 @@ class TUDChatSqlMethods(Globals.Persistent, Acquisition.Implicit):
                 `whisper_target`  VARCHAR( 255 )           NULL DEFAULT NULL,
             PRIMARY KEY (`id` ),
             INDEX ( `chat_id` )
-            );
+            ) CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;
             """ % (prefix))
 
         self.getPreviousAction = SQL('getPreviousAction', 'get id of previous action',
