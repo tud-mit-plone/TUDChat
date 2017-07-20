@@ -15,6 +15,9 @@ class ChatView(BrowserView):
     def getIntroduction(self):
         return self.context.getField('introduction').get(self.context)
 
+    def getWhisperOption(self):
+        return self.context.getField('whisper').get(self.context)
+
     ## @brief this function generates a list of all chat sessions which were active
     #  @return list of chat session objects
     def getActiveChatSessions(self):

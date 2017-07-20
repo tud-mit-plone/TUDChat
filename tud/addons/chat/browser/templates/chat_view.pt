@@ -71,10 +71,17 @@
 
 <p tal:content="view/getIntroduction"> Introduction </p>
 
-<h3>Datenschutzhinweis</h3>
-<p class="chat_explanation">
-    Um an einem Chat teilnehmen zu können, wählen Sie bitte unten einen Chat-Raum aus, tragen Ihren gewünschten Benutzernamen ein und bestätigen, dass Sie diesen Datenschutzhinweis zur Kenntnis genommen haben. Um anonym zu bleiben, nutzen Sie bitte einen Nickname als Benutzernamen. Er muss zwischen 3 und 20 Zeichen lang sein und mindestens 3 Buchstaben enthalten. Wenn Sie eine Nachricht im Chat verschicken, können alle Teilnehmer den von Ihnen gewählten Benutzernamen und die Nachricht sehen. Die Nachrichten werden zusammen mit einem Zeitstempel über die Chatlaufzeit hinaus anonymisiert gespeichert. Bitte beachten Sie, dass persönliche Angaben in den Chatnachrichten nicht anonymisiert werden können. Die Moderatoren können die Chats im Nachhinein  ausschließlich  zur Verbesserung der FAQ-Angebote auswerten. Die Löschung der Daten erfolgt spätestens nach 3 Monaten. Die Räume sind zeitlich befristet und werden moderiert. Bei Fehlverhalten von Chatnutzern können Konsequenzen in Form von einer Verwarnung und permanenter Verweisung des Chatraums folgen. Zur Realisierung der Verweisung wird in diesem Fall ein Cookie in Ihrem Browser gesetzt. Private Nachrichten können aktuell im Chat nicht verschickt werden. Sollten Sie vertrauliche Informationen übertragen wollen, nutzen Sie bitte die E-Mail-Kontaktdaten auf den Webseiten.
-</p>
+<tal:block condition="active_sessions">
+    <h3>Datenschutzhinweis</h3>
+    <p tal:define="whisper view/getWhisperOption;"
+       class="chat_explanation">
+        Wenn Sie eine Nachricht im Chat verschicken, können alle Teilnehmer den von Ihnen gewählten Benutzernamen und die Nachricht sehen. Die Nachrichten werden zusammen mit einem Zeitstempel über die Chatlaufzeit hinaus anonymisiert gespeichert. Bitte beachten Sie, dass persönliche Angaben in den Chatnachrichten nicht anonymisiert werden können. Die Moderatoren können die Chats im Nachhinein ausschließlich zur Verbesserung der FAQ-Angebote auswerten. Die Löschung der Daten erfolgt spätestens nach 3 Monaten. Die Räume sind zeitlich befristet und werden moderiert. Bei Fehlverhalten von Chatnutzern können Konsequenzen in Form einer Verwarnung, eines Rauswurfs und einer permanenter Verweisung des Chatraums folgen. Zur Realisierung der permanenten Verweisung wird in diesem Fall ein Cookie in Ihrem Browser gesetzt.
+        <tal:block condition="python: whisper == 'off'">Private Nachrichten können im Chat nicht verschickt werden.</tal:block>
+        <tal:block condition="python: whisper == 'restricted'">Private Nachrichten können im Chat an Moderatoren verschickt werden.</tal:block>
+        <tal:block condition="python: whisper == 'on'">Private Nachrichten können im Chat verschickt werden.</tal:block>
+        Sollten Sie vertrauliche Informationen übertragen wollen, nutzen Sie bitte die E-Mail-Kontaktdaten auf den Webseiten.
+    </p>
+</tal:block>
 
 <tal:block condition="python:active_sessions is not None">
 
@@ -96,6 +103,7 @@
 
         <div>
           <label for="username">gewünschter Benutzername</label>
+          <span class="formHelp" id="username_help">Um anonym zu bleiben, nutzen Sie bitte einen Nickname als Benutzernamen.</span>
           <input type="text" name="username" id="username" maxlength="20" />
         </div>
 
