@@ -77,21 +77,19 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         del parameters['method']
 
         if hasattr(self, method):
+
+            # decode string parameters to unicode parameters
+            for key in parameters.keys():
+                if isinstance(parameters[key], str):
+                    try:
+                        parameters[key] = parameters[key].decode("utf-8")
+                    except ValueError:
+                        return simplejson.dumps("ERROR: Parameter '{}' is no valid utf-8 string".format(key))
+
             result = getattr(self, method)(**parameters)
             return simplejson.dumps(result)
         else:
             return simplejson.dumps("ERROR: Method not available")
-
-    ## @brief this function checks for a valid utf-8 string
-    #  @param url str string to check
-    #  @return bool true for valid utf-8 otherwise false
-    def checkUTF8(self, string):
-        """ utf-8 check"""
-        try:
-            string.decode("utf8")
-        except:
-            return False
-        return True
 
     ## @brief get IP address from a request
     #  @return string IP address as a string or None if not available
@@ -384,7 +382,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         if chat_max_users and chat_max_users <= len(self.cache['chat_users']):
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das Benutzerlimit für diese Chat-Session ist bereits erreicht.'}}
 
-        if len(re.findall(r"[a-zA-ZäöüÄÖÜ]",user))<3:
+        if len(re.findall(u"[a-zA-ZäöüÄÖÜ]",user))<3:
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername muss mindestens drei Buchstaben enthalten.'}}
 
         if len(user) < 3:
@@ -392,9 +390,6 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         if len(user) > 20:
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu lang. (Er darf maximal 20 Zeichen lang sein.)'}}
-
-        if not self.checkUTF8(user):
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername enthält ungültige Zeichen. (Es sind nur UTF-8-Zeichen erlaubt.)'}}
 
         if not self.isActive():
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der gewählte Chat-Raum ist zurzeit nicht aktiv.'}}
@@ -597,10 +592,6 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return
         else:
             chat_users[user]['last_message_sent'] = now
-
-        #filter invalid utf8
-        if not self.checkUTF8(message):
-            return
 
         if max_message_length:
             message = message[:max_message_length]
