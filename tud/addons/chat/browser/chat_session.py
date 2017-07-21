@@ -83,6 +83,8 @@ class ChatSessionAjaxView(ChatSessionBaseView):
     ## @brief replacements for special html chars (char "&" is in function included)
     htmlspecialchars         = {'"':'&quot;', '\'':'&#039;', '<':'&lt;', '>':'&gt;'} # {'"':'&quot;'} this comment is needed, because there is a bug in doxygen
 
+    ## @brief list of chars, which aren't allowed in ajax parameters (star marks moderators)
+    forbiddenchars           = [u"★", u"☆"]
 
     def __call__(self):
         self.request.response.setHeader("Content-type", "application/json")
@@ -100,13 +102,16 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         if hasattr(self, method):
 
-            # decode string parameters to unicode parameters
+            # decode string parameters to unicode parameters and remove forbidden chars
             for key in parameters.keys():
                 if isinstance(parameters[key], str):
                     try:
                         parameters[key] = parameters[key].decode("utf-8")
                     except ValueError:
                         return simplejson.dumps("ERROR: Parameter '{}' is no valid utf-8 string".format(key))
+
+                    for forbiddenchar in self.forbiddenchars:
+                        parameters[key] = parameters[key].replace(forbiddenchar, '')
 
             result = getattr(self, method)(**parameters)
             return simplejson.dumps(result)
