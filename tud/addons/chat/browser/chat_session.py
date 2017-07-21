@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 import simplejson
+import urllib
 
 from zope.component import getUtility
 from DateTime import DateTime
@@ -22,6 +23,25 @@ class ChatSessionBaseView(BrowserView):
     ## @brief define roles that have admin privileges
     admin_roles              = ['Admin','ChatModerator']
 
+    def __init__(self, context, request):
+        super(ChatSessionBaseView, self).__init__(context, request)
+
+        cacheManager = getUtility(ICacheManager)
+
+        cache_name = "chat_{}".format(IUUID(self.context))
+        self.cache = cacheManager.get_cache(cache_name, expire=18000)
+
+        if not self.cache.has_key('chat_users'):
+            self.cache.set_value('chat_users', {})
+        if not self.cache.has_key('kicked_chat_users'):
+            self.cache.set_value('kicked_chat_users', {})
+        if not self.cache.has_key('warned_chat_users'):
+            self.cache.set_value('warned_chat_users', {})
+        if not self.cache.has_key('banned_chat_users'):
+            self.cache.set_value('banned_chat_users', {})
+        if not self.cache.has_key('check_timestamp'):
+            self.cache.set_value('check_timestamp', DateTime().timeTime())
+
     def getSessionInformation(self):
         result = {}
         for field in ('title', 'description', 'chat_id', 'password', 'max_users', 'start_date', 'end_date',):
@@ -39,28 +59,30 @@ class ChatSessionBaseView(BrowserView):
         user = getSecurityManager().getUser()
         return user.has_role(self.admin_roles, self)
 
+    ## @brief this function checks if an user is in a specific room
+    #  @param user str user name to check
+    #  @return bool true if the user in the room, otherwise false
+    def hasUser(self, user):
+        """ Check for the existence of a user. """
+        return user in self.cache['chat_users'].keys()
+
+    ## @brief Check, if a user is registered to a chat session
+    #  @return bool True, if user is registered, otherwise False
+    def isRegistered(self):
+        """ Check, if a user is registered to a chat session. """
+        session = self.request.SESSION
+
+        if session.get('user_properties'):
+            if self.hasUser(session.get('user_properties').get('name')):
+                return True
+            else:
+                session.clear()
+        return False
+
 class ChatSessionAjaxView(ChatSessionBaseView):
     ## @brief replacements for special html chars (char "&" is in function included)
     htmlspecialchars         = {'"':'&quot;', '\'':'&#039;', '<':'&lt;', '>':'&gt;'} # {'"':'&quot;'} this comment is needed, because there is a bug in doxygen
 
-    def __init__(self, context, request):
-        super(ChatSessionAjaxView, self).__init__(context, request)
-
-        cacheManager = getUtility(ICacheManager)
-
-        cache_name = "chat_{}".format(IUUID(self.context))
-        self.cache = cacheManager.get_cache(cache_name, expire=18000)
-
-        if not self.cache.has_key('chat_users'):
-            self.cache.set_value('chat_users', {})
-        if not self.cache.has_key('kicked_chat_users'):
-            self.cache.set_value('kicked_chat_users', {})
-        if not self.cache.has_key('warned_chat_users'):
-            self.cache.set_value('warned_chat_users', {})
-        if not self.cache.has_key('banned_chat_users'):
-            self.cache.set_value('banned_chat_users', {})
-        if not self.cache.has_key('check_timestamp'):
-            self.cache.set_value('check_timestamp', DateTime().timeTime())
 
     def __call__(self):
         self.request.response.setHeader("Content-type", "application/json")
@@ -142,19 +164,6 @@ class ChatSessionAjaxView(ChatSessionBaseView):
                     self.removeUser(user)
             self.cache['check_timestamp'] = now
 
-    ## @brief Check, if a user is registered to a chat session
-    #  @return bool True, if user is registered, otherwise False
-    def isRegistered(self):
-        """ Check, if a user is registered to a chat session. """
-        session = self.request.SESSION
-
-        if session.get('user_properties'):
-            if self.hasUser(session.get('user_properties').get('name')):
-                return True
-            else:
-                session.clear()
-        return False
-
     ## @brief check, if a user is banned from this chat
     #  @return bool True, if user is banned, otherwise False
     def isBanned(self):
@@ -233,13 +242,6 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             self.cache['chat_users'] = chat_users
             return True
         return False
-
-    ## @brief this function checks if an user is in a specific room
-    #  @param user str user name to check
-    #  @return bool true if the user in the room, otherwise false
-    def hasUser(self, user):
-        """ Check for the existence of a user. """
-        return user in self.cache['chat_users'].keys()
 
     ## @brief this function removes an user from a specific room
     #  @param user str user name to remove
@@ -450,6 +452,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return {'status': {'code': UserStatus.BANNED, 'message': ''}}
 
         if not self.isRegistered():
+            session['chat_not_authorized_message'] = 'Sie sind nicht autorisiert! Bitte loggen Sie sich ein.'
             return {'status': {'code': UserStatus.NOT_AUTHORIZED, 'message': 'NOT AUTHORIZED'}}
 
 
@@ -698,6 +701,19 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 class ChatSessionView(ChatSessionBaseView):
     """Default chat session view
     """
+
+    def __call__(self):
+        if self.isRegistered():
+            return super(ChatSessionView, self).__call__()
+        else:
+            session=self.request.SESSION
+            session['chat_not_authorized_message'] = 'Sie sind nicht autorisiert! Bitte loggen Sie sich ein.'
+
+            target_url = "{}?room={}".format(self.context.getParentNode().absolute_url(), urllib.quote(self.context.id))
+            self.request.response.redirect(target_url)
+
+            return
+
     def getChatInformation(self):
         chat = self.context.getParentNode()
 

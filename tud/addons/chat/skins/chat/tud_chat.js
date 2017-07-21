@@ -146,12 +146,7 @@ var updateCheck = function(welcome_message){
 
         if (data.status.code == 1) { // Not authorized
             // $.doTimeout( 'updateCheck'); // stop updateCheck
-            $.notification.error("Sie sind nicht authorisiert! Bitte loggen Sie sich ein.", false, [{"name" :"Ok",
-                                                                          "click":function(){
-                                                                              $.notification.clear();
-                                                                              goHierarchieUp();
-                                                                          }},
-                                                                         ]);
+            goHierarchieUp();
             return;
         }
         if (data.status.code == 2) { // Kicked

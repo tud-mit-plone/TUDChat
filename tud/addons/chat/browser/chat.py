@@ -68,6 +68,13 @@ class ChatView(BrowserView):
 
             return message
 
+        if session.has_key("chat_not_authorized_message"):
+            message = session["chat_not_authorized_message"]
+
+            del session["chat_not_authorized_message"]
+
+            return message
+
         return None
 
 class ChatSessionsView(BrowserView):
