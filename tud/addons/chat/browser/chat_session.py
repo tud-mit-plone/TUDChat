@@ -4,8 +4,8 @@ import simplejson
 import urllib
 
 from zope.component import getUtility
+from zope.security import checkPermission
 from DateTime import DateTime
-from AccessControl import getSecurityManager
 
 from Products.Five import BrowserView
 
@@ -20,8 +20,6 @@ class BanStrategy:
     COOKIE, IP, COOKIE_AND_IP = ('COOKIE', 'IP', 'COOKIE_AND_IP')
 
 class ChatSessionBaseView(BrowserView):
-    ## @brief define roles that have admin privileges
-    admin_roles              = ['Admin','ChatModerator']
 
     def __init__(self, context, request):
         super(ChatSessionBaseView, self).__init__(context, request)
@@ -54,10 +52,7 @@ class ChatSessionBaseView(BrowserView):
     #  @return bool True, if user is admin, otherwise False
     def isAdmin(self):
         """ Check, if a user is admin for this chat. """
-        # use the existing security mechanism, look for admin roles on the context
-        # this respects groups and acquires settings along the path
-        user = getSecurityManager().getUser()
-        return user.has_role(self.admin_roles, self)
+        return checkPermission('cmf.ModifyPortalContent', self.context)
 
     ## @brief this function checks if an user is in a specific room
     #  @param user str user name to check
