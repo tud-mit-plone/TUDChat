@@ -18,6 +18,7 @@ from Products.Archetypes.atapi import StringField, IntegerField
 from Products.Archetypes.public import StringWidget, SelectionWidget, IntegerWidget
 from Products.Archetypes.public import DisplayList
 from Products.validation.validators import ExpressionValidator
+from Products.ZMySQLDA.DA import Connection
 
 try:
     from raptus.multilanguagefields import fields
@@ -68,11 +69,9 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         schemata           = 'default',
         default            = '',
         storage            = atapi.AnnotationStorage(),
-        enforceVocabulary  = True,
-        vocabulary         = "getAllowedDbList",
-        widget             = SelectionWidget(
+        widget             = StringWidget(
             label        = u"Datenbank",
-            description  = u"Mit welcher Datenbank soll der Chat betrieben werden?"
+            description  = u"Bitte geben Sie die ID des ZMySQL-Objektes an. Das Objekt muss sich auf einem Teilpfad des Chat-Objektes befinden."
         )
     ),
     StringField("database_prefix",
@@ -226,36 +225,26 @@ class Chat(base.ATCTFolder):
             connector_id = REQUEST.get('connector_id')
             database_prefix = REQUEST.get('database_prefix')
             if not errors:
-                self.chat_storage = TUDChatSqlStorage(connector_id, database_prefix) # Update chat_storage
-                if self.chat_storage.createTables() or database_prefix in self.own_database_prefixes.get(connector_id, []): # check if the prefix is free or is it an already used prefix
-                    if self.own_database_prefixes.get(connector_id):
-                        self.own_database_prefixes[connector_id].add(database_prefix)
+                try:
+                    zmysql = getattr(self, connector_id)
+                    if not isinstance(zmysql, Connection):
+                        errors['connector_id'] = "Beim angegebenen Objekt handelt es sich nicht um ein ZMySQL-Objekt."
+                        zmysql = None
+                except AttributeError:
+                    errors['connector_id'] = "Es wurde auf keinem Teilpfad ein Objekt mit dieser ID gefunden."
+                    zmysql = None
+
+                if zmysql:
+                    self.chat_storage = TUDChatSqlStorage(connector_id, database_prefix) # Update chat_storage
+                    if self.chat_storage.createTables() or database_prefix in self.own_database_prefixes.get(connector_id, []): # check if the prefix is free or is it an already used prefix
+                        if self.own_database_prefixes.get(connector_id):
+                            self.own_database_prefixes[connector_id].add(database_prefix)
+                        else:
+                            self.own_database_prefixes[connector_id] = set([database_prefix])
+                        logger.info("TUDChat: connector_id = %s" % (connector_id,))
                     else:
-                        self.own_database_prefixes[connector_id] = set([database_prefix])
-                    logger.info("TUDChat: connector_id = %s" % (connector_id,))
-                else:
-                    errors['database_prefix'] = "Dieser Prefix wird in dieser Datenbank bereits verwendet. Bitte wählen Sie einen anderen Prefix."
+                        errors['database_prefix'] = "Dieser Prefix wird in dieser Datenbank bereits verwendet. Bitte wählen Sie einen anderen Prefix."
             REQUEST.set('post_validated', True)
-
-    security.declarePublic("getAllowedDbList")
-    ## @brief get a list of for chat usage allowed database connections
-    #  @return list list of allowed databases
-    def getAllowedDbList(self):
-        """
-        Get a list of allowed Mysql_Connection_IDs
-        """
-        dl = DisplayList()
-        portal_tud_chat_tool = getToolByName(self, 'portal_tud_chat')
-
-        url=self.absolute_url()
-        if url.count('/')<3:
-            path = '/'
-        else:
-            path = '/'.join(url.split('/')[3:])
-
-        for connection in portal_tud_chat_tool.getAllowedDbList(path):
-            dl.add(connection, connection)
-        return dl
 
     security.declarePublic("show_id")
     def show_id(self,):
