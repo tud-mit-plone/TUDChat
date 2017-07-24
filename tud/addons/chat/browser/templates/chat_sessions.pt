@@ -1,0 +1,113 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"
+      lang="en-US"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="contact">
+
+<body>
+<metal:javascriptslot fill-slot="javascript_head_slot">
+
+  <script language="javascript">
+
+    $(document).ready(
+        function(){
+          $('#sessions tr:odd').css('background-color', '#eee');
+        }
+    );
+
+
+  </script>
+
+</metal:javascriptslot>
+
+<metal:cssslot fill-slot="style_slot">
+
+  <style type="text/css">
+  <!--
+    #sessions th, #sessions td {
+      text-align:center;
+      padding: 0 5px;
+    }
+    #sessions tr td:first-child + td {
+      text-align:left;
+    }
+
+    #sessions .info {
+      font-style: italic;
+      color: #555;
+    }
+
+  -->
+  </style>
+
+
+</metal:cssslot>
+
+<metal:main fill-slot="main">
+
+<h1>Chat-Sitzungen verwalten</h1>
+
+<div class="field">
+  <table width="100%" id='sessions'>
+    <tr>
+      <th>Status</th>
+      <th>Titel</th>
+      <th>Passwort</th>
+      <th>maximale Benutzer</th>
+      <th>Startzeit</th>
+      <th>Endzeit</th>
+      <th>Protokoll</th>
+      <th>Bearbeiten</th>
+    </tr>
+    <tr tal:repeat="session python: view.getSessions()">
+      <td>
+        <span tal:replace="python: view.getStateTitle(session)"/>
+      </td>
+      <td>
+        <span tal:replace="session/title"/>
+      </td>
+      <td tal:define="password session/password|nothing">
+        <tal:value condition="password" replace="password" />
+        <tal:Altvalue condition="not:password">
+          <span class="info" tal:content="string:Keine Passwort gesetzt" />
+        </tal:Altvalue>
+      </td>
+      <td tal:define="max_users session/max_users|nothing">
+        <tal:value condition="max_users" replace="max_users" />
+        <tal:Altvalue condition="not:max_users">
+          <span class="info" tal:content="string:Keine Begrenzung" />
+        </tal:Altvalue>
+      </td>
+      <td>
+        <span tal:define="chat_start session/start_date"
+              tal:replace="python:chat_start.strftime('%d.%m.%Y, %H:%M Uhr')"/>
+      </td>
+      <td>
+        <span tal:define="chat_end session/end_date"
+              tal:replace="python:chat_end.strftime('%d.%m.%Y, %H:%M Uhr')"/>
+      </td>
+      <td>
+        <a tal:condition="python: view.getState(session) == 'locked'" tal:attributes="href python:session.absolute_url() + '/log'">Log ansehen</a>
+      </td>
+      <td>
+        <a tal:condition="python: view.getState(session) == 'open'" tal:attributes="href python:session.absolute_url() + '/edit'">Bearbeiten</a>
+      </td>
+    </tr>
+  </table>
+</div>
+
+</metal:main>
+
+<metal:bottom fill-slot="bottom">
+  <div class="documentBottomLine">
+    <div metal:use-macro="context/document_byline/macros/byline">
+        Get the byline - contains details about author and modification date.
+    </div>
+    <div metal:use-macro="context/document_actions/macros/document_actions">
+        Document actions (print, sendto etc)
+    </div>
+    <br class="floatclearer" />
+  </div>
+</metal:bottom>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser">
+
+  <permission
+    id="tud.addons.chat.ManageChat"
+    title="tud.addons.chat: Manage Chat"
+    />
+  <permission
+    id="tud.addons.chat.ConfigureChat"
+    title="tud.addons.chat: Configure Chat"
+    />
+  <permission
+    id="tud.addons.chat.ModerateChat"
+    title="tud.addons.chat: Moderate Chat"
+    />
+
+</configure>
