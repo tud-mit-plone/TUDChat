@@ -52,7 +52,7 @@ class ChatSessionBaseView(BrowserView):
     #  @return bool True, if user is admin, otherwise False
     def isAdmin(self):
         """ Check, if a user is admin for this chat. """
-        return checkPermission('cmf.ModifyPortalContent', self.context)
+        return checkPermission('tud.addons.chat.ModerateChat', self.context)
 
     ## @brief this function checks if an user is in a specific room
     #  @param user str user name to check

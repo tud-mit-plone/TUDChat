@@ -6,9 +6,6 @@ import logging
 # Zope imports
 from zope.interface import implementer
 
-# CMF imports
-from Products.CMFCore import permissions
-
 from Products.Archetypes import atapi
 from Products.ATContentTypes.content import base, schemata
 from Products.Archetypes.atapi import Schema
@@ -84,8 +81,8 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
         required           = True,
         default            = 0,
         validators         = RegexValidator('checkNum', '^[0-9]+$', errmsg = 'Die Chat-ID muss eine Zahl groesser oder gleich 0 sein.'),
-        read_permission    = permissions.ManagePortal,
-        write_permission   = permissions.ManagePortal,
+        read_permission    = 'tud.addons.chat: Manage Chat',
+        write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = StringWidget(
             label        = u"Chat-ID",
             description  = u"Eindeutige Datenbank-ID dieser Chat-Sitzung (bei 0 wird die ID generiert, wenn die Sitzung angelegt wird)"

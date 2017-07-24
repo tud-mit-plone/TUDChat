@@ -43,6 +43,6 @@
             condition_expr=""
             url_expr="string:${object_url}/edit"
             visible="True">
-        <permission value="Modify portal content"/>
+        <permission value="tud.addons.chat: Configure Chat"/>
     </action>
 </object>

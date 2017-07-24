@@ -6,6 +6,7 @@ import logging
 # Zope imports
 from AccessControl import ClassSecurityInfo
 from zope.interface import implementer
+from zope.security import checkPermission
 
 # CMF imports
 from Products.CMFCore.utils import getToolByName
@@ -69,6 +70,8 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         schemata           = 'default',
         default            = '',
         storage            = atapi.AnnotationStorage(),
+        read_permission    = 'tud.addons.chat: Manage Chat',
+        write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = StringWidget(
             label        = u"Datenbank",
             description  = u"Bitte geben Sie die ID des ZMySQL-Objektes an. Das Objekt muss sich auf einem Teilpfad des Chat-Objektes befinden."
@@ -81,6 +84,8 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         schemata           = 'default',
         default            = '',
         storage            = atapi.AnnotationStorage(),
+        read_permission    = 'tud.addons.chat: Manage Chat',
+        write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = StringWidget(
             label        = u"Datenbank-Praefix",
             description  = u"Bitte geben Sie einen Praefix fuer Tabellen in der Datebank an; z.B.: 'institutionsname'"
@@ -99,6 +104,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
     StringField('adminColor',
         required           = True,
         default            = '#ff0000',
+        write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = StringWidget(
             label        = u"Textfarbe fuer Chatmoderator",
             description  = u"Bitte geben Sie die Textfarbe als HTML-Farbcode fuer die Chatmoderatoren an."
@@ -107,6 +113,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
     IntegerField('timeout',
         required           = True,
         default            = 15,
+        write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = IntegerWidget(
             label        = u"Socket-Timeout (in Sekunden)",
             description  = u"Bitte geben Sie den Socket-Timeout fuer den Chatuser an. Nach dieser Zeit wird dieser automatisch aus dem Chat entfernt."
@@ -115,6 +122,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
     IntegerField('refreshRate',
         required           = True,
         default            = 2,
+        write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = IntegerWidget(
             label        = u"Aktualisierungs-Rate (in Sekunden)",
             description  = u"Bitte geben Sie Frequenz an, in welcher der Chat aktualisiert werden soll."
@@ -140,6 +148,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         required           = True,
         default            = 'COOKIE',
         vocabulary         = BAN_STRATEGIES,
+        write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = SelectionWidget(
             visible      = -1,
             label        = u"Ban-Strategie",
@@ -224,7 +233,7 @@ class Chat(base.ATCTFolder):
         if not REQUEST.get('post_validated'):
             connector_id = REQUEST.get('connector_id')
             database_prefix = REQUEST.get('database_prefix')
-            if not errors:
+            if checkPermission('tud.addons.chat.ManageChat', self) and connector_id and not errors:
                 try:
                     zmysql = getattr(self, connector_id)
                     if not isinstance(zmysql, Connection):

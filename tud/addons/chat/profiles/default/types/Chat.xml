@@ -46,7 +46,7 @@
             condition_expr=""
             url_expr="string:${object_url}/edit"
             visible="True">
-        <permission value="Modify portal content"/>
+        <permission value="tud.addons.chat: Configure Chat"/>
     </action>
     <action title="Chat-Sitzungen verwalten"
             action_id="chat_sessions"
@@ -54,6 +54,6 @@
             condition_expr=""
             url_expr="string:${object_url}/chat_sessions"
             visible="True">
-        <permission value="Modify portal content"/>
+        <permission value="tud.addons.chat: Configure Chat"/>
     </action>
 </object>

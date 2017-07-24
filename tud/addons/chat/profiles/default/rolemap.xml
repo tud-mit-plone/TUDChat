@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<rolemap>
+    <permissions>
+        <permission name="tud.addons.chat: Manage Chat" acquire="True">
+            <role name="Manager"/>
+            <role name="Site Administrator"/>
+        </permission>
+        <permission name="tud.addons.chat: Configure Chat" acquire="True">
+            <role name="Manager"/>
+            <role name="Site Administrator"/>
+            <role name="Reviewer"/>
+        </permission>
+        <permission name="tud.addons.chat: Moderate Chat" acquire="True">
+            <role name="Manager"/>
+            <role name="Site Administrator"/>
+            <role name="Reviewer"/>
+            <role name="Editor"/>
+        </permission>
+    </permissions>
+</rolemap>

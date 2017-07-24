@@ -10,6 +10,7 @@
 
     <include package="collective.beaker" />
 
+    <include file="permissions.zcml"/>
     <include package=".adapter"/>
     <include package=".content"/>
     <include package=".browser"/>
