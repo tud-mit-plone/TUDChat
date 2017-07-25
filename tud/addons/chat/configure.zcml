@@ -8,6 +8,7 @@
             package         = "."
             initialize      = ".initialize"/>
 
+    <include package="raptus.multilanguagefields" />
     <include package="collective.beaker" />
 
     <include file="permissions.zcml"/>

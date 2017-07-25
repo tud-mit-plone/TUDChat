@@ -26,6 +26,7 @@ setup(name='tud.addons.chat',
       install_requires=[
           'setuptools',
           'plone.api',
+          'raptus.multilanguagefields>=1.1b10',
           'Products.ZMySQLDA',
           'simplejson',
           'collective.beaker'

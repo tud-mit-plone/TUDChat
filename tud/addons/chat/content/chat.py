@@ -21,12 +21,8 @@ from Products.Archetypes.public import DisplayList
 from Products.validation.validators import ExpressionValidator
 from Products.ZMySQLDA.DA import Connection
 
-try:
-    from raptus.multilanguagefields import fields
-    from raptus.multilanguagefields import widgets
-except ImportError:
-    from Products.Archetypes import Field as fields
-    from Products.Archetypes import Widget as widgets
+from raptus.multilanguagefields import fields as MultiLanguageFields
+from raptus.multilanguagefields import widgets as MultiLanguageWidgets
 
 from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
 
@@ -53,12 +49,12 @@ WHISPER_OPTIONS = DisplayList((
     ))
 
 ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
-    fields.TextField('introduction',
+    MultiLanguageFields.TextField('introduction',
         required           = False,
         searchable         = False,
         schemata           = 'default',
         default            = '',
-        widget            = widgets.TextAreaWidget(
+        widget            = MultiLanguageWidgets.TextAreaWidget(
             label        = u"Begrueßungstext",
             description  = u"Bitte geben Sie den Text an, der bei der Raumauswahl angezeigt werden soll."
         )

@@ -13,24 +13,20 @@ from Products.Archetypes.atapi import StringField, IntegerField, DateTimeField
 from Products.Archetypes.public import StringWidget, IntegerWidget, CalendarWidget
 from Products.validation.validators import ExpressionValidator, RegexValidator
 
-try:
-    from raptus.multilanguagefields import fields
-    from raptus.multilanguagefields import widgets
-except ImportError:
-    from Products.Archetypes import Field as fields
-    from Products.Archetypes import Widget as widgets
+from raptus.multilanguagefields import fields as MultiLanguageFields
+from raptus.multilanguagefields import widgets as MultiLanguageWidgets
 
 from tud.addons.chat.interfaces import IChatSession
 
 logger = logging.getLogger('tud.addons.chat')
 
 ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
-    fields.TextField('description',
+    MultiLanguageFields.TextField('description',
         required           = False,
         searchable         = False,
         schemata           = 'default',
         default            = '',
-        widget            = widgets.TextAreaWidget(
+        widget            = MultiLanguageWidgets.TextAreaWidget(
             label        = u"Beschreibung",
             description  = u"Bitte geben Sie eine Beschreibung fuer die Chat-Sitzung an."
         )
@@ -51,10 +47,10 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = u"Bitte geben Sie das Ende der Chat-Sitzung an."
         )
     ),
-    fields.StringField('welcome_message',
+    MultiLanguageFields.StringField('welcome_message',
         required           = False,
         default            = '',
-        widget             = widgets.StringWidget(
+        widget             = MultiLanguageWidgets.StringWidget(
             label        = u"Willkommensnachricht",
             description  = u"Bitte machen Sie eine Eingabe, falls eine Willkommensnachricht gewuenscht ist. Diese Nachricht sieht dann jeder nach dem Betreten des Chat-Raums."
         )
