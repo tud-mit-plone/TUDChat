@@ -1,0 +1,46 @@
+<configure
+        xmlns="http://namespaces.zope.org/zope"
+        xmlns:browser="http://namespaces.zope.org/browser">
+
+    <browser:page
+             for         = "tud.addons.chat.content.chat.Chat"
+             name        = "view"
+             class       = ".chat.ChatView"
+             template    = "templates/chat_view.pt"
+             layer       = "tud.addons.chat.interfaces.IAddonInstalled"
+             permission  = "zope2.View"
+     />
+     <browser:page
+             for         = "tud.addons.chat.content.chat.Chat"
+             name        = "chat_sessions"
+             class       = ".chat.ChatSessionsView"
+             template    = "templates/chat_sessions.pt"
+             layer       = "tud.addons.chat.interfaces.IAddonInstalled"
+             permission  = "cmf.ModifyPortalContent"
+     />
+
+     <browser:page
+             for         = "tud.addons.chat.content.chat_session.ChatSession"
+             name        = "view"
+             class       = ".chat_session.ChatSessionView"
+             template    = "templates/chat_session_view.pt"
+             layer       = "tud.addons.chat.interfaces.IAddonInstalled"
+             permission  = "zope2.View"
+     />
+     <browser:page
+             for         = "tud.addons.chat.content.chat_session.ChatSession"
+             name        = "chatajax"
+             class       = ".chat_session.ChatSessionAjaxView"
+             layer       = "tud.addons.chat.interfaces.IAddonInstalled"
+             permission  = "zope2.View"
+     />
+     <browser:page
+             for         = "tud.addons.chat.content.chat_session.ChatSession"
+             name        = "log"
+             class       = ".chat_session.ChatSessionLogView"
+             template    = "templates/chat_session_log.pt"
+             layer       = "tud.addons.chat.interfaces.IAddonInstalled"
+             permission  = "cmf.ModifyPortalContent"
+     />
+
+</configure>

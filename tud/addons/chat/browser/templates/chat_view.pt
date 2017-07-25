@@ -1,0 +1,174 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
+  metal:use-macro="context/main_template/macros/master" i18n:domain="plone">
+<head>
+
+<metal:block metal:fill-slot="javascript_head_slot">
+    <script language="javascript" src="jquery.ba-dotimeout.min.js"></script>
+    <script language="javascript">
+    $(document).ready(
+        function() {
+            $('#login').submit(function(e) {
+              $('.chatErrorMessage').remove();
+
+              var chat_url = $("[name='chatroom']").val();
+
+              $("input[type='submit']").attr("disabled", "disabled");
+
+              $.getJSON(chat_url + "/@@chatajax", {method: 'registerMe', user: $("input[name='username']").val(), agreement: $("[name='agreement']").prop("checked"), password: $("#password").val() }, function(response) {
+
+                $.doTimeout( 'enableSubmitButton', 2000, function(){
+                    $("input[type='submit']").removeAttr("disabled");
+                });
+
+                if (response == true) {
+                    window.location = chat_url + "?" + new Date().getTime();
+                } else {
+                    if (response.status.message != '')
+                        $('#contentSlot').prepend('<dl class="chatErrorMessage portalMessage error"><dt>Fehler</dt><dd>' + response.status.message + '</dd></dl>');
+                        var top = $('#contentSlot')[0].offsetTop;
+                        window.scrollTo(0, top);
+                }
+               });
+              return false;
+            });
+
+            function updateVisibilityPasswordField() {
+              if (jQuery.inArray($('[name=chatroom]').val(), password_channels) != -1) {
+                $(".password_field").show().children("#password").val("");
+              } else {
+                $(".password_field").hide().children("#password").val("");
+              }
+            }
+
+            updateVisibilityPasswordField();
+            $('[name=chatroom]').change(updateVisibilityPasswordField);
+
+        }
+    );
+    </script>
+</metal:block>
+
+<metal:block metal:fill-slot="style_slot">
+    <link rel="stylesheet" type="text/css" href="tud_chat.css" />
+    <link rel="stylesheet" type="text/css" tal:attributes="href string:${context/absolute_url}/tud_chat_additional.css" />
+</metal:block>
+
+</head>
+
+<body metal:fill-slot="main" i18n:domain="tudchat"
+      tal:define="active_sessions view/getActiveChatSessions;
+                  next_sessions view/getNextChatSessions">
+
+<div tal:define="message view/getPortalMessage"
+     tal:condition="message">
+    <dl id="portal-message" class="portalMessage warning">
+        <dt i18n:domain="plone" i18n:translate="Info"></dt>
+        <dd tal:content="structure message"></dd>
+    </dl>
+</div>
+
+<h2 tal:content="view/getTitle"> Title of chat </h2>
+
+<p tal:content="view/getIntroduction"> Introduction </p>
+
+<tal:block condition="active_sessions">
+    <h3>Datenschutzhinweis</h3>
+    <p tal:define="whisper view/getWhisperOption;"
+       class="chat_explanation">
+        Wenn Sie eine Nachricht im Chat verschicken, können alle Teilnehmer den von Ihnen gewählten Benutzernamen und die Nachricht sehen. Die Nachrichten werden zusammen mit einem Zeitstempel über die Chatlaufzeit hinaus anonymisiert gespeichert. Bitte beachten Sie, dass persönliche Angaben in den Chatnachrichten nicht anonymisiert werden können. Die Moderatoren können die Chats im Nachhinein ausschließlich zur Verbesserung der FAQ-Angebote auswerten. Die Löschung der Daten erfolgt spätestens nach 3 Monaten. Die Räume sind zeitlich befristet und werden moderiert. Bei Fehlverhalten von Chatnutzern können Konsequenzen in Form einer Verwarnung, eines Rauswurfs und einer permanenter Verweisung des Chatraums folgen. Zur Realisierung der permanenten Verweisung wird in diesem Fall ein Cookie in Ihrem Browser gesetzt.
+        <tal:block condition="python: whisper == 'off'">Private Nachrichten können im Chat nicht verschickt werden.</tal:block>
+        <tal:block condition="python: whisper == 'restricted'">Private Nachrichten können im Chat an Moderatoren verschickt werden.</tal:block>
+        <tal:block condition="python: whisper == 'on'">Private Nachrichten können im Chat verschickt werden.</tal:block>
+        Sollten Sie vertrauliche Informationen übertragen wollen, nutzen Sie bitte die E-Mail-Kontaktdaten auf den Webseiten.
+    </p>
+</tal:block>
+
+<tal:block condition="python:active_sessions is not None">
+
+    <form id="login" class="chat_login" action="" tal:condition="active_sessions">
+        <script language="javascript" tal:content="python: 'var password_channels = [' + ','.join(['\'{}\''.format(str(session.absolute_url())) for session in active_sessions if session.getField('password').get(session) != '']) + '];'"></script>
+        <div>
+          <label for="chatroom">Raum</label>
+          <tal:block condition="python: len(active_sessions) > 1">
+            <select tal:define="room request/form/room|nothing"
+                    name="chatroom">
+                <tal:block repeat="session active_sessions">
+                    <tal:block define="session_id session/id">
+                        <option tal:condition="python: room != session_id"
+                                tal:attributes="value session/absolute_url"
+                                class="chat_option"
+                                tal:content="session/title">
+                            Chat session name
+                        </option>
+                        <option tal:condition="python: room == session_id"
+                                tal:attributes="value session/absolute_url"
+                                class="chat_option"
+                                tal:content="session/title"
+                                selected>
+                            Chat session name
+                        </option>
+                    </tal:block>
+                </tal:block>
+            </select>
+          </tal:block>
+          <tal:block condition="python: len(active_sessions) == 1" tal:define="session python:active_sessions[0]">
+            <input type="hidden" name="chatroom" tal:attributes="value session/absolute_url" /> <span class="chat_option" tal:content="session/title" />
+          </tal:block>
+        </div>
+
+        <div>
+          <label for="username">gewünschter Benutzername</label>
+          <span class="formHelp" id="username_help">Um anonym zu bleiben, nutzen Sie bitte einen Nickname als Benutzernamen.</span>
+          <input type="text" name="username" id="username" maxlength="20" />
+        </div>
+
+        <div class="password_field">
+          <label for="password">Passwort für den Chatraum</label>
+          <input type="password" name="password" id="password" autocomplete="off" />
+        </div>
+
+        <div class="agreement_field">
+          <input type="checkbox" name="agreement" id="agreement" />
+          <label for="agreement">Ich habe den Datenschutzhinweis gelesen und verstanden und möchte unter den darin genannten Bedingungen teilnehmen.</label>
+        </div>
+
+        <div>
+          <label for="submit">&nbsp;</label>
+          <input type="submit" name="submit" value="Anmelden"/>
+        </div>
+    </form>
+
+    <tal:block condition="python: not active_sessions">
+      <p class="chat_nosession">
+        Es existiert derzeit keine aktive Chatsitzung.
+        <span tal:condition="python: next_sessions">Es werden allerdings welche stattfinden.</span>
+        <span tal:condition="python: not next_sessions">Es befindet sich auch keine Chatsitzung in Planung.</span>
+      </p>
+    </tal:block>
+
+
+    <tal:block condition="python: next_sessions">
+        <h3>Folgende Chatsitzungen werden zukünftig stattfinden:</h3>
+        <table class="future_sessions">
+            <thead>
+                <tr>
+                    <th>Titel</th>
+                    <th>Beginn</th>
+                    <th>Ende</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr tal:repeat="session next_sessions">
+                    <td tal:content="session/title"></td>
+                    <td tal:define="session_start session/start_date;"
+                        tal:content="python: session_start.strftime('%d.%m.%y')+' '+session_start.strftime('%H:%M')+' Uhr'"></td>
+                    <td tal:define="session_end session/end_date;"
+                        tal:content="python: session_end.strftime('%d.%m.%y')+' '+session_end.strftime('%H:%M')+' Uhr'"></td>
+                </tr>
+            </tbody>
+        </table>
+    </tal:block>
+</tal:block>
+<p tal:condition="python:active_sessions is None">Es wurde noch keine Datenbank konfiguriert. Diese kann in den Chat-Einstellungen eingestellt werden.</p>
+</body>
+</html>

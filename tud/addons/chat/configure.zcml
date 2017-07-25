@@ -1,0 +1,42 @@
+<configure
+        xmlns               = "http://namespaces.zope.org/zope"
+        xmlns:five          = "http://namespaces.zope.org/five"
+        xmlns:genericsetup  = "http://namespaces.zope.org/genericsetup"
+        xmlns:cmf           = "http://namespaces.zope.org/cmf">
+
+    <five:registerPackage
+            package         = "."
+            initialize      = ".initialize"/>
+
+    <include package="collective.beaker" />
+
+    <include file="permissions.zcml"/>
+    <include package=".adapter"/>
+    <include package=".content"/>
+    <include package=".browser"/>
+
+    <cmf:registerDirectory
+            name            = "skins"
+            directory       = "skins"
+            recursive       = "True"
+            />
+
+    <!-- Register the installation GenericSetup extension profile -->
+    <genericsetup:registerProfile
+            name            = "default"
+            title           = "tud.addons.chat"
+            directory       = "profiles/default"
+            description     = "TUD addon that provides a chat system"
+            provides        = "Products.GenericSetup.interfaces.EXTENSION"
+            />
+
+    <!-- Register additional import step for installation -->
+    <genericsetup:importStep
+            name            = "tud.addons.chat.various"
+            title           = "tud.addons.chat: miscellaneous import steps"
+            description     = "Various import steps"
+            handler         = "tud.addons.chat.setuphandlers.setupVarious">
+    </genericsetup:importStep>
+
+
+</configure>
