@@ -103,6 +103,7 @@ fields_to_hide = [
     'allowDiscussion',
     'excludeFromNav',
     'contributors',
+    'rights',
 ]
 
 for field in fields_to_hide:
