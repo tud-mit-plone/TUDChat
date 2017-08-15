@@ -1,7 +1,15 @@
 <configure
-  xmlns="http://namespaces.zope.org/zope"
-  xmlns:browser="http://namespaces.zope.org/browser">
+  xmlns="http://namespaces.zope.org/zope">
 
+
+  <permission
+    id="tud.addons.chat.AddChat"
+    title="tud.addons.chat: Add Chat"
+    />
+  <permission
+    id="tud.addons.chat.AddChatSession"
+    title="tud.addons.chat: Add ChatSession"
+    />
   <permission
     id="tud.addons.chat.ManageChat"
     title="tud.addons.chat: Manage Chat"

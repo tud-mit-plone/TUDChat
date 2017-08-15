@@ -87,6 +87,28 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
 ),
 )
 
+fields_to_hide = [
+    'creators',
+    'description',
+    'effectiveDate',
+    'expirationDate',
+    'subject',
+    'relatedItems',
+    'location',
+    'language',
+    'allowDiscussion',
+    'excludeFromNav',
+    'contributors',
+    'rights',
+]
+
+for field in fields_to_hide:
+    ChatSessionSchema[field].widget.visible = {
+        'edit': 'invisible',
+        'view': 'invisible'
+    }
+    ChatSessionSchema[field].searchable = False
+
 schemata.finalizeATCTSchema(ChatSessionSchema, folderish=False, moveDiscussion=False)
 
 @implementer(IChatSession)

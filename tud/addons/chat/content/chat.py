@@ -181,6 +181,28 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
 ),
 )
 
+fields_to_hide = [
+    'creators',
+    'description',
+    'effectiveDate',
+    'expirationDate',
+    'subject',
+    'relatedItems',
+    'location',
+    'language',
+    'allowDiscussion',
+    'excludeFromNav',
+    'contributors',
+    'rights',
+]
+
+for field in fields_to_hide:
+    ChatSchema[field].widget.visible = {
+        'edit': 'invisible',
+        'view': 'invisible'
+    }
+    ChatSchema[field].searchable = False
+
 schemata.finalizeATCTSchema(ChatSchema, folderish=False, moveDiscussion=False)
 
 @implementer(IChat)
@@ -206,9 +228,9 @@ class Chat(base.ATCTFolder):
     own_database_prefixes    = {}
 
     ## @brief class constructor which prepares the database connection
-    #  @param id the identifier of the chat object
-    def __init__(self, id):
-        super(Chat, self).__init__(id)
+    #  @param oid the identifier of the chat object
+    def __init__(self, oid, **kwargs):
+        super(Chat, self).__init__(oid, **kwargs)
         self.own_database_prefixes = self.own_database_prefixes
 
     ##########################################################################
@@ -250,6 +272,8 @@ class Chat(base.ATCTFolder):
             REQUEST.set('post_validated', True)
 
     security.declarePublic("show_id")
+
+
     def show_id(self,):
         """
         Determine whether to show an id in an edit form
