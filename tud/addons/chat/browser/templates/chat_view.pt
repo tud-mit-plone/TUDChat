@@ -23,10 +23,11 @@
                 if (response == true) {
                     window.location = chat_url + "?" + new Date().getTime();
                 } else {
-                    if (response.status.message != '')
-                        $('#contentSlot').prepend('<dl class="chatErrorMessage portalMessage error"><dt>Fehler</dt><dd>' + response.status.message + '</dd></dl>');
-                        var top = $('#contentSlot')[0].offsetTop;
+                    if (response.status.message != '') {
+                        $('#content').before('<dl class="chatErrorMessage portalMessage error"><dt>Fehler</dt><dd>' + response.status.message + '</dd></dl>');
+                        var top = $('.chatErrorMessage').first()[0].offsetTop;
                         window.scrollTo(0, top);
+                    }
                 }
                });
               return false;
