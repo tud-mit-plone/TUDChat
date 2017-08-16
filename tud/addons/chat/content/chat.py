@@ -223,15 +223,11 @@ class Chat(base.ATCTFolder):
 
     chat_storage = None
 
-    # Data
-    ## @brief for each connector_id the own prefixes in this database
-    own_database_prefixes    = {}
-
     ## @brief class constructor which prepares the database connection
     #  @param oid the identifier of the chat object
     def __init__(self, oid, **kwargs):
         super(Chat, self).__init__(oid, **kwargs)
-        self.own_database_prefixes = self.own_database_prefixes
+        self.own_database_prefixes = {}
 
     ##########################################################################
     # General Utility methods
@@ -260,14 +256,10 @@ class Chat(base.ATCTFolder):
                     zmysql = None
 
                 if zmysql:
-                    self.chat_storage = TUDChatSqlStorage(connector_id, database_prefix) # Update chat_storage
-                    if self.chat_storage.createTables() or database_prefix in self.own_database_prefixes.get(connector_id, []): # check if the prefix is free or is it an already used prefix
-                        if self.own_database_prefixes.get(connector_id):
-                            self.own_database_prefixes[connector_id].add(database_prefix)
-                        else:
-                            self.own_database_prefixes[connector_id] = set([database_prefix])
-                        logger.info("TUDChat: connector_id = %s" % (connector_id,))
-                    else:
+                    dbc = zmysql()
+                    tables = [table['table_name'] for table in dbc.tables() if table['table_type'] == 'table']
+                    used_prefixes = [table[:-7].encode('utf-8') for table in tables if table.endswith(u'_action')]
+                    if database_prefix in used_prefixes and not database_prefix in self.own_database_prefixes.get(connector_id, {}): # check if the prefix is free or is it an already used prefix
                         errors['database_prefix'] = "Dieser Prefix wird in dieser Datenbank bereits verwendet. Bitte wählen Sie einen anderen Prefix."
             REQUEST.set('post_validated', True)
 
