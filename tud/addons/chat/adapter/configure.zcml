@@ -20,7 +20,12 @@
     <subscriber
         for="tud.addons.chat.interfaces.IChatSession
              Products.Archetypes.interfaces.IObjectInitializedEvent"
-        handler=".chat_session.added_handler"
+        handler=".chat_session.generate_chat_id"
+        />
+    <subscriber
+        for="tud.addons.chat.interfaces.IChatSession
+             OFS.interfaces.IObjectClonedEvent"
+        handler=".chat_session.generate_chat_id"
         />
     <subscriber
         for="tud.addons.chat.interfaces.IChatSession

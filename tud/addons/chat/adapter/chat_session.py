@@ -2,6 +2,7 @@ import re
 
 from DateTime import DateTime
 
+from OFS.interfaces import IObjectClonedEvent
 from plone.indexer.decorator import indexer
 
 from tud.addons.chat.interfaces import IChat, IChatSession
@@ -14,16 +15,16 @@ def startDateIndexer(object, **kw):
 def endDateIndexer(object, **kw):
     return object.end_date
 
-def added_handler(obj, event):
+def generate_chat_id(obj, event):
     """
-    Generates chat_id for chat sessions if chat_id is 0
+    Generates chat_id for chat sessions if chat_id is 0 or if a chat session was copied
     """
     chat = obj.getParentNode()
 
     if not IChat.providedBy(chat) or not chat.chat_storage:
         return
 
-    if obj.getField('chat_id').get(obj) != 0:
+    if obj.getField('chat_id').get(obj) != 0 and not IObjectClonedEvent.providedBy(event):
         return
 
     max_id_content = max([int(session.getField('chat_id').get(session)) for session in chat.getChildNodes()])
