@@ -3,6 +3,8 @@
 # Python imports
 import logging
 
+from OFS.CopySupport import CopyError
+
 # Zope imports
 from AccessControl import ClassSecurityInfo
 from zope.interface import implementer
@@ -228,6 +230,11 @@ class Chat(base.ATCTFolder):
     def __init__(self, oid, **kwargs):
         super(Chat, self).__init__(oid, **kwargs)
         self.own_database_prefixes = {}
+
+    def manage_cutObjects(self, *args, **kwargs):
+        """Forbid moving chat sessions
+        """
+        raise CopyError()
 
     ##########################################################################
     # General Utility methods
