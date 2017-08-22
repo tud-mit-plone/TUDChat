@@ -236,6 +236,14 @@ class Chat(base.ATCTFolder):
         """
         raise CopyError()
 
+    def canSetDefaultPage(self):
+        """Forbid default page selection
+
+        :return: False
+        :rtype: bool
+        """
+        return False
+
     ##########################################################################
     # General Utility methods
     ##########################################################################
