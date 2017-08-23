@@ -34,7 +34,7 @@
             });
 
             function updateVisibilityPasswordField() {
-              if (jQuery.inArray($('[name=chatroom]').val(), password_channels) != -1) {
+              if (typeof(password_channels) != "undefined" && jQuery.inArray($('[name=chatroom]').val(), password_channels) != -1) {
                 $(".password_field").show().children("#password").val("");
               } else {
                 $(".password_field").hide().children("#password").val("");
