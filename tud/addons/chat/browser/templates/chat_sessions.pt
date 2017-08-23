@@ -44,7 +44,7 @@
 
 <metal:main fill-slot="main">
 
-<h1>Chat-Sitzungen verwalten</h1>
+<h1 class="documentFirstHeading">Chat-Sitzungen verwalten</h1>
 
 <div class="field">
   <table width="100%" id='sessions'>

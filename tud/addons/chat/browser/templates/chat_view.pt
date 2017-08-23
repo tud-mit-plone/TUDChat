@@ -68,12 +68,12 @@
     </dl>
 </div>
 
-<h2 tal:content="view/getTitle"> Title of chat </h2>
+<h1 class="documentFirstHeading" tal:content="view/getTitle"> Title of chat </h1>
 
 <p tal:content="view/getIntroduction"> Introduction </p>
 
 <tal:block condition="active_sessions">
-    <h3>Datenschutzhinweis</h3>
+    <h2>Datenschutzhinweis</h2>
     <p tal:define="whisper view/getWhisperOption;"
        class="chat_explanation">
         Wenn Sie eine Nachricht im Chat verschicken, können alle Teilnehmer den von Ihnen gewählten Benutzernamen und die Nachricht sehen. Die Nachrichten werden zusammen mit einem Zeitstempel über die Chatlaufzeit hinaus anonymisiert gespeichert. Bitte beachten Sie, dass persönliche Angaben in den Chatnachrichten nicht anonymisiert werden können. Die Moderatoren können die Chats im Nachhinein ausschließlich zur Verbesserung der FAQ-Angebote auswerten. Die Löschung der Daten erfolgt spätestens nach 3 Monaten. Die Räume sind zeitlich befristet und werden moderiert. Bei Fehlverhalten von Chatnutzern können Konsequenzen in Form einer Verwarnung, eines Rauswurfs und einer permanenter Verweisung des Chatraums folgen. Zur Realisierung der permanenten Verweisung wird in diesem Fall ein Cookie in Ihrem Browser gesetzt.
@@ -149,7 +149,7 @@
 
 
     <tal:block condition="python: next_sessions">
-        <h3>Folgende Chatsitzungen werden zukünftig stattfinden:</h3>
+        <h2>Folgende Chatsitzungen werden zukünftig stattfinden:</h2>
         <table class="future_sessions">
             <thead>
                 <tr>
