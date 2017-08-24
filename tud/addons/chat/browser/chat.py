@@ -28,7 +28,7 @@ class ChatView(BrowserView):
             'path': '/'.join(self.context.getPhysicalPath()),
             'ChatSessionStartDate': {'query': datetime.now(), 'range': 'max'},
             'ChatSessionEndDate': {'query': datetime.now(), 'range': 'min'},
-            'review_state': 'open'
+            'review_state': 'editable'
             }
         return [brain.getObject() for brain in catalog(query)]
 
@@ -41,7 +41,7 @@ class ChatView(BrowserView):
             'object_provides': IChatSession.__identifier__,
             'path': '/'.join(self.context.getPhysicalPath()),
             'ChatSessionStartDate': {'query': datetime.now(), 'range': 'min'},
-            'review_state': 'open'
+            'review_state': 'editable'
             }
         return [brain.getObject() for brain in catalog(query)]
 

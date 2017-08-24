@@ -43,24 +43,24 @@ def removed_handler(obj, event):
     chat_storage = obj.getChatStorage()
     chat_storage.deleteActions(chat_id)
 
-## @brief this function obfuscates user names of closed unlocked chat sessions and locks these chat sessions
+## @brief this function obfuscates user names of closed and not already archived chat sessions
 #  @return bool True
 def action_succeeded_handler(obj, event):
     """
-    Locks a closed unlocked chat session and obfuscates user names of message senders and in messages.
-    Only a closed unlocked chat session that is closed for more than five minutes will be processed.
+    Obfuscates user names of message senders and in messages.
+    Only a chat session that is closed for more than five minutes will be processed.
     """
-    if event.action == 'lock':
+    if event.action == 'archive':
         chat = obj.getParentNode()
         chat_storage = chat.chat_storage
         chat_id = obj.getField('chat_id').get(obj)
 
         if not chat_storage:
-            raise Exception("Can't lock without storage!")
+            raise Exception("Can't archive without storage!")
 
         now = DateTime().timeTime()
 
-        #lock only chat sessions that are closed for more than five minutes
+        #archive only chat sessions that are closed for more than five minutes
         if obj.getField('end_date').get(obj) < now - 300:
             users = [user['user'] for user in chat_storage.getUsersBySessionId(chat_id)]
             #replace long user names before short user names

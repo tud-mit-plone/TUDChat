@@ -73,7 +73,7 @@
       tal:define="session_info view/getSessionInformation;
                   chat_id session_info/chat_id;
                   log python: view.getLogs();"
-      tal:condition="python: context_state.workflow_state() == 'locked'">
+      tal:condition="python: context_state.workflow_state() == 'archived'">
     <h1>Chat-Log</h1>
     <table id="infotable">
         <tr>
