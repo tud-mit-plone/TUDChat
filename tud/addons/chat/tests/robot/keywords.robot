@@ -108,7 +108,7 @@ Set Date Field
     Select From List By Value  css=#archetypes-fieldname-${fieldname} select[name='${fieldname}_month']  ${month.zfill(2)}
     Select From List By Value  css=#archetypes-fieldname-${fieldname} select[name='${fieldname}_day']  ${day.zfill(2)}
     Select From List By Value  css=#archetypes-fieldname-${fieldname} select[name='${fieldname}_hour']  ${date.strftime('%I')}
-    Select From List By Value  css=#archetypes-fieldname-${fieldname} select[name='${fieldname}_minute']  ${minute}
+    Select From List By Value  css=#archetypes-fieldname-${fieldname} select[name='${fieldname}_minute']  ${minute.zfill(2)}
     Select From List By Value  css=#archetypes-fieldname-${fieldname} select[name='${fieldname}_ampm']  ${date.strftime('%p')}
 
 #------------------------------------------------------------------------------
