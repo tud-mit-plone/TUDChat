@@ -89,7 +89,6 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
 
 fields_to_hide = [
     'creators',
-    'description',
     'effectiveDate',
     'expirationDate',
     'subject',
