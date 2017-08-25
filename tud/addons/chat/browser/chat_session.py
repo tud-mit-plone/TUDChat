@@ -74,6 +74,12 @@ class ChatSessionBaseView(BrowserView):
                 session.clear()
         return False
 
+    def isActive(self):
+        chat_start = self.context.getField('start_date').get(self.context)
+        chat_end = self.context.getField('end_date').get(self.context)
+        now = DateTime()
+        return now > chat_start and now < chat_end
+
 class ChatSessionAjaxView(ChatSessionBaseView):
     ## @brief replacements for special html chars (char "&" is in function included)
     htmlspecialchars         = {'"':'&quot;', '\'':'&#039;', '<':'&lt;', '>':'&gt;'} # {'"':'&quot;'} this comment is needed, because there is a bug in doxygen
@@ -337,12 +343,6 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return True
         return False
 
-    def isActive(self):
-        chat_start = self.context.getField('start_date').get(self.context)
-        chat_end = self.context.getField('end_date').get(self.context)
-        now = DateTime()
-        return now > chat_start and now < chat_end
-
     ## @brief this function removes an user from a chat room
     #  @return bool true if the user was successfully removed from the room, otherwise false
     def logout(self):
@@ -452,7 +452,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return {'status': {'code': UserStatus.BANNED, 'message': ''}}
 
         if not self.isRegistered():
-            session['chat_not_authorized_message'] = 'Sie sind nicht autorisiert! Bitte loggen Sie sich ein.'
+            session['chat_not_authorized_message'] = 'Bitte melden Sie sich an, um an einer Chatsitzung teilzunehmen.'
             return {'status': {'code': UserStatus.NOT_AUTHORIZED, 'message': 'NOT AUTHORIZED'}}
 
 
@@ -706,10 +706,13 @@ class ChatSessionView(ChatSessionBaseView):
         if self.isRegistered():
             return super(ChatSessionView, self).__call__()
         else:
-            session=self.request.SESSION
-            session['chat_not_authorized_message'] = 'Sie sind nicht autorisiert! Bitte loggen Sie sich ein.'
+            if self.isActive():
+                session=self.request.SESSION
+                session['chat_not_authorized_message'] = 'Bitte melden Sie sich an, um an einer Chatsitzung teilzunehmen.'
+                target_url = "{}?room={}".format(self.context.getParentNode().absolute_url(), urllib.quote(self.context.id))
+            else:
+                target_url = self.context.getParentNode().absolute_url()
 
-            target_url = "{}?room={}".format(self.context.getParentNode().absolute_url(), urllib.quote(self.context.id))
             self.request.response.redirect(target_url)
 
             return
