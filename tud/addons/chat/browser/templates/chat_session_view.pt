@@ -30,6 +30,7 @@
 
 <body metal:fill-slot="main" i18n:domain="tudchat" tal:define="chat_info view/getChatInformation;
                                                                session_info view/getSessionInformation;
+                                                               whisper view/getWhisperOption;
                                                                max_msg_length chat_info/maxMessageLength">
     <h1 class="documentFirstHeading" tal:content="session_info/title"></h1>
     <tal:block define="description session_info/description"
@@ -44,15 +45,15 @@
         </tal:block>
     </tal:block>
     <div id="chat" tal:attributes="data-welcome_message view/getWelcomeMessage;
-                                   data-whisper view/getWhisperOption;
+                                   data-whisper whisper;
                                    data-date_frequency view/getDateFrequencyOption">
         <div id="chatContent">
         </div>
         <div id="chatMsg">
             <form id="chatMsgForm">
-                <textarea type="text" name="msg" id="chatMsgValue" autocomplete="off" rows="1" placeholder="Bitte geben Sie hier ihre Nachricht ein." tal:attributes="maxlength python: max_msg_length > 0 and max_msg_length or None; style python: max_msg_length > 0 and 'padding-right: 80px' or None"></textarea>
+                <textarea type="text" name="msg" id="chatMsgValue" autocomplete="off" rows="1" placeholder="Bitte geben Sie hier Ihre Nachricht ein." tal:attributes="maxlength python: max_msg_length > 0 and max_msg_length or None; style python: max_msg_length > 0 and 'padding-right: 80px' or None"></textarea>
                 <span id="counter" tal:condition="python: max_msg_length > 0">0</span>
-                <button id="chatMsgSubmit" type="submit" title="Zum Absenden hier klicken oder 'Enter' drücken.">Absenden</button>
+                <button id="chatMsgSubmit" type="submit" title="Zum Absenden klicken oder mit 'Enter' bestätigen.">Absenden</button>
                 <span id='chatMsgMoreButtons' tal:condition="view/isAdmin"><button class='moreButtonsExpand icon-down'></button>
                     <span class="buttonsWrapper">
                       <button data-method="warnUser" class='chatMsgMoreButton'>Warn</button>
@@ -74,13 +75,20 @@
 
         <h2>Hinweise zur Benutzung:</h2>
         <p tal:define="chat_end session_info/end_date;
-                         chat_end python: chat_end.strftime('%d.%m.%Y, %H:%M Uhr')">
-            Die Chaträume werden <span class='admin icon-view'>moderiert</span> und es können bei Fehlverhalten Konsequenzen in Form von einer Verwarnung und permanenter Verweisung des Chatraums folgen. <span class="chatDuration" tal:content="string: Dieser Chat ist bis zum ${chat_end} aktiv und wird anschließend automatisch geschlossen."></span>
+                       chat_end python: chat_end.strftime('%d.%m.%Y, %H:%M Uhr')">
+            Die Chatsitzungen werden von den <span class='admin icon-view'>gekennzeichneten Personen</span> moderiert. Chatnutzer können bei Fehlverhalten verwarnt, aus dem Chat entfernt oder permanent verwiesen werden.
+            <span class="chatDuration" tal:content="string: Diese Chatsitzung ist bis zum ${chat_end} aktiv und wird anschließend automatisch geschlossen."></span>
+            <tal:block condition="python: whisper == 'restricted'">
+                In diesem Chat können Sie private Nachrichten verschicken, die nur für Sie und den adressierten Moderatoren sichtbar sind. Klicken Sie dafür auf den entsprechenden Nutzernamen.
+            </tal:block>
+            <tal:block condition="python: whisper == 'on'">
+                In diesem Chat können Sie private Nachrichten verschicken, die nur für Sie und den Adressaten sichtbar sind. Klicken Sie dafür auf den entsprechenden Nutzernamen.
+            </tal:block>
         </p>
 
         <h2>Chat verlassen:</h2>
         <p>
-            <button id="logout">Chat verlassen</button>
+            <button id="logout">Chatsitzung verlassen</button>
         </p>
     </div>
 </body>

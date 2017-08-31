@@ -208,10 +208,10 @@ var updateCheck = function(welcome_message){
           // Notification: User has entered the room
           if (!firstGetActions){
             if (usernames.length == 1)
-              $("#chatContent").append("<div class='chat-info'><span class='username'>"+usernames+"</span> hat den Raum betreten.</div>");
+              $("#chatContent").append("<div class='chat-info'><span class='username'>"+usernames+"</span> hat die Chatsitzung betreten.</div>");
             else if (usernames.length != 0) {
               last_user = usernames.pop();
-              $("#chatContent").append("<div class='chat-info'><span class='username'>"+usernames.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum betreten.</div>");
+              $("#chatContent").append("<div class='chat-info'><span class='username'>"+usernames.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben die Chatsitzung betreten.</div>");
             }
           }
         }
@@ -224,10 +224,10 @@ var updateCheck = function(welcome_message){
           // Notification: User has left the room
           if (!firstGetActions){
             if (user.length == 1)
-              $("#chatContent").append("<div class='chat-info'><span class='username'>"+user+"</span> hat den Raum verlassen.</div>");
+              $("#chatContent").append("<div class='chat-info'><span class='username'>"+user+"</span> hat die Chatsitzung verlassen.</div>");
             else if (user.length != 0) {
               last_user = user.pop();
-              $("#chatContent").append("<div class='chat-info'><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben den Raum verlassen.</div>");
+              $("#chatContent").append("<div class='chat-info'><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben die Chatsitzung verlassen.</div>");
             }
           }
         }
@@ -422,7 +422,7 @@ $(document).ready(
        // security information for user links
         $("#chatContent").delegate(".message_content a", "click", function(e) {
             if(!$(this).hasClass("username") && !$(e.target.parentNode.parentNode).hasClass('admin_message')){
-                $.notification.warn("Dieser Link wurde von einem Chat-Nutzer geschrieben. Die TU-Dresden möchte sich an dieser Stelle ausdrücklich von dem Inhalt dieses Links distanzieren. <br/><br/> Soll der Link <tt>" + e.target.href + "</tt> wirklich geöffnet werden?", false,
+                $.notification.warn("Dieser Link wurde nicht von einem Moderator geschrieben. Die TU Dresden distanziert sich an dieser Stelle ausdrücklich vom Inhalt dieses Links.<br/><br/> Soll der Link <tt>" + e.target.href + "</tt> wirklich geöffnet werden?", false,
                                                                         [{"name" :"Ja",
                                                                             "click":function(){
                                                                               window.open(e.target.href,"_blank")

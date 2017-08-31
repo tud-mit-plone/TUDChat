@@ -18,6 +18,10 @@ class ChatView(BrowserView):
     def getWhisperOption(self):
         return self.context.getField('whisper').get(self.context)
 
+    def getShowOldMessagesOptions(self):
+        return {'count' : self.context.getField('oldMessagesCount').get(self.context),
+                'minutes' : self.context.getField('oldMessagesMinutes').get(self.context)}
+
     ## @brief this function generates a list of all chat sessions which were active
     #  @return list of chat session objects
     def getActiveChatSessions(self):
@@ -59,7 +63,7 @@ class ChatView(BrowserView):
             return message
 
         if session.has_key("chat_ban_message"):
-            message = "Sie wurden dauerhaft des Chats verwiesen!"
+            message = "Sie wurden von einem Moderator dauerhaft des Chats verwiesen!"
 
             if session["chat_ban_message"]:
                 message += "<br /><br />Grund: {}".format(session["chat_ban_message"])

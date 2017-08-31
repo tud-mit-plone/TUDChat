@@ -44,7 +44,7 @@
 
 <metal:main fill-slot="main">
 
-<h1 class="documentFirstHeading">Chat-Sitzungen verwalten</h1>
+<h1 class="documentFirstHeading">Chatsitzungen verwalten</h1>
 
 <div class="field">
   <table width="100%" id='sessions'>
@@ -52,7 +52,7 @@
       <th>Status</th>
       <th>Titel</th>
       <th>Passwort</th>
-      <th>maximale Benutzer</th>
+      <th>Benutzerlimit</th>
       <th>Startzeit</th>
       <th>Endzeit</th>
       <th>Protokoll</th>
@@ -68,13 +68,13 @@
       <td tal:define="password session/password|nothing">
         <tal:value condition="password" replace="password" />
         <tal:Altvalue condition="not:password">
-          <span class="info" tal:content="string:Keine Passwort gesetzt" />
+          <span class="info" tal:content="string:Kein Passwort" />
         </tal:Altvalue>
       </td>
       <td tal:define="max_users session/max_users|nothing">
         <tal:value condition="max_users" replace="max_users" />
         <tal:Altvalue condition="not:max_users">
-          <span class="info" tal:content="string:Keine Begrenzung" />
+          <span class="info" tal:content="string:unbegrenzt" />
         </tal:Altvalue>
       </td>
       <td>

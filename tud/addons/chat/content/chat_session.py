@@ -27,32 +27,32 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
         schemata           = 'default',
         default            = '',
         widget            = MultiLanguageWidgets.TextAreaWidget(
-            label        = u"Beschreibung",
-            description  = u"Bitte geben Sie eine Beschreibung fuer die Chat-Sitzung an."
+            label        = "Beschreibung",
+            description  = "Wird über dem Chatfenster angezeigt."
         )
     ),
     DateTimeField('start_date',
         required=True,
         searchable=False,
         widget=CalendarWidget(
-            label        = u"Beginn",
-            description  = u"Bitte geben Sie den Beginn der Chat-Sitzung an."
+            label        = "Beginn",
+            description  = "Datum und Zeit, zu der die Chatsitzung beginnt."
         )
     ),
     DateTimeField('end_date',
         required=True,
         searchable=False,
         widget=CalendarWidget(
-            label        = u"Ende",
-            description  = u"Bitte geben Sie das Ende der Chat-Sitzung an."
+            label        = "Ende",
+            description  = "Datum und Zeit, zu der die Chatsitzung endet."
         )
     ),
     MultiLanguageFields.StringField('welcome_message',
         required           = False,
         default            = '',
         widget             = MultiLanguageWidgets.StringWidget(
-            label        = u"Willkommensnachricht",
-            description  = u"Bitte machen Sie eine Eingabe, falls eine Willkommensnachricht gewuenscht ist. Diese Nachricht sieht dann jeder nach dem Betreten des Chat-Raums."
+            label        = "Willkommensnachricht",
+            description  = "Diese Nachricht wird jedem Teilnehmer nach Betreten der Chatsitzung angezeigt."
         )
     ),
     StringField('password',
@@ -60,8 +60,8 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
         default            = '',
         validators         = (ExpressionValidator('python: len(value) <= 30', 'Das Passwort darf maximal 30 Zeichen lang sein.'), ),
         widget             = StringWidget(
-            label        = u"Passwort",
-            description  = u"Bitte geben Sie ein Passwort fuer die Chat-Sitzung an, falls Sie den Zugang beschraenken wollen."
+            label        = "Passwort",
+            description  = "Geben Sie ein Passwort für die Chatsitzung an, falls Sie den Zugang beschränken wollen."
         )
     ),
     IntegerField('max_users',
@@ -69,8 +69,8 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
         default            = 0,
         validators         = RegexValidator('checkNum', '^[0-9]+$', errmsg = 'Die maximale Benutzeranzahl muss eine Zahle groesser oder gleich 0 sein.'),
         widget             = IntegerWidget(
-            label        = u"maximale Benutzer",
-            description  = u"Bitte geben Sie die maximale Benutzerzahl ein, falls Sie die Anzahl der Chat-Benutzer limitieren moechten. (0 bedeutet keine Beschraenkung)"
+            label        = "maximale Teilnehmerzahl",
+            description  = "Geben Sie die maximale Anzahl an Teilnehmern der Chatsitzung ein, falls Sie diese limitieren möchten. Bei Eingabe von 0 gibt es keine Beschränkung."
         )
     ),
     IntegerField('chat_id',
@@ -80,8 +80,8 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
         read_permission    = 'tud.addons.chat: Manage Chat',
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = StringWidget(
-            label        = u"Chat-ID",
-            description  = u"Eindeutige Datenbank-ID dieser Chat-Sitzung (bei 0 wird die ID generiert, wenn die Sitzung angelegt wird)"
+            label        = "Chat-ID",
+            description  = "Eindeutige Datenbank-ID dieser Chatsitzung. Um die ID automatisch zu generieren, geben Sie an dieser Stelle 0 ein (funktioniert nur beim Anlegen)."
         )
     ),
 ),
