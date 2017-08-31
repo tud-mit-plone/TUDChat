@@ -29,7 +29,8 @@ setup(name='tud.addons.chat',
           'raptus.multilanguagefields>=1.1b10',
           'Products.ZMySQLDA',
           'simplejson',
-          'collective.beaker'
+          'collective.beaker',
+          'python-dateutil'
           # -*- Extra requirements: -*-
       ],
       extras_require={'test': ['plone.app.robotframework']},

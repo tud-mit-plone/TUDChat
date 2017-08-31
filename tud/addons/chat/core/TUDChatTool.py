@@ -209,26 +209,4 @@ class TUDChatTool(UniqueObject, SimpleItem, PropertyManager):
 
         return db_id_list
 
-    def archiveClosedChatSessions(self):
-        """
-            This function starts in all closed and not archived chat sessions a workflow transition which obfuscates user names.
-            A cron should periodical call this function.
-            The count of archived chat sessions will be returned.
-        """
-        # disable CSRF-Protection to allow write access
-        alsoProvides(self.REQUEST, IDisableCSRFProtection)
-
-        catalog = getToolByName(self, 'portal_catalog')
-        query = {
-            'object_provides': IChatSession.__identifier__,
-            'ChatSessionEndDate': {'query': datetime.now() - timedelta(minutes = 6), 'range': 'max'},
-            'review_state': 'editable'
-            }
-        session_brains = catalog(query)
-        for session_brain in session_brains:
-            session = session_brain.getObject()
-            api.content.transition(obj=session, transition='archive')
-
-        return str(len(session_brains))
-
 InitializeClass(TUDChatTool)
