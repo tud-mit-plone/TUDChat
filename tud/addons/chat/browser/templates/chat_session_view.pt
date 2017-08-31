@@ -86,7 +86,6 @@
             </tal:block>
         </p>
 
-        <h2>Chat verlassen:</h2>
         <p>
             <button id="logout">Chatsitzung verlassen</button>
         </p>
