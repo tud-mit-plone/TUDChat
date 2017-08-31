@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
@@ -44,7 +44,8 @@ class ChatView(BrowserView):
         query = {
             'object_provides': IChatSession.__identifier__,
             'path': '/'.join(self.context.getPhysicalPath()),
-            'ChatSessionStartDate': {'query': datetime.now(), 'range': 'min'},
+            'ChatSessionStartDate': {'query': datetime.now() + timedelta(minutes = 1), # addition is needed to filter sessions that have been active for less than one minute
+                                     'range': 'min'},
             'review_state': 'editable'
             }
         return [brain.getObject() for brain in catalog(query)]
