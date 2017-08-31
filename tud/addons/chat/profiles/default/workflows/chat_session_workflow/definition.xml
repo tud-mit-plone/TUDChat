@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
 <dc-workflow xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     i18n:domain="plone" workflow_id="chat_session_workflow" title="Chat Session Workflow"
-    description="" state_variable="review_state" initial_state="open"
+    description="" state_variable="review_state" initial_state="editable"
     manager_bypass="False" i18n:attributes="title">
     <permission>View</permission>
     <permission>Modify portal content</permission>
 
-    <state state_id="open" title="Open" i18n:attributes="title">
-        <exit-transition transition_id="lock" />
+    <state state_id="editable" title="Editable" i18n:attributes="title">
+        <exit-transition transition_id="archive" />
         <permission-map name="View" acquired="False">
             <permission-role>Anonymous</permission-role>
         </permission-map>
         <permission-map name="Modify portal content" acquired="True">
         </permission-map>
     </state>
-    <state state_id="locked" title="Locked" i18n:attributes="title">
-        <exit-transition transition_id="reopen" />
+    <state state_id="archived" title="Archived" i18n:attributes="title">
+        <exit-transition transition_id="reactivate" />
         <permission-map name="View" acquired="False">
             <permission-role>Reviewer</permission-role>
             <permission-role>Manager</permission-role>
@@ -25,28 +25,28 @@
         </permission-map>
     </state>
 
-    <transition transition_id="lock"
-                title="Lock"
-                new_state="locked"
+    <transition transition_id="archive"
+                title="Archive"
+                new_state="archived"
                 trigger="USER"
                 before_script=""
                 after_script=""
                 i18n:attributes="title">
-        <action url="%(content_url)s/content_status_modify?workflow_action=lock"
-            category="workflow" icon="">Lock</action>
+        <action url="%(content_url)s/content_status_modify?workflow_action=archive"
+            category="workflow" icon="">Archive</action>
         <guard>
             <guard-permission>Manage portal</guard-permission>
         </guard>
     </transition>
-    <transition transition_id="reopen"
-                title="Reopen"
-                new_state="open"
+    <transition transition_id="reactivate"
+                title="Reactivate"
+                new_state="editable"
                 trigger="USER"
                 before_script=""
                 after_script=""
                 i18n:attributes="title">
-        <action url="%(content_url)s/content_status_modify?workflow_action=reopen"
-            category="workflow" icon="">Reopen</action>
+        <action url="%(content_url)s/content_status_modify?workflow_action=reactivate"
+            category="workflow" icon="">Reactivate</action>
         <guard>
             <guard-permission>Manage portal</guard-permission>
         </guard>

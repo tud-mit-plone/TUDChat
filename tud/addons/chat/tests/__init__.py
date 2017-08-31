@@ -1,0 +1,1 @@
+from Testing.ZopeTestCase.utils import setupCoreSessions

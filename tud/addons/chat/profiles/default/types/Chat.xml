@@ -48,7 +48,7 @@
             visible="True">
         <permission value="tud.addons.chat: Configure Chat"/>
     </action>
-    <action title="Chat-Sitzungen verwalten"
+    <action title="Chatsitzungen verwalten"
             action_id="chat_sessions"
             category="object_buttons"
             condition_expr=""

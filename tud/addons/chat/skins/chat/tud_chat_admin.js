@@ -70,7 +70,7 @@ $(document).ready(
         $("body").delegate("a.delete", "click", function(e) {
             var message = $("#chatEntry"+$(e.target).attr("data-mid")).children("span.message_content").text();
             message = ((message.length > 150) ? message.substr(0, 150) + "..." : message);
-            $.notification.warn("Wollen Sie wirklich diese Nachricht löschen? <br/><br/>" + $("#chatEntry"+$(e.target).attr("data-mid")).children("span.username").text() + " " + message, false,
+            $.notification.warn("Wollen Sie diese Nachricht wirklich löschen? <br/><br/>" + $("#chatEntry"+$(e.target).attr("data-mid")).children("span.username").text() + " " + message, false,
                                                                         [{"name" :"Ok",
                                                                             "click":function(){
                                                                               $.post(ajax_url, {'method': 'deleteMessage', 'message_id': $(e.target).attr("data-mid") }, function(data) { updateCheck(); });

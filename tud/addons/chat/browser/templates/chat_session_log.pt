@@ -73,7 +73,7 @@
       tal:define="session_info view/getSessionInformation;
                   chat_id session_info/chat_id;
                   log python: view.getLogs();"
-      tal:condition="python: context_state.workflow_state() == 'locked'">
+      tal:condition="python: context_state.workflow_state() == 'archived'">
     <h1>Chat-Log</h1>
     <table id="infotable">
         <tr>
@@ -98,7 +98,7 @@
           <td>
             <tal:value condition="session_info/password" replace="session_info/password" />
             <tal:Altvalue condition="not:session_info/password">
-              <span class="info" tal:content="string:Keine Passwort gesetzt" />
+              <span class="info" tal:content="string:Kein Passwort" />
             </tal:Altvalue>
           </td>
         </tr>
@@ -107,7 +107,7 @@
           <td>
             <tal:value condition="session_info/max_users" replace="session_info/max_users" />
             <tal:Altvalue condition="not:session_info/max_users">
-              <span class="info" tal:content="string:Keine Begrenzung" />
+              <span class="info" tal:content="string:unbegrenzt" />
             </tal:Altvalue>
           </td>
         </tr>

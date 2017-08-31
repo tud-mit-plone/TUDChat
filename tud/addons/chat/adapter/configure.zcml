@@ -1,6 +1,12 @@
 <configure
     xmlns="http://namespaces.zope.org/zope">
 
+    <subscriber
+        for="tud.addons.chat.interfaces.IChat
+             zope.lifecycleevent.IObjectModifiedEvent"
+        handler=".chat.edited_handler"
+        />
+
     <adapter
         name="ChatSessionStartDate"
         factory=".chat_session.startDateIndexer"
@@ -14,7 +20,12 @@
     <subscriber
         for="tud.addons.chat.interfaces.IChatSession
              Products.Archetypes.interfaces.IObjectInitializedEvent"
-        handler=".chat_session.added_handler"
+        handler=".chat_session.generate_chat_id"
+        />
+    <subscriber
+        for="tud.addons.chat.interfaces.IChatSession
+             OFS.interfaces.IObjectClonedEvent"
+        handler=".chat_session.generate_chat_id"
         />
     <subscriber
         for="tud.addons.chat.interfaces.IChatSession

@@ -74,6 +74,12 @@ class ChatSessionBaseView(BrowserView):
                 session.clear()
         return False
 
+    def isActive(self):
+        chat_start = self.context.getField('start_date').get(self.context)
+        chat_end = self.context.getField('end_date').get(self.context)
+        now = DateTime()
+        return now > chat_start and now < chat_end
+
 class ChatSessionAjaxView(ChatSessionBaseView):
     ## @brief replacements for special html chars (char "&" is in function included)
     htmlspecialchars         = {'"':'&quot;', '\'':'&#039;', '<':'&lt;', '>':'&gt;'} # {'"':'&quot;'} this comment is needed, because there is a bug in doxygen
@@ -337,12 +343,6 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return True
         return False
 
-    def isActive(self):
-        chat_start = self.context.getField('start_date').get(self.context)
-        chat_end = self.context.getField('end_date').get(self.context)
-        now = DateTime()
-        return now > chat_start and now < chat_end
-
     ## @brief this function removes an user from a chat room
     #  @return bool true if the user was successfully removed from the room, otherwise false
     def logout(self):
@@ -382,22 +382,22 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         chat_max_users = context.getField('max_users').get(context)
         if chat_max_users and chat_max_users <= len(self.cache['chat_users']):
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das Benutzerlimit für diese Chat-Session ist bereits erreicht.'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das Benutzerlimit für diese Chatsitzung ist bereits erreicht.'}}
 
         if len(re.findall(u"[a-zA-ZäöüÄÖÜ]",user))<3:
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername muss mindestens drei Buchstaben enthalten.'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu kurz, er muss mindestens 3 Zeichen lang sein.'}}
 
         if len(user) < 3:
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu kurz. (Er muss mindestens 3 Zeichen lang sein.)'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu kurz, er muss mindestens 3 Zeichen lang sein.'}}
 
         if len(user) > 20:
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu lang. (Er darf maximal 20 Zeichen lang sein.)'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu lang, er darf maximal 20 Zeichen lang sein.'}}
 
         if not self.isActive():
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der gewählte Chat-Raum ist zurzeit nicht aktiv.'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Die gewählte Chatsitzung ist zurzeit nicht aktiv.'}}
 
         if user.lower() in [chat_user.lower() for chat_user in self.cache['chat_users'].keys()]:
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der Benutzername ist bereits belegt.'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der Benutzername ist bereits vergeben.'}}
 
         if self.isBanned():
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Sie wurden dauerhaft des Chats verwiesen. <br/> <br/> Grund: ' + str(self.getBanReason())}}
@@ -452,7 +452,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return {'status': {'code': UserStatus.BANNED, 'message': ''}}
 
         if not self.isRegistered():
-            session['chat_not_authorized_message'] = 'Sie sind nicht autorisiert! Bitte loggen Sie sich ein.'
+            session['chat_not_authorized_message'] = 'Bitte melden Sie sich an, um an einer Chatsitzung teilzunehmen.'
             return {'status': {'code': UserStatus.NOT_AUTHORIZED, 'message': 'NOT AUTHORIZED'}}
 
 
@@ -482,11 +482,11 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             if not self.isActive():
                 self.removeUser(user)
                 session.set('user_properties', user_properties)
-                return {'status': {'code': UserStatus.KICKED, 'message': 'Die Chat-Sitzung ist abgelaufen.'}}
+                return {'status': {'code': UserStatus.KICKED, 'message': 'Die Chatsitzung ist abgelaufen.'}}
             if not user_properties.get('chatInactiveWarning') and context.getField('end_date').get(context).timeTime() - now < 300: # warn user 5 minutes before the chat will close
                 user_properties['chatInactiveWarning'] = True
                 session.set('user_properties', user_properties)
-                return {'status': {'code': UserStatus.CHAT_WARN, 'message': 'Die Chat-Sitzung läuft in weniger als 5 Minuten ab.'}}
+                return {'status': {'code': UserStatus.CHAT_WARN, 'message': 'Die Chatsitzung läuft in weniger als 5 Minuten ab.'}}
 
         # Lookup last action
         start_action = user_properties.get('start_action')
@@ -706,10 +706,13 @@ class ChatSessionView(ChatSessionBaseView):
         if self.isRegistered():
             return super(ChatSessionView, self).__call__()
         else:
-            session=self.request.SESSION
-            session['chat_not_authorized_message'] = 'Sie sind nicht autorisiert! Bitte loggen Sie sich ein.'
+            if self.isActive():
+                session=self.request.SESSION
+                session['chat_not_authorized_message'] = 'Bitte melden Sie sich an, um an einer Chatsitzung teilzunehmen.'
+                target_url = "{}?room={}".format(self.context.getParentNode().absolute_url(), urllib.quote(self.context.id))
+            else:
+                target_url = self.context.getParentNode().absolute_url()
 
-            target_url = "{}?room={}".format(self.context.getParentNode().absolute_url(), urllib.quote(self.context.id))
             self.request.response.redirect(target_url)
 
             return
