@@ -46,7 +46,9 @@ class ChatView(BrowserView):
             'path': '/'.join(self.context.getPhysicalPath()),
             'ChatSessionStartDate': {'query': datetime.now() + timedelta(minutes = 1), # addition is needed to filter sessions that have been active for less than one minute
                                      'range': 'min'},
-            'review_state': 'editable'
+            'review_state': 'editable',
+            'sort_on': 'ChatSessionStartDate',
+            'sort_order': 'ascending'
             }
         return [brain.getObject() for brain in catalog(query)]
 
