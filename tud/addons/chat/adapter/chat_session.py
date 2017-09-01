@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 import re
 
 from DateTime import DateTime
 
+from OFS.interfaces import IObjectClonedEvent
 from plone.indexer.decorator import indexer
 
 from tud.addons.chat.interfaces import IChat, IChatSession
@@ -14,16 +16,16 @@ def startDateIndexer(object, **kw):
 def endDateIndexer(object, **kw):
     return object.end_date
 
-def added_handler(obj, event):
+def generate_chat_id(obj, event):
     """
-    Generates chat_id for chat sessions if chat_id is 0
+    Generates chat_id for chat sessions if chat_id is 0 or if a chat session was copied
     """
     chat = obj.getParentNode()
 
     if not IChat.providedBy(chat) or not chat.chat_storage:
         return
 
-    if obj.getField('chat_id').get(obj) != 0:
+    if obj.getField('chat_id').get(obj) != 0 and not IObjectClonedEvent.providedBy(event):
         return
 
     max_id_content = max([int(session.getField('chat_id').get(session)) for session in chat.getChildNodes()])
@@ -42,24 +44,24 @@ def removed_handler(obj, event):
     chat_storage = obj.getChatStorage()
     chat_storage.deleteActions(chat_id)
 
-## @brief this function obfuscates user names of closed unlocked chat sessions and locks these chat sessions
+## @brief this function obfuscates user names of closed and not already archived chat sessions
 #  @return bool True
 def action_succeeded_handler(obj, event):
     """
-    Locks a closed unlocked chat session and obfuscates user names of message senders and in messages.
-    Only a closed unlocked chat session that is closed for more than five minutes will be processed.
+    Obfuscates user names of message senders and in messages.
+    Only a chat session that is closed for more than five minutes will be processed.
     """
-    if event.action == 'lock':
+    if event.action == 'archive':
         chat = obj.getParentNode()
         chat_storage = chat.chat_storage
         chat_id = obj.getField('chat_id').get(obj)
 
         if not chat_storage:
-            raise Exception("Can't lock without storage!")
+            raise Exception("Can't archive without storage!")
 
         now = DateTime().timeTime()
 
-        #lock only chat sessions that are closed for more than five minutes
+        #archive only chat sessions that are closed for more than five minutes
         if obj.getField('end_date').get(obj) < now - 300:
             users = [user['user'] for user in chat_storage.getUsersBySessionId(chat_id)]
             #replace long user names before short user names
@@ -108,18 +110,18 @@ class StartEndDateValidator(object):
         try:
             start = DateTime(start_date)
         except:
-            errors['start_date'] = 'Falsches Beginn-Datum! Bitte korrigieren Sie Ihre Eingabe.'
+            errors['start_date'] = 'Der Beginn des Chats hat kein gültiges Datumsformat.'
 
         try:
             end = DateTime(end_date)
         except:
-            errors['end_date'] = 'Falsches Ende-Datum! Bitte korrigieren Sie Ihre Eingabe.'
+            errors['end_date'] = 'Das Ende des Chats hat kein gültiges Datumsformat.'
 
         if 'start_date' in errors or 'end_date' in errors:
             # No point in validating bad input
             return errors
 
         if start > end:
-            errors['end_date'] = 'Beginn-Datum ist nach Ende-Datum! Bitte korrigieren Sie Ihre Eingabe.'
+            errors['end_date'] = 'Der Beginn des Chats muss vor dessen Ende liegen.'
 
         return errors and errors or None

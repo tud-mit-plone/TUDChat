@@ -34,7 +34,7 @@
             });
 
             function updateVisibilityPasswordField() {
-              if (jQuery.inArray($('[name=chatroom]').val(), password_channels) != -1) {
+              if (typeof(password_channels) != "undefined" && jQuery.inArray($('[name=chatroom]').val(), password_channels) != -1) {
                 $(".password_field").show().children("#password").val("");
               } else {
                 $(".password_field").hide().children("#password").val("");
@@ -68,19 +68,36 @@
     </dl>
 </div>
 
-<h2 tal:content="view/getTitle"> Title of chat </h2>
+<h1 class="documentFirstHeading" tal:content="view/getTitle"> Title of chat </h1>
 
 <p tal:content="view/getIntroduction"> Introduction </p>
 
 <tal:block condition="active_sessions">
-    <h3>Datenschutzhinweis</h3>
-    <p tal:define="whisper view/getWhisperOption;"
+    <h2>Datenschutzhinweis</h2>
+    <p tal:define="whisper view/getWhisperOption;
+                   old_messages view/getShowOldMessagesOptions;"
        class="chat_explanation">
-        Wenn Sie eine Nachricht im Chat verschicken, können alle Teilnehmer den von Ihnen gewählten Benutzernamen und die Nachricht sehen. Die Nachrichten werden zusammen mit einem Zeitstempel über die Chatlaufzeit hinaus anonymisiert gespeichert. Bitte beachten Sie, dass persönliche Angaben in den Chatnachrichten nicht anonymisiert werden können. Die Moderatoren können die Chats im Nachhinein ausschließlich zur Verbesserung der FAQ-Angebote auswerten. Die Löschung der Daten erfolgt spätestens nach 3 Monaten. Die Räume sind zeitlich befristet und werden moderiert. Bei Fehlverhalten von Chatnutzern können Konsequenzen in Form einer Verwarnung, eines Rauswurfs und einer permanenter Verweisung des Chatraums folgen. Zur Realisierung der permanenten Verweisung wird in diesem Fall ein Cookie in Ihrem Browser gesetzt.
-        <tal:block condition="python: whisper == 'off'">Private Nachrichten können im Chat nicht verschickt werden.</tal:block>
-        <tal:block condition="python: whisper == 'restricted'">Private Nachrichten können im Chat an Moderatoren verschickt werden.</tal:block>
-        <tal:block condition="python: whisper == 'on'">Private Nachrichten können im Chat verschickt werden.</tal:block>
+        Die Chatsitzungen sind zeitlich befristet und werden moderiert.
+        Wenn Sie eine Nachricht im Chat verschicken, können alle Teilnehmer den von Ihnen gewählten Benutzernamen und die Nachricht sehen.
+        <tal:block condition="python: old_messages['count'] == 1">
+            Bitte beachten Sie zudem, dass neuen Teilnehmern der Chatsitzung die letzte Nachricht<tal:block condition="python: old_messages['minutes'] > 0">,</tal:block>
+            <tal:block condition="python: old_messages['minutes'] == 1">falls sie nicht älter als 1 Minute ist,</tal:block>
+            <tal:block condition="python: old_messages['minutes'] > 1">falls sie nicht älter als <tal:block tal:content="old_messages/minutes"></tal:block> Minuten ist,</tal:block>
+            angezeigt wird.
+        </tal:block>
+        <tal:block condition="python: old_messages['count'] > 1">
+            Bitte beachten Sie zudem, dass neuen Teilnehmern der Chatsitzung bis zu
+            <tal:block content="old_messages/count"></tal:block>
+            vergangene Nachrichten<tal:block condition="python: old_messages['minutes'] > 0">,</tal:block>
+            <tal:block condition="python: old_messages['minutes'] == 1">die nicht älter als 1 Minute sind,</tal:block>
+            <tal:block condition="python: old_messages['minutes'] > 1">die nicht älter als <tal:block tal:content="old_messages/minutes"></tal:block> Minuten sind,</tal:block>
+            angezeigt werden.
+        </tal:block>
+        <tal:block condition="python: whisper == 'off'">In diesem Chat können keine private Nachrichten verschickt werden.</tal:block>
+        <tal:block condition="python: whisper == 'restricted'">In diesem Chat können Sie private Nachrichten verschicken, die nur für Sie und den adressierten Moderatoren sichtbar sind.</tal:block>
+        <tal:block condition="python: whisper == 'on'">In diesem Chat können Sie private Nachrichten verschicken, die nur für Sie und den Adressaten sichtbar sind.</tal:block>
         Sollten Sie vertrauliche Informationen übertragen wollen, nutzen Sie bitte die E-Mail-Kontaktdaten auf den Webseiten.
+        Die Nachrichten werden zusammen mit einem Zeitstempel über die Chatlaufzeit hinaus anonymisiert gespeichert. Bitte beachten Sie, dass persönliche Angaben in den Chatnachrichten nicht anonymisiert werden können. Eine Auswertung der Chatsitzungen durch die Moderatoren erfolgt ausschließlich zur Verbesserung der Angebote. Drei Monate nach Ablauf der Chatsitzung werden die Daten automatisch gelöscht.
     </p>
 </tal:block>
 
@@ -89,7 +106,7 @@
     <form id="login" class="chat_login" action="" tal:condition="active_sessions">
         <script language="javascript" tal:content="python: 'var password_channels = [' + ','.join(['\'{}\''.format(str(session.absolute_url())) for session in active_sessions if session.getField('password').get(session) != '']) + '];'"></script>
         <div>
-          <label for="chatroom">Raum</label>
+          <label for="chatroom">Chatsitzung</label>
           <tal:block condition="python: len(active_sessions) > 1">
             <select tal:define="room request/form/room|nothing"
                     name="chatroom">
@@ -124,7 +141,7 @@
         </div>
 
         <div class="password_field">
-          <label for="password">Passwort für den Chatraum</label>
+          <label for="password">Passwort für die Chatsitzung</label>
           <input type="password" name="password" id="password" autocomplete="off" />
         </div>
 
@@ -135,21 +152,20 @@
 
         <div>
           <label for="submit">&nbsp;</label>
-          <input type="submit" name="submit" value="Anmelden"/>
+          <input type="submit" name="submit" class="allowMultiSubmit" value="Anmelden"/>
         </div>
     </form>
 
     <tal:block condition="python: not active_sessions">
       <p class="chat_nosession">
         Es existiert derzeit keine aktive Chatsitzung.
-        <span tal:condition="python: next_sessions">Es werden allerdings welche stattfinden.</span>
-        <span tal:condition="python: not next_sessions">Es befindet sich auch keine Chatsitzung in Planung.</span>
+        <span tal:condition="python: not next_sessions">Aktuell sind keine weiteren Chatsitzungen geplant.</span>
       </p>
     </tal:block>
 
 
     <tal:block condition="python: next_sessions">
-        <h3>Folgende Chatsitzungen werden zukünftig stattfinden:</h3>
+        <h2>Folgende Chatsitzungen werden zukünftig stattfinden:</h2>
         <table class="future_sessions">
             <thead>
                 <tr>
@@ -170,6 +186,6 @@
         </table>
     </tal:block>
 </tal:block>
-<p tal:condition="python:active_sessions is None">Es wurde noch keine Datenbank konfiguriert. Diese kann in den Chat-Einstellungen eingestellt werden.</p>
+<p tal:condition="python:active_sessions is None">Es wurde noch keine Datenbank konfiguriert. Diese kann in den Einstellungen des Chats festgelegt werden.</p>
 </body>
 </html>

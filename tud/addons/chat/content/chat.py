@@ -3,6 +3,8 @@
 # Python imports
 import logging
 
+from OFS.CopySupport import CopyError
+
 # Zope imports
 from AccessControl import ClassSecurityInfo
 from zope.interface import implementer
@@ -21,12 +23,8 @@ from Products.Archetypes.public import DisplayList
 from Products.validation.validators import ExpressionValidator
 from Products.ZMySQLDA.DA import Connection
 
-try:
-    from raptus.multilanguagefields import fields
-    from raptus.multilanguagefields import widgets
-except ImportError:
-    from Products.Archetypes import Field as fields
-    from Products.Archetypes import Widget as widgets
+from raptus.multilanguagefields import fields as MultiLanguageFields
+from raptus.multilanguagefields import widgets as MultiLanguageWidgets
 
 from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
 
@@ -35,32 +33,32 @@ from tud.addons.chat.interfaces import IChat
 logger = logging.getLogger('tud.addons.chat')
 
 DATE_FREQUENCIES = DisplayList((
-    ('off', 'Deaktiviert'),
-    ('minute', 'Aktiviert (maximal jede Minute)'),
-    ('message', 'Aktiviert (bei jeder Nachricht)'),
+    ('off', 'deaktiviert'),
+    ('minute', 'maximal jede Minute'),
+    ('message', 'bei jeder Nachricht'),
     ))
 
 BAN_STRATEGIES = DisplayList((
-    ('COOKIE', 'Nur Cookie (empfohlen)'),
-    ('IP', 'Nur IP-Adresse'),
+    ('COOKIE', 'nur Cookie (empfohlen)'),
+    ('IP', 'nur IP-Adresse'),
     ('COOKIE_AND_IP', 'Cookie und IP-Adresse (restriktiv)'),
     ))
 
 WHISPER_OPTIONS = DisplayList((
-    ('off', 'Deaktiviert'),
-    ('restricted', 'Eingeschraenkt aktiviert'),
-    ('on', 'Aktiviert'),
+    ('off', 'deaktiviert'),
+    ('restricted', 'nur mit Moderatoren'),
+    ('on', 'aktiviert'),
     ))
 
 ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
-    fields.TextField('introduction',
+    MultiLanguageFields.TextField('introduction',
         required           = False,
         searchable         = False,
         schemata           = 'default',
         default            = '',
-        widget            = widgets.TextAreaWidget(
-            label        = u"Begrueßungstext",
-            description  = u"Bitte geben Sie den Text an, der bei der Raumauswahl angezeigt werden soll."
+        widget            = MultiLanguageWidgets.TextAreaWidget(
+            label        = "Begrüßungstext",
+            description  = "Wird den Nutzern bei der Auswahl der Chatsitzung angezeigt."
         )
     ),
     StringField("connector_id",
@@ -72,8 +70,8 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         read_permission    = 'tud.addons.chat: Manage Chat',
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = StringWidget(
-            label        = u"Datenbank",
-            description  = u"Bitte geben Sie die ID des ZMySQL-Objektes an. Das Objekt muss sich auf einem Teilpfad des Chat-Objektes befinden."
+            label        = "Datenbank",
+            description  = "Bitte geben Sie die ID des ZMySQL-Objektes an. Das Objekt muss sich in einem Teilpfad des Chatobjektes befinden."
         )
     ),
     StringField("database_prefix",
@@ -85,8 +83,8 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         read_permission    = 'tud.addons.chat: Manage Chat',
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = StringWidget(
-            label        = u"Datenbank-Praefix",
-            description  = u"Bitte geben Sie einen Praefix fuer Tabellen in der Datebank an; z.B.: 'institutionsname'"
+            label        = "Datenbank-Präfix",
+            description  = "Bitte geben Sie ein Präfix für Tabellen in der Datenbank an, z.B. institutionsname."
         )
     ),
     StringField('date_frequency',
@@ -94,8 +92,8 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         default            = 'minute',
         vocabulary         = DATE_FREQUENCIES,
         widget             = SelectionWidget(
-            label        = u"Haeufigkeit der Zeitangabe im Chat",
-            description  = u"Bitte geben Sie an, wie haeufig die Zeit bei den Nachrichten im Chat angegeben werden soll. Wenn keine Zeitangabe erfolgen soll, waehlen Sie 'Deaktiviert'. Wenn maximal jede Minute eine Zeitangabe erfolgen soll, waehlen Sie 'Aktiviert (maximal jede Minute)'. Wenn bei jeder Nachricht eine Zeitangabe erfolgen soll, waehlen Sie 'Aktiviert (bei jeder Nachricht)'.",
+            label        = "Zeitangabe im Chat",
+            description  = "Wenn zu jeder Nachricht eine Zeitangabe erfolgen soll, wählen Sie 'bei jeder Nachricht'. Bei Auswahl von 'maximal jede Minute' erfolgt die Zeitangabe maximal einmal pro Minute. Soll keine Zeitangabe vor den Nachrichten angegeben werden, wählen Sie 'deaktiviert'.",
             format       = "select",
         )
     ),
@@ -104,8 +102,8 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         default            = '#ff0000',
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = StringWidget(
-            label        = u"Textfarbe fuer Chatmoderator",
-            description  = u"Bitte geben Sie die Textfarbe als HTML-Farbcode fuer die Chatmoderatoren an."
+            label        = "Markierungsfarbe für Chatmoderatoren",
+            description  = "Benutzername und Nachrichten von Moderatoren werden mit dieser Farbe markiert. Die Eingabe muss als HTML-Farbcode erfolgen (z.B. #ff0000)."
         )
     ),
     IntegerField('timeout',
@@ -113,8 +111,8 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         default            = 15,
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = IntegerWidget(
-            label        = u"Socket-Timeout (in Sekunden)",
-            description  = u"Bitte geben Sie den Socket-Timeout fuer den Chatuser an. Nach dieser Zeit wird dieser automatisch aus dem Chat entfernt."
+            label        = "Socket-Timeout (in Sekunden)",
+            description  = "Wenn ein Teilnehmer über diese Zeitspanne hinweg nicht mit dem Server kommuniziert hat, wird er automatisch aus der Chatsitzung entfernt."
         )
     ),
     IntegerField('refreshRate',
@@ -122,24 +120,24 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         default            = 2,
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = IntegerWidget(
-            label        = u"Aktualisierungs-Rate (in Sekunden)",
-            description  = u"Bitte geben Sie Frequenz an, in welcher der Chat aktualisiert werden soll."
+            label        = "Aktualisierungsrate (in Sekunden)",
+            description  = "Gibt an, wie häufig die Anzeige des Chats aktualisiert wird."
         )
     ),
     IntegerField('maxMessageLength',
         required           = True,
         default            = 0,
         widget             = IntegerWidget(
-            label        = u"maximale Nachrichtenlaenge",
-            description  = u"Bitte geben Sie die maximale Anzahl von Zeichen an, aus der eine einzelne Chat-Nachricht bestehen darf. (0 bedeutet, dass keine Begrenzung aktiv ist)"
+            label        = "maximale Nachrichtenlänge",
+            description  = "Maximale Anzahl von Zeichen, aus der eine einzelne Chatnachricht bestehen darf. Geben Sie 0 ein, wenn Sie die Zeichenlänge nicht begrenzen wollen."
         )
     ),
     IntegerField('blockTime',
         required           = True,
         default            = 1,
         widget             = IntegerWidget(
-            label        = u"Wartezeit zwischen Nachrichten (in Sekunden)",
-            description  = u"Bitte geben Sie die Wartezeit an, bis der Benutzer wieder erneut eine Nachricht schicken kann."
+            label        = "Wartezeit zwischen Nachrichten (in Sekunden)",
+            description  = "Zeitdauer, die mindestens zwischen zwei Nachrichten eines Nutzers liegen muss."
         )
     ),
     StringField('banStrategy',
@@ -149,27 +147,27 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = SelectionWidget(
             visible      = -1,
-            label        = u"Ban-Strategie",
-            description  = u"Bitte waehlen Sie mit welchen Mitteln gebannte Benutzer markiert werden. ",
+            label        = "Ban-Strategie",
+            description  = "Methode, mit der ein Nutzer markiert wird, um permanent aus dem Chat ausgeschlossen zu werden.",
             format       = "select"
         )
     ),
     IntegerField('oldMessagesCount',
         required           = True,
         default            = 20,
-        validators         = (ExpressionValidator('python: int(value) >= 0', u'Die Anzahl muss 0 oder groesser 0 sein.'), ),
+        validators         = (ExpressionValidator('python: int(value) >= 0', 'Die Anzahl muss 0 oder größer 0 sein.'), ),
         widget             = IntegerWidget(
-            label        = u"Maximale Anzahl anzuzeigender vorangegangener Nachrichten beim Betreten eines Chat-Raums",
-            description  = u"Bitte geben Sie die maximale Anzahl der vorangegangenen Nachrichten, die dem Benutzer beim Betreten eines Chat-Raums angezeigt werden sollen, an. (0 bedeutet, dass keine vorangegangenen Nachrichten angezeigt werden)"
+            label        = "Anzahl vergangener Nachrichten beim Betreten einer Chatsitzung",
+            description  = "Gibt an, wie viele vergangene Nachrichten einem neuen Teilnehmer beim Betreten der Chatsitzung maximal angezeigt werden. Geben Sie 0 ein, wenn keine vergangenen Nachrichten angezeigt werden sollen."
         )
     ),
     IntegerField('oldMessagesMinutes',
         required           = True,
         default            = 0,
-        validators         = (ExpressionValidator('python: int(value) >= 0', u'Die Minutenanzahl muss 0 oder groesser 0 sein.'), ),
+        validators         = (ExpressionValidator('python: int(value) >= 0', 'Die Minutenanzahl muss 0 oder größer 0 sein.'), ),
         widget             = IntegerWidget(
-            label        = u"Maximales Alter der vorangegangenen Nachrichten beim Betreten eines Chat-Raums (in Minuten)",
-            description  = u"Diese Einstellung findet nur Anwendung, wenn die maximale Anzahl anzuzeigender vorangegangener Nachrichten groesser als 0 ist. Bitte geben Sie das maximale Alter der vorangegangenen Nachrichten, die dem Benutzer beim Betreten eines Chat-Raums angezeigt werden sollen, in Minuten an. (0 bedeutet, dass keine zeitliche Beschraenkung aktiv ist)"
+            label        = "Alter der vergangenen Nachrichten beim Betreten einer Chatsitzung (in Minuten)",
+            description  = "Gibt an, wie alt die vergangenen Nachrichten maximal sein dürfen, damit sie noch angezeigt werden. Geben Sie 0 ein, wenn vergangene Nachrichten unabhängig von ihrem Alter angezeigt werden sollen. Diese Einstellung findet nur Anwendung, wenn die Anzahl anzuzeigender vergangener Nachrichten größer als 0 ist."
         )
     ),
     StringField('whisper',
@@ -177,8 +175,8 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         default            = 'on',
         vocabulary         = WHISPER_OPTIONS,
         widget             = SelectionWidget(
-            label        = u"Fluestern",
-            description  = u"Wenn Fluestern aktiviert ist, kann jeder Benutzer einem anderen Benutzer direkt eine Nachricht uebermitteln. Bei einer eingeschraenkten Aktivierung koennen zwei Benutzer, die beide keine Moderatoren sind, nicht miteinander fluestern.",
+            label        = "Flüstern",
+            description  = "Beim Flüstern wird eine private Nachricht verschickt, die nur Absender und Adressat sehen können. Ist der Modus 'nur mit Moderatoren' ausgewählt, können Teilnehmer nur mit Moderatoren flüstern, aber nicht untereinander.",
             format       = "select",
         )
     ),
@@ -227,15 +225,24 @@ class Chat(base.ATCTFolder):
 
     chat_storage = None
 
-    # Data
-    ## @brief for each connector_id the own prefixes in this database
-    own_database_prefixes    = {}
-
     ## @brief class constructor which prepares the database connection
     #  @param oid the identifier of the chat object
     def __init__(self, oid, **kwargs):
         super(Chat, self).__init__(oid, **kwargs)
-        self.own_database_prefixes = self.own_database_prefixes
+        self.own_database_prefixes = {}
+
+    def manage_cutObjects(self, *args, **kwargs):
+        """Forbid moving chat sessions
+        """
+        raise CopyError()
+
+    def canSetDefaultPage(self):
+        """Forbid default page selection
+
+        :return: False
+        :rtype: bool
+        """
+        return False
 
     ##########################################################################
     # General Utility methods
@@ -260,19 +267,15 @@ class Chat(base.ATCTFolder):
                         errors['connector_id'] = "Beim angegebenen Objekt handelt es sich nicht um ein ZMySQL-Objekt."
                         zmysql = None
                 except AttributeError:
-                    errors['connector_id'] = "Es wurde auf keinem Teilpfad ein Objekt mit dieser ID gefunden."
+                    errors['connector_id'] = "Es wurde in keinem Teilpfad ein Objekt mit dieser ID gefunden."
                     zmysql = None
 
                 if zmysql:
-                    self.chat_storage = TUDChatSqlStorage(connector_id, database_prefix) # Update chat_storage
-                    if self.chat_storage.createTables() or database_prefix in self.own_database_prefixes.get(connector_id, []): # check if the prefix is free or is it an already used prefix
-                        if self.own_database_prefixes.get(connector_id):
-                            self.own_database_prefixes[connector_id].add(database_prefix)
-                        else:
-                            self.own_database_prefixes[connector_id] = set([database_prefix])
-                        logger.info("TUDChat: connector_id = %s" % (connector_id,))
-                    else:
-                        errors['database_prefix'] = "Dieser Prefix wird in dieser Datenbank bereits verwendet. Bitte wählen Sie einen anderen Prefix."
+                    dbc = zmysql()
+                    tables = [table['table_name'] for table in dbc.tables() if table['table_type'] == 'table']
+                    used_prefixes = [table[:-7].encode('utf-8') for table in tables if table.endswith(u'_action')]
+                    if database_prefix in used_prefixes and not database_prefix in self.own_database_prefixes.get(connector_id, {}): # check if the prefix is free or is it an already used prefix
+                        errors['database_prefix'] = "Das Präfix wird in dieser Datenbank bereits verwendet. Bitte wählen Sie ein anderes Präfix."
             REQUEST.set('post_validated', True)
 
     security.declarePublic("show_id")

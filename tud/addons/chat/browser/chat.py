@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
@@ -18,6 +18,10 @@ class ChatView(BrowserView):
     def getWhisperOption(self):
         return self.context.getField('whisper').get(self.context)
 
+    def getShowOldMessagesOptions(self):
+        return {'count' : self.context.getField('oldMessagesCount').get(self.context),
+                'minutes' : self.context.getField('oldMessagesMinutes').get(self.context)}
+
     ## @brief this function generates a list of all chat sessions which were active
     #  @return list of chat session objects
     def getActiveChatSessions(self):
@@ -28,7 +32,7 @@ class ChatView(BrowserView):
             'path': '/'.join(self.context.getPhysicalPath()),
             'ChatSessionStartDate': {'query': datetime.now(), 'range': 'max'},
             'ChatSessionEndDate': {'query': datetime.now(), 'range': 'min'},
-            'review_state': 'open'
+            'review_state': 'editable'
             }
         return [brain.getObject() for brain in catalog(query)]
 
@@ -40,8 +44,11 @@ class ChatView(BrowserView):
         query = {
             'object_provides': IChatSession.__identifier__,
             'path': '/'.join(self.context.getPhysicalPath()),
-            'ChatSessionStartDate': {'query': datetime.now(), 'range': 'min'},
-            'review_state': 'open'
+            'ChatSessionStartDate': {'query': datetime.now() + timedelta(minutes = 1), # addition is needed to filter sessions that have been active for less than one minute
+                                     'range': 'min'},
+            'review_state': 'editable',
+            'sort_on': 'ChatSessionStartDate',
+            'sort_order': 'ascending'
             }
         return [brain.getObject() for brain in catalog(query)]
 
@@ -59,7 +66,7 @@ class ChatView(BrowserView):
             return message
 
         if session.has_key("chat_ban_message"):
-            message = "Sie wurden dauerhaft des Chats verwiesen!"
+            message = "Sie wurden von einem Moderator dauerhaft des Chats verwiesen!"
 
             if session["chat_ban_message"]:
                 message += "<br /><br />Grund: {}".format(session["chat_ban_message"])
