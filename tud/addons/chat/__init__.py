@@ -4,7 +4,7 @@ TUDChat product
 """
 # CMF imports
 from Products.CMFCore.DirectoryView import registerDirectory
-from Products.CMFCore.utils import ContentInit, ToolInit
+from Products.CMFCore.utils import ContentInit
 
 # AT imports
 from Products.Archetypes.public import process_types, listTypes
@@ -12,9 +12,6 @@ from Products.Archetypes.public import process_types, listTypes
 # Product import
 from tud.addons.chat.config import *
 from tud.addons.chat.core import *
-
-# TUDChatTool import
-from tud.addons.chat.core.TUDChatTool import TUDChatTool
 
 import logging
 logger = logging.getLogger('tud.addons.chat')
@@ -35,9 +32,3 @@ def initialize(context):
                          ).initialize(context)
 
         logger.info('return value of ContentInit: %s' % str(ret))
-
-    tool = ToolInit('%s Tool' % PROJECTNAME,
-                    tools=(TUDChatTool,),
-                    product_name=PROJECTNAME,
-                    icon='tool_icon.gif',)
-    tool.initialize(context)
