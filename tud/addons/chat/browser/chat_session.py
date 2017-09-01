@@ -400,7 +400,10 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der Benutzername ist bereits vergeben.'}}
 
         if self.isBanned():
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Sie wurden dauerhaft des Chats verwiesen. <br/> <br/> Grund: ' + str(self.getBanReason())}}
+            message = 'Sie wurden dauerhaft des Chats verwiesen.'
+            if self.getBanReason():
+                message += '<br /><br />Grund: {}'.format(self.getBanReason())
+            return {'status': {'code': UserStatus.LOGIN_ERROR, 'message': message}}
 
         session = self.request.SESSION
         old_messages_count = chat.getField('oldMessagesCount').get(chat)
