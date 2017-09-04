@@ -110,18 +110,18 @@ class StartEndDateValidator(object):
         try:
             start = DateTime(start_date)
         except:
-            errors['start_date'] = 'Der Beginn des Chats hat kein gültiges Datumsformat.'
+            errors['start_date'] = u'Der Beginn des Chats hat kein gültiges Datumsformat.'
 
         try:
             end = DateTime(end_date)
         except:
-            errors['end_date'] = 'Das Ende des Chats hat kein gültiges Datumsformat.'
+            errors['end_date'] = u'Das Ende des Chats hat kein gültiges Datumsformat.'
 
         if 'start_date' in errors or 'end_date' in errors:
             # No point in validating bad input
             return errors
 
         if start > end:
-            errors['end_date'] = 'Der Beginn des Chats muss vor dessen Ende liegen.'
+            errors['end_date'] = u'Der Beginn des Chats muss vor dessen Ende liegen.'
 
         return errors and errors or None
