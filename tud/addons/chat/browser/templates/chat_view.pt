@@ -147,7 +147,7 @@
 
         <div class="agreement_field">
           <input type="checkbox" name="agreement" id="agreement" />
-          <label for="agreement">Ich habe den Datenschutzhinweis gelesen und verstanden und möchte unter den darin genannten Bedingungen teilnehmen.</label>
+          <label for="agreement">Ich habe die Hinweise zum Datenschutz gelesen und verstanden und willige freiwillig in die darin genannte Verarbeitung meiner personenbezogen Daten ein.</label>
         </div>
 
         <div>
