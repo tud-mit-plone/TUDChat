@@ -76,7 +76,7 @@
         <h2>Hinweise zur Benutzung:</h2>
         <p tal:define="chat_end session_info/end_date;
                        chat_end python: chat_end.strftime('%d.%m.%Y, %H:%M Uhr')">
-            Die Chatsitzungen werden von den <span class='admin icon-view'>gekennzeichneten Personen</span> moderiert. Chatnutzer können bei Fehlverhalten verwarnt, aus dem Chat entfernt oder permanent verwiesen werden.
+            Die Chatsitzungen werden von den mit <span class='admin icon-view'>gekennzeichneten Personen</span> moderiert. Chatnutzer können bei Fehlverhalten verwarnt, aus dem Chat entfernt oder permanent verwiesen werden.
             <span class="chatDuration" tal:content="string: Diese Chatsitzung ist bis zum ${chat_end} aktiv und wird anschließend automatisch geschlossen."></span>
             <tal:block condition="python: whisper == 'restricted'">
                 In diesem Chat können Sie private Nachrichten verschicken, die nur für Sie und den adressierten Moderatoren sichtbar sind. Klicken Sie dafür auf den entsprechenden Nutzernamen.
