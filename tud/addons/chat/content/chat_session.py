@@ -11,12 +11,12 @@ from Products.ATContentTypes.content import base, schemata
 from Products.Archetypes.atapi import Schema
 from Products.Archetypes.atapi import StringField, IntegerField, DateTimeField
 from Products.Archetypes.public import StringWidget, IntegerWidget, CalendarWidget
-from Products.validation.validators import ExpressionValidator, RegexValidator
 
 from raptus.multilanguagefields import fields as MultiLanguageFields
 from raptus.multilanguagefields import widgets as MultiLanguageWidgets
 
 from tud.addons.chat.interfaces import IChatSession
+from tud.addons.chat.validators import LengthValidator, MinMaxValidator
 
 logger = logging.getLogger('tud.addons.chat')
 
@@ -58,7 +58,7 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
     StringField('password',
         required           = False,
         default            = '',
-        validators         = (ExpressionValidator('python: len(value) <= 30', 'Das Passwort darf maximal 30 Zeichen lang sein.'), ),
+        validators         = (LengthValidator('max_30_check', maximum = 30), ),
         widget             = StringWidget(
             label        = "Passwort",
             description  = "Geben Sie ein Passwort für die Chatsitzung an, falls Sie den Zugang beschränken wollen."
@@ -67,7 +67,7 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
     IntegerField('max_users',
         required           = False,
         default            = 0,
-        validators         = RegexValidator('checkNum', '^[0-9]+$', errmsg = 'Die maximale Benutzeranzahl muss eine Zahle groesser oder gleich 0 sein.'),
+        validators         = MinMaxValidator('min_0_check', minimum = 0),
         widget             = IntegerWidget(
             label        = "maximale Teilnehmerzahl",
             description  = "Geben Sie die maximale Anzahl an Teilnehmern der Chatsitzung ein, falls Sie diese limitieren möchten. Bei Eingabe von 0 gibt es keine Beschränkung."
@@ -76,7 +76,7 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
     IntegerField('chat_id',
         required           = True,
         default            = 0,
-        validators         = RegexValidator('checkNum', '^[0-9]+$', errmsg = 'Die Chat-ID muss eine Zahl groesser oder gleich 0 sein.'),
+        validators         = MinMaxValidator('min_0_check', minimum = 0),
         read_permission    = 'tud.addons.chat: Manage Chat',
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = StringWidget(

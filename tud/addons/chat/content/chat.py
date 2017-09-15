@@ -20,7 +20,6 @@ from Products.Archetypes.atapi import Schema
 from Products.Archetypes.atapi import StringField, IntegerField
 from Products.Archetypes.public import StringWidget, SelectionWidget, IntegerWidget
 from Products.Archetypes.public import DisplayList
-from Products.validation.validators import ExpressionValidator
 from Products.ZMySQLDA.DA import Connection
 
 from raptus.multilanguagefields import fields as MultiLanguageFields
@@ -29,6 +28,7 @@ from raptus.multilanguagefields import widgets as MultiLanguageWidgets
 from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
 
 from tud.addons.chat.interfaces import IChat
+from tud.addons.chat.validators import MinMaxValidator, HexColorCodeValidator
 
 logger = logging.getLogger('tud.addons.chat')
 
@@ -100,6 +100,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
     StringField('adminColor',
         required           = True,
         default            = '#ff0000',
+        validators         = (HexColorCodeValidator(), ),
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = StringWidget(
             label        = "Markierungsfarbe für Chatmoderatoren",
@@ -109,6 +110,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
     IntegerField('timeout',
         required           = True,
         default            = 15,
+        validators         = (MinMaxValidator('min_5_check', minimum = 5), ),
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = IntegerWidget(
             label        = "Socket-Timeout (in Sekunden)",
@@ -118,6 +120,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
     IntegerField('refreshRate',
         required           = True,
         default            = 2,
+        validators         = (MinMaxValidator('min_1_check', minimum = 1), ),
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = IntegerWidget(
             label        = "Aktualisierungsrate (in Sekunden)",
@@ -127,6 +130,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
     IntegerField('maxMessageLength',
         required           = True,
         default            = 0,
+        validators         = (MinMaxValidator('min_0_check', minimum = 0), ),
         widget             = IntegerWidget(
             label        = "maximale Nachrichtenlänge",
             description  = "Maximale Anzahl von Zeichen, aus der eine einzelne Chatnachricht bestehen darf. Geben Sie 0 ein, wenn Sie die Zeichenlänge nicht begrenzen wollen."
@@ -135,6 +139,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
     IntegerField('blockTime',
         required           = True,
         default            = 1,
+        validators         = (MinMaxValidator('min_0_check', minimum = 0), ),
         widget             = IntegerWidget(
             label        = "Wartezeit zwischen Nachrichten (in Sekunden)",
             description  = "Zeitdauer, die mindestens zwischen zwei Nachrichten eines Nutzers liegen muss."
@@ -155,7 +160,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
     IntegerField('oldMessagesCount',
         required           = True,
         default            = 20,
-        validators         = (ExpressionValidator('python: int(value) >= 0', 'Die Anzahl muss 0 oder größer 0 sein.'), ),
+        validators         = (MinMaxValidator('min_0_check', minimum = 0), ),
         widget             = IntegerWidget(
             label        = "Anzahl vergangener Nachrichten beim Betreten einer Chatsitzung",
             description  = "Gibt an, wie viele vergangene Nachrichten einem neuen Teilnehmer beim Betreten der Chatsitzung maximal angezeigt werden. Geben Sie 0 ein, wenn keine vergangenen Nachrichten angezeigt werden sollen."
@@ -164,7 +169,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
     IntegerField('oldMessagesMinutes',
         required           = True,
         default            = 0,
-        validators         = (ExpressionValidator('python: int(value) >= 0', 'Die Minutenanzahl muss 0 oder größer 0 sein.'), ),
+        validators         = (MinMaxValidator('min_0_check', minimum = 0), ),
         widget             = IntegerWidget(
             label        = "Alter der vergangenen Nachrichten beim Betreten einer Chatsitzung (in Minuten)",
             description  = "Gibt an, wie alt die vergangenen Nachrichten maximal sein dürfen, damit sie noch angezeigt werden. Geben Sie 0 ein, wenn vergangene Nachrichten unabhängig von ihrem Alter angezeigt werden sollen. Diese Einstellung findet nur Anwendung, wenn die Anzahl anzuzeigender vergangener Nachrichten größer als 0 ist."
