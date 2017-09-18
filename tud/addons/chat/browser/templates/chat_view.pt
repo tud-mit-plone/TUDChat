@@ -71,7 +71,13 @@
 
 <h1 class="documentFirstHeading" tal:content="view/getTitle"> Title of chat </h1>
 
-<p tal:content="view/getIntroduction"> Introduction </p>
+<p tal:define="introduction view/getIntroduction"
+   tal:condition="introduction">
+    <tal:block repeat="line introduction/splitlines">
+        <tal:block replace="line"></tal:block>
+        <br tal:condition="not: repeat/line/end">
+    </tal:block>
+</p>
 
 <tal:block condition="active_sessions">
     <h2 i18n:translate="data_protection_information">Data protection information</h2>
