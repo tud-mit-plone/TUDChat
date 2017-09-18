@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<object name="ChatSession"
+<object xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+        name="ChatSession"
         meta_type="Factory-based Type Information with dynamic views"
-        i18n:domain="plone"
-        xmlns:i18n="http://xml.zope.org/namespaces/i18n">
-    <property name="title">ChatSession</property>
+        i18n:domain="tud.addons.chat">
+    <property name="title" i18n:translate="">ChatSession</property>
     <property name="description"></property>
     <property name="content_icon"></property>
     <property name="content_meta_type">ChatSession</property>

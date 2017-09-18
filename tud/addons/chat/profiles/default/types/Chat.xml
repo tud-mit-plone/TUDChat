@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<object name="Chat"
+<object xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+        name="Chat"
         meta_type="Factory-based Type Information with dynamic views"
-        i18n:domain="plone"
-        xmlns:i18n="http://xml.zope.org/namespaces/i18n">
-    <property name="title">Chat</property>
+        i18n:domain="tud.addons.chat">
+    <property name="title" i18n:translate="">Chat</property>
     <property name="description"></property>
     <property name="content_icon"></property>
     <property name="content_meta_type">Chat</property>
@@ -48,7 +48,7 @@
             visible="True">
         <permission value="tud.addons.chat: Configure Chat"/>
     </action>
-    <action title="Chatsitzungen verwalten"
+    <action title="Manage chat sessions"
             action_id="chat_sessions"
             category="object_buttons"
             condition_expr=""

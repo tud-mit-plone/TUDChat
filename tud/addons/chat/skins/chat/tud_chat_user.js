@@ -14,7 +14,7 @@ function printMessage(message) {
     var whisperIcon = "";
     if(changes.whisper_target) {
         entry_classes += " whisper";
-        whisperSpan = "<span class='additional_content'>" + getUnameLink(changes.whisper_target, { preText: "Private Nachricht an " }) + "</span>";
+        whisperSpan = "<span class='additional_content'>" + getUnameLink(changes.whisper_target, { preText: _('private_message_to') + " " }) + "</span>";
         whisperIcon = "<span class='whisper-icon'></span>";
     }
 

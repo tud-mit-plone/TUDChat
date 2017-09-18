@@ -6,6 +6,8 @@ from zope.interface import implementer
 
 from Products.validation.interfaces.IValidator import IValidator
 
+from tud.addons.chat import chatMessageFactory as _
+
 @implementer(IValidator)
 class MinMaxValidator(object):
     """Checks that a number is within the defined value range.
@@ -19,16 +21,17 @@ class MinMaxValidator(object):
         self.maximum = maximum
 
     def __call__(self, value, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+
         try:
             value = int(value)
         except:
-            return "Es muss eine Zahl eingegeben werden."
-
+            return instance.translate(_(u'validation_no_number', default = u'A number must be entered.'))
 
         if self.minimum is not None and value < self.minimum:
-            return "Die Anzahl muss {0} oder größer {0} sein.".format(self.minimum)
+            return instance.translate(_(u'validation_number_too_small', default = u'The number must be ${number} or greater than ${number}.', mapping={u'number': self.minimum}))
         if self.maximum is not None and value > self.maximum:
-            return "Die Anzahl muss {0} oder kleiner {0} sein.".format(self.maximum)
+            return instance.translate(_(u'validation_number_too_large', default = u'The number must be ${number} or less than ${number}.', mapping={u'number': self.maximum}))
 
         return True
 
@@ -37,12 +40,14 @@ class LengthValidator(MinMaxValidator):
     """
 
     def __call__(self, value, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+
         value = unicode(value, "utf8")
 
         if self.minimum is not None and len(value) < self.minimum:
-            return "Eine Länge von {0} Zeichen darf nicht unterschritten werden.".format(self.minimum)
+            return instance.translate(_(u'validation_string_too_short', default = u'A length of ${number} characters must not be undercut.', mapping={u'number': self.minimum}))
         if self.maximum is not None and len(value) > self.maximum:
-            return "Eine Länge von {0} Zeichen darf nicht überschritten werden.".format(self.maximum)
+            return instance.translate(_(u'validation_string_too_long', default = u'A length of ${number} characters must not be exceeded.', mapping={u'number': self.maximum}))
 
         return True
 
@@ -58,9 +63,10 @@ class HexColorCodeValidator(object):
         self.regexp = re.compile(r'^#[0-9a-f]{6}$', re.IGNORECASE)
 
     def __call__(self, value, *args, **kwargs):
+        instance = kwargs.get('instance', None)
         value = unicode(value, "utf8")
 
         if not self.regexp.match(value):
-            return "Es muss ein gültiger HTML-Farbcode im Hexadezimal-Format angegeben werden."
+            return instance.translate(_(u'validation_invalid_hex_color_code', default = u'A valid HTML color code in hexadecimal format must be specified.'))
 
         return True

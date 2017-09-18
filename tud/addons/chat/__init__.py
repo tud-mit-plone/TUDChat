@@ -2,6 +2,9 @@
 """
 TUDChat product
 """
+
+from zope.i18nmessageid import MessageFactory
+
 # CMF imports
 from Products.CMFCore.DirectoryView import registerDirectory
 from Products.CMFCore.utils import ContentInit
@@ -15,6 +18,8 @@ from tud.addons.chat.core import *
 
 import logging
 logger = logging.getLogger('tud.addons.chat')
+
+chatMessageFactory = MessageFactory('tud.addons.chat')
 
 # Initialization method
 def initialize(context):

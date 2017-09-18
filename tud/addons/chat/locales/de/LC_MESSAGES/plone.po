@@ -1,0 +1,41 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2017-09-18 19:51+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Language-Code: de\n"
+"Language-Name: German\n"
+"Preferred-Encodings: utf-8 latin1\n"
+"Domain: tud.addons.chat\n"
+"Language: de\n"
+"Last-Translator: David Voigt <david.voigt@tu-dresden.de>\n"
+"Language-Team: \n"
+"X-Generator: Poedit 2.0.3\n"
+
+#: profiles/default/workflows/chat_session_workflow/definition.xml
+msgid "Archive"
+msgstr "Archivieren"
+
+#: profiles/default/workflows/chat_session_workflow/definition.xml
+msgid "Archived"
+msgstr "Archiviert"
+
+#: profiles/default/workflows/chat_session_workflow/definition.xml
+msgid "Chat Session Workflow"
+msgstr "Chatsitzungs-Workflow"
+
+#: profiles/default/workflows/chat_session_workflow/definition.xml
+msgid "Editable"
+msgstr "Bearbeitbar"
+
+#: profiles/default/workflows/types/Chat.xml
+msgid "Manage chat sessions"
+msgstr "Chatsitzungen verwalten"
+
+#: profiles/default/workflows/chat_session_workflow/definition.xml
+msgid "Reactivate"
+msgstr "Reaktivieren"

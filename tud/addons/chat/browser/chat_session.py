@@ -13,6 +13,8 @@ from plone.uuid.interfaces import IUUID
 
 from collective.beaker.interfaces import ICacheManager
 
+from tud.addons.chat import chatMessageFactory as _
+
 class UserStatus:
     OK, NOT_AUTHORIZED, KICKED, BANNED, LOGIN_ERROR, WARNED, CHAT_WARN = range(7)
 
@@ -374,35 +376,35 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         user = user.strip()
 
         if agreement == "false":
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ohne Zustimmung zum Datenschutzhinweis kann der Chat nicht betreten werden.'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_privacy', default = u'You will not be able to enter the chat without agreeing to the privacy notice.'))}}
 
         chat_password = context.getField('password').get(context)
         if chat_password and chat_password != password:
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das eingegebene Passwort ist nicht korrekt.'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_password', default = u'The entered password is not correct.'))}}
 
         chat_max_users = context.getField('max_users').get(context)
         if chat_max_users and chat_max_users <= len(self.cache['chat_users']):
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Das Benutzerlimit für diese Chatsitzung ist bereits erreicht.'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_max_users', default = u'The user limit for this chat session has been reached.'))}}
 
         if len(re.findall(u"[a-zA-ZäöüÄÖÜ]",user))<3:
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu kurz, er muss mindestens 3 Zeichen lang sein.'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_short_name', default = u'Your username is too short; it must be at least 3 characters long.'))}}
 
         if len(user) < 3:
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu kurz, er muss mindestens 3 Zeichen lang sein.'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_short_name', default = u'Your username is too short; it must be at least 3 characters long.'))}}
 
         if len(user) > 20:
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Ihr Benutzername ist zu lang, er darf maximal 20 Zeichen lang sein.'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_long_name', default = u'Your username is too long, it may not be longer than 20 characters.'))}}
 
         if not self.isActive():
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Die gewählte Chatsitzung ist zurzeit nicht aktiv.'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_session_inactive', default = u'The chosen chat session is currently inactive.'))}}
 
         if user.lower() in [chat_user.lower() for chat_user in self.cache['chat_users'].keys()]:
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':'Der Benutzername ist bereits vergeben.'}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_name_in_use', default = u'The username is already in use.'))}}
 
         if self.isBanned():
-            message = 'Sie wurden dauerhaft des Chats verwiesen.'
+            message = self.context.translate(_(u'login_err_banned', default = u'You were banned permanently.'))
             if self.getBanReason():
-                message += '<br /><br />Grund: {}'.format(self.getBanReason())
+                message += '<br /><br />' + self.context.translate(_(u'login_err_banned_reason', default = u'Reason: ${reason}', mapping={u'reason': self.getBanReason()}))
             return {'status': {'code': UserStatus.LOGIN_ERROR, 'message': message}}
 
         session = self.request.SESSION
@@ -455,7 +457,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return {'status': {'code': UserStatus.BANNED, 'message': ''}}
 
         if not self.isRegistered():
-            session['chat_not_authorized_message'] = 'Bitte melden Sie sich an, um an einer Chatsitzung teilzunehmen.'
+            session['chat_not_authorized_message'] = _(u'session_not_authorized', default = u'Please log in to participate in a chat session.')
             return {'status': {'code': UserStatus.NOT_AUTHORIZED, 'message': 'NOT AUTHORIZED'}}
 
 
@@ -485,11 +487,11 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             if not self.isActive():
                 self.removeUser(user)
                 session.set('user_properties', user_properties)
-                return {'status': {'code': UserStatus.KICKED, 'message': 'Die Chatsitzung ist abgelaufen.'}}
+                return {'status': {'code': UserStatus.KICKED, 'message': _(u'session_expired', default = u'The chat session has expired.')}}
             if not user_properties.get('chatInactiveWarning') and context.getField('end_date').get(context).timeTime() - now < 300: # warn user 5 minutes before the chat will close
                 user_properties['chatInactiveWarning'] = True
                 session.set('user_properties', user_properties)
-                return {'status': {'code': UserStatus.CHAT_WARN, 'message': 'Die Chatsitzung läuft in weniger als 5 Minuten ab.'}}
+                return {'status': {'code': UserStatus.CHAT_WARN, 'message': _(u'session_expires_5_min', default = u'The chat session expires in less than 5 minutes.')}}
 
         # Lookup last action
         start_action = user_properties.get('start_action')
@@ -711,7 +713,7 @@ class ChatSessionView(ChatSessionBaseView):
         else:
             if self.isActive():
                 session=self.request.SESSION
-                session['chat_not_authorized_message'] = 'Bitte melden Sie sich an, um an einer Chatsitzung teilzunehmen.'
+                session['chat_not_authorized_message'] = _(u'session_not_authorized', default = u'Please log in to participate in a chat session.')
                 target_url = "{}?room={}".format(self.context.getParentNode().absolute_url(), urllib.quote(self.context.id))
             else:
                 target_url = self.context.getParentNode().absolute_url()

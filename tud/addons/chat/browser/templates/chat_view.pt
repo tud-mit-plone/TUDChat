@@ -1,5 +1,5 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
-  metal:use-macro="context/main_template/macros/master" i18n:domain="plone">
+  metal:use-macro="context/main_template/macros/master" i18n:domain="tud.addons.chat">
 <head>
 
 <metal:block metal:fill-slot="javascript_head_slot">
@@ -24,7 +24,7 @@
                     window.location = chat_url + "?" + new Date().getTime();
                 } else {
                     if (response.status.message != '') {
-                        $('#content').before('<dl class="chatErrorMessage portalMessage error"><dt>Fehler</dt><dd>' + response.status.message + '</dd></dl>');
+                        $('#content').before('<dl class="chatErrorMessage portalMessage error"><dt i18n:domain="plone" i18n:translate="Error">Error</dt><dd>' + response.status.message + '</dd></dl>');
                         var top = $('.chatErrorMessage').first()[0].offsetTop;
                         window.scrollTo(0, top);
                     }
@@ -56,14 +56,15 @@
 
 </head>
 
-<body metal:fill-slot="main" i18n:domain="tudchat"
-      tal:define="active_sessions view/getActiveChatSessions;
+<body metal:fill-slot="main"
+      tal:define="toLocalizedTime nocall:context/@@plone/toLocalizedTime;
+                  active_sessions view/getActiveChatSessions;
                   next_sessions view/getNextChatSessions">
 
 <div tal:define="message view/getPortalMessage"
      tal:condition="message">
     <dl id="portal-message" class="portalMessage warning">
-        <dt i18n:domain="plone" i18n:translate="Info"></dt>
+        <dt i18n:domain="plone" i18n:translate="Info">Info</dt>
         <dd tal:content="structure message"></dd>
     </dl>
 </div>
@@ -73,31 +74,49 @@
 <p tal:content="view/getIntroduction"> Introduction </p>
 
 <tal:block condition="active_sessions">
-    <h2>Datenschutzhinweis</h2>
+    <h2 i18n:translate="data_protection_information">Data protection information</h2>
     <p tal:define="whisper view/getWhisperOption;
                    old_messages view/getShowOldMessagesOptions;"
-       class="chat_explanation">
-        Die Chatsitzungen sind zeitlich befristet und werden moderiert.
-        Wenn Sie eine Nachricht im Chat verschicken, können alle Teilnehmer den von Ihnen gewählten Benutzernamen und die Nachricht sehen.
-        <tal:block condition="python: old_messages['count'] == 1">
-            Bitte beachten Sie zudem, dass neuen Teilnehmern der Chatsitzung die letzte Nachricht<tal:block condition="python: old_messages['minutes'] > 0">,</tal:block>
-            <tal:block condition="python: old_messages['minutes'] == 1">falls sie nicht älter als 1 Minute ist,</tal:block>
-            <tal:block condition="python: old_messages['minutes'] > 1">falls sie nicht älter als <tal:block tal:content="old_messages/minutes"></tal:block> Minuten ist,</tal:block>
-            angezeigt wird.
+       class="chat_explanation" i18n:translate="data_protection_information_text">
+        The chat sessions are limited in time and are moderated.
+        When you send a message in the chat, all participants can see your chosen username and your message.
+        <tal:block i18n:name="old_messages_information">
+            <tal:block condition="python: old_messages['count'] == 1">
+                <tal:block condition="python: old_messages['minutes'] == 0"
+                           i18n:translate="data_protection_old_messages_one">
+                    Please also note that new members of the chat session will see the last message.
+                </tal:block>
+                <tal:block condition="python: old_messages['minutes'] == 1"
+                           i18n:translate="data_protection_old_messages_one_minutes_one">
+                    Please also note that new members of the chat session will see the last message if it is not older than 1 minute.
+                </tal:block>
+                <tal:block condition="python: old_messages['minutes'] > 1"
+                           i18n:translate="data_protection_old_messages_one_minutes_many">
+                    Please also note that new members of the chat session will see the last message if it is not older than <tal:block tal:content="old_messages/minutes" i18n:name="minutes"></tal:block> minutes.
+                </tal:block>
+            </tal:block>
+            <tal:block condition="python: old_messages['count'] > 1">
+                <tal:block condition="python: old_messages['minutes'] == 0"
+                           i18n:translate="data_protection_old_messages_many">
+                    Please also note that new members of the chat session will see the last <tal:block content="old_messages/count" i18n:name="messages"></tal:block> messages.
+                </tal:block>
+                <tal:block condition="python: old_messages['minutes'] == 1"
+                           i18n:translate="data_protection_old_messages_many_minutes_one">
+                    Please also note that new members of the chat session will see the last <tal:block content="old_messages/count" i18n:name="messages"></tal:block> messages if they are not older than 1 minute.
+                </tal:block>
+                <tal:block condition="python: old_messages['minutes'] > 1"
+                           i18n:translate="data_protection_old_messages_many_minutes_many">
+                    Please also note that new members of the chat session will see the last <tal:block content="old_messages/count" i18n:name="messages"></tal:block> messages if they are not older than <tal:block tal:content="old_messages/minutes" i18n:name="minutes"></tal:block> minutes.
+                </tal:block>
+            </tal:block>
         </tal:block>
-        <tal:block condition="python: old_messages['count'] > 1">
-            Bitte beachten Sie zudem, dass neuen Teilnehmern der Chatsitzung bis zu
-            <tal:block content="old_messages/count"></tal:block>
-            vergangene Nachrichten<tal:block condition="python: old_messages['minutes'] > 0">,</tal:block>
-            <tal:block condition="python: old_messages['minutes'] == 1">die nicht älter als 1 Minute sind,</tal:block>
-            <tal:block condition="python: old_messages['minutes'] > 1">die nicht älter als <tal:block tal:content="old_messages/minutes"></tal:block> Minuten sind,</tal:block>
-            angezeigt werden.
+        <tal:block i18n:name="whisper_information">
+            <tal:block condition="python: whisper == 'off'" i18n:translate="data_protection_whisper_off">In this chat no private messages can be sent.</tal:block>
+            <tal:block condition="python: whisper == 'restricted'" i18n:translate="data_protection_whisper_restricted">In this chat you can send private messages that are visible only to you and the moderator addressed.</tal:block>
+            <tal:block condition="python: whisper == 'on'" i18n:translate="data_protection_whisper_on">In this chat you can send private messages that are only visible to you and the recipient.</tal:block>
         </tal:block>
-        <tal:block condition="python: whisper == 'off'">In diesem Chat können keine private Nachrichten verschickt werden.</tal:block>
-        <tal:block condition="python: whisper == 'restricted'">In diesem Chat können Sie private Nachrichten verschicken, die nur für Sie und den adressierten Moderatoren sichtbar sind.</tal:block>
-        <tal:block condition="python: whisper == 'on'">In diesem Chat können Sie private Nachrichten verschicken, die nur für Sie und den Adressaten sichtbar sind.</tal:block>
-        Sollten Sie vertrauliche Informationen übertragen wollen, nutzen Sie bitte die E-Mail-Kontaktdaten auf den Webseiten.
-        Die Nachrichten werden zusammen mit einem Zeitstempel über die Chatlaufzeit hinaus anonymisiert gespeichert. Bitte beachten Sie, dass persönliche Angaben in den Chatnachrichten nicht anonymisiert werden können. Eine Auswertung der Chatsitzungen durch die Moderatoren erfolgt ausschließlich zur Verbesserung der Angebote. Drei Monate nach Ablauf der Chatsitzung werden die Daten automatisch gelöscht.
+        If you wish to transmit confidential information, please use the e-mail contact data on the websites.
+        The messages are stored anonymously together with a time stamp beyond the chat time. Please note that personal information in the chat messages cannot be anonymized. An evaluation of the chat sessions by the moderators is made exclusively for the improvement of the offers. Three months after the chat session expires, the data is automatically deleted.
     </p>
 </tal:block>
 
@@ -106,7 +125,7 @@
     <form id="login" class="chat_login" action="" tal:condition="active_sessions">
         <script language="javascript" tal:content="python: 'var password_channels = [' + ','.join(['\'{}\''.format(str(session.absolute_url())) for session in active_sessions if session.getField('password').get(session) != '']) + '];'"></script>
         <div>
-          <label for="chatroom">Chatsitzung</label>
+          <label for="chatroom" i18n:translate="chat_session">Chat session</label>
           <tal:block condition="python: len(active_sessions) > 1">
             <select tal:define="room request/form/room|nothing"
                     name="chatroom">
@@ -135,57 +154,57 @@
         </div>
 
         <div>
-          <label for="username">gewünschter Benutzername</label>
-          <span class="formHelp" id="username_help">Um anonym zu bleiben, nutzen Sie bitte einen Nickname als Benutzernamen.</span>
+          <label for="username" i18n:translate="login_username">desired username</label>
+          <span class="formHelp" id="username_help" i18n:translate="login_username_help">To stay anonymous, please use a nickname as your username.</span>
           <input type="text" name="username" id="username" maxlength="20" />
         </div>
 
         <div class="password_field">
-          <label for="password">Passwort für die Chatsitzung</label>
+          <label for="password" i18n:translate="login_password">Password for the chat session</label>
           <input type="password" name="password" id="password" autocomplete="off" />
         </div>
 
         <div class="agreement_field">
           <input type="checkbox" name="agreement" id="agreement" />
-          <label for="agreement">Ich habe die Hinweise zum Datenschutz gelesen und verstanden und willige freiwillig in die darin genannte Verarbeitung meiner personenbezogen Daten ein.</label>
+          <label for="agreement" i18n:translate="login_agreement">I have read and understood the notes on data protection and I agree voluntarily to the processing of my personal data.</label>
         </div>
 
         <div>
           <label for="submit">&nbsp;</label>
-          <input type="submit" name="submit" class="allowMultiSubmit" value="Anmelden"/>
+          <input type="submit" name="submit" class="allowMultiSubmit" value="Login" i18n:attributes="value login_button"/>
         </div>
     </form>
 
     <tal:block condition="python: not active_sessions">
       <p class="chat_nosession">
-        Es existiert derzeit keine aktive Chatsitzung.
-        <span tal:condition="python: not next_sessions">Aktuell sind keine weiteren Chatsitzungen geplant.</span>
+        <tal:block i18n:translate="chat_no_active_session">There is currently no active chat session.</tal:block>
+        <span tal:condition="python: not next_sessions" i18n:translate="chat_no_future_sessions">No further chat sessions are currently planned.</span>
       </p>
     </tal:block>
 
 
     <tal:block condition="python: next_sessions">
-        <h2>Folgende Chatsitzungen werden zukünftig stattfinden:</h2>
+        <h2 i18n:translate="chat_future_sessions">The following chat sessions will be held in the future:</h2>
         <table class="future_sessions">
             <thead>
                 <tr>
-                    <th>Titel</th>
-                    <th>Beginn</th>
-                    <th>Ende</th>
+                    <th i18n:translate="chat_future_session_title">Title</th>
+                    <th i18n:translate="chat_future_session_begin">Begin</th>
+                    <th i18n:translate="chat_future_session_end">End</th>
                 </tr>
             </thead>
             <tbody>
                 <tr tal:repeat="session next_sessions">
                     <td tal:content="session/title"></td>
                     <td tal:define="session_start session/start_date;"
-                        tal:content="python: session_start.strftime('%d.%m.%y')+' '+session_start.strftime('%H:%M')+' Uhr'"></td>
+                        tal:content="python: toLocalizedTime(session_start, 'date_format_long')"></td>
                     <td tal:define="session_end session/end_date;"
-                        tal:content="python: session_end.strftime('%d.%m.%y')+' '+session_end.strftime('%H:%M')+' Uhr'"></td>
+                        tal:content="python: toLocalizedTime(session_end, 'date_format_long')"></td>
                 </tr>
             </tbody>
         </table>
     </tal:block>
 </tal:block>
-<p tal:condition="python:active_sessions is None">Es wurde noch keine Datenbank konfiguriert. Diese kann in den Einstellungen des Chats festgelegt werden.</p>
+<p tal:condition="python:active_sessions is None" i18n:translate="chat_no_database">No database has been configured yet. You can specify the database in the chat settings.</p>
 </body>
 </html>

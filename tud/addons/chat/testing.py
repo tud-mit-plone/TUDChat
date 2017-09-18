@@ -50,6 +50,10 @@ class TudAddonsChatLayer(BeakerConfigLayer, PloneSandboxLayer):
         self.loadZCML(package=tud.addons.chat, context=configurationContext)
         z2.installProduct(app, 'tud.addons.chat')
 
+        import jarn.jsi18n
+        self.loadZCML(package=jarn.jsi18n, context=configurationContext)
+        z2.installProduct(app, 'jarn.jsi18n')
+
         # Add session to instance
         setupCoreSessions(app)
 

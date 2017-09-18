@@ -15,10 +15,10 @@ function printMessage(message) {
     var whisperIcon = "";
     if(changes.whisper_target) {
         entry_classes += " whisper";
-        whisperSpan = "<span class='additional_content'>" + getUnameLink(changes.whisper_target, { preText: "Private Nachricht an ", fromAdmin: true }) + "</span>";
+        whisperSpan = "<span class='additional_content'>" + getUnameLink(changes.whisper_target, { preText: _('private_message_to') + " ", fromAdmin: true }) + "</span>";
         whisperIcon = "<span class='whisper-icon'></span>";
     } else {
-        adminSpan = " <span class='adminActions'><a href='#' class='edit' data-mid="+message.id+" title='Nachricht bearbeiten'>&nbsp;</a> <a href='#' class='delete' data-mid="+message.id+" title='Nachricht l&ouml;schen'>&nbsp;</a></span>";
+        adminSpan = " <span class='adminActions'><a href='#' class='edit' data-mid="+message.id+" title='" + _('edit_message') + "'>&nbsp;</a> <a href='#' class='delete' data-mid="+message.id+" title='" + _('delete_message') + "'>&nbsp;</a></span>";
     }
 
     var userNameString = getUnameLink(message.name, { fromAdmin: true, checkOnline: true, toAdmin: changes.admin_message });
@@ -51,8 +51,8 @@ $(document).ready(
             $("li.selected").removeClass("selected");
             // Select current message
             $("#chatEntry"+mId).addClass("selected");
-            $.notification.warn("Nachricht bearbeiten <br/> <br/><form id='editMsgForm'><label for='newMsg'>Neue Nachricht:</label><br/><br/> <input type='text' id='newMsg' value='"+oldMsg+"' class='editBox'/></form>", false,
-                                                                        [{"name" :"Bearbeiten",
+            $.notification.warn(_('edit_message') + "<br/> <br/><form id='editMsgForm'><label for='newMsg'>" + _('new_message') + "</label><br/><br/> <input type='text' id='newMsg' value='"+oldMsg+"' class='editBox'/></form>", false,
+                                                                        [{"name" :_('button_edit'),
                                                                             "click":function(){
                                                                               if (oldMsg != $("#newMsg").val()) {
                                                                                 $.post(ajax_url, {'method': 'editMessage', 'message_id' :mId, 'message': $("#newMsg").val() } , function(data) { updateCheck(); });
@@ -60,7 +60,7 @@ $(document).ready(
                                                                               $("#chatEntry"+mId).removeClass("selected");
                                                                               $.notification.clear();
                                                                             }},
-                                                                        {"name" :"Abbrechen", "click": function() { $.notification.clear(); $("#chatEntry"+mId).removeClass("selected");} },
+                                                                        {"name" :_('button_abort'), "click": function() { $.notification.clear(); $("#chatEntry"+mId).removeClass("selected");} },
                                                                          ]);
             e.preventDefault();
         });
@@ -70,13 +70,13 @@ $(document).ready(
         $("body").delegate("a.delete", "click", function(e) {
             var message = $("#chatEntry"+$(e.target).attr("data-mid")).children("span.message_content").text();
             message = ((message.length > 150) ? message.substr(0, 150) + "..." : message);
-            $.notification.warn("Wollen Sie diese Nachricht wirklich löschen? <br/><br/>" + $("#chatEntry"+$(e.target).attr("data-mid")).children("span.username").text() + " " + message, false,
-                                                                        [{"name" :"Ok",
+            $.notification.warn(_('delete_confirmation') + "<br/><br/>" + $("#chatEntry"+$(e.target).attr("data-mid")).children("span.username").text() + " " + message, false,
+                                                                        [{"name" :_('button_ok'),
                                                                             "click":function(){
                                                                               $.post(ajax_url, {'method': 'deleteMessage', 'message_id': $(e.target).attr("data-mid") }, function(data) { updateCheck(); });
                                                                               $.notification.clear();
                                                                             }},
-                                                                        {"name" :"Abbrechen", "click": $.notification.clear },
+                                                                        {"name" :_('button_abort'), "click": $.notification.clear },
                                                                          ]);
             e.preventDefault();
         });
