@@ -15,13 +15,10 @@ from Products.CMFCore import permissions
 from Products.Archetypes import atapi
 from Products.ATContentTypes.content import base, schemata
 from Products.Archetypes.atapi import Schema
-from Products.Archetypes.atapi import StringField, IntegerField
-from Products.Archetypes.public import StringWidget, SelectionWidget, IntegerWidget
+from Products.Archetypes.atapi import StringField, TextField, IntegerField
+from Products.Archetypes.public import StringWidget, TextAreaWidget, SelectionWidget, IntegerWidget
 from Products.Archetypes.public import DisplayList
 from Products.ZMySQLDA.DA import Connection
-
-from raptus.multilanguagefields import fields as MultiLanguageFields
-from raptus.multilanguagefields import widgets as MultiLanguageWidgets
 
 from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
 
@@ -50,12 +47,12 @@ WHISPER_OPTIONS = DisplayList((
     ))
 
 ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
-    MultiLanguageFields.TextField('introduction',
+    TextField('introduction',
         required           = False,
         searchable         = False,
         schemata           = 'default',
         default            = '',
-        widget            = MultiLanguageWidgets.TextAreaWidget(
+        widget            = TextAreaWidget(
             label        = _(u'chat_introduction_label', default = u'Welcoming text'),
             description  = _(u'chat_introduction_desc', default = u'This text will be displayed at chat session selection.')
         )

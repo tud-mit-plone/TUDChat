@@ -40,10 +40,6 @@ class TudAddonsChatLayer(BeakerConfigLayer, PloneSandboxLayer):
         :return:
         """
 
-        import raptus.multilanguagefields
-        self.loadZCML(package=raptus.multilanguagefields, context=configurationContext)
-        z2.installProduct(app, 'raptus.multilanguagefields')
-
         z2.installProduct(app, 'Products.ZMySQLDA')
 
         import tud.addons.chat
