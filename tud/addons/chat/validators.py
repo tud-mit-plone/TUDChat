@@ -60,13 +60,12 @@ class HexColorCodeValidator(object):
         self.name = name
         self.title = title or name
         self.description = description
-        self.regexp = re.compile(r'^#[0-9a-f]{6}$', re.IGNORECASE)
 
     def __call__(self, value, *args, **kwargs):
         instance = kwargs.get('instance', None)
         value = unicode(value, "utf8")
 
-        if not self.regexp.match(value):
+        if not re.match(r'^#[0-9a-f]{6}$', value, re.IGNORECASE):
             return instance.translate(_(u'validation_invalid_hex_color_code', default = u'A valid HTML color code in hexadecimal format must be specified.'))
 
         return True
