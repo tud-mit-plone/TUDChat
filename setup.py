@@ -30,7 +30,8 @@ setup(name='tud.addons.chat',
           'Products.ZMySQLDA',
           'simplejson',
           'collective.beaker',
-          'python-dateutil'
+          'python-dateutil',
+          'jarn.jsi18n'
           # -*- Extra requirements: -*-
       ],
       extras_require={'test': ['plone.app.robotframework']},

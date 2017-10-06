@@ -5,6 +5,7 @@
     manager_bypass="False" i18n:attributes="title">
     <permission>View</permission>
     <permission>Modify portal content</permission>
+    <permission>tud.addons.chat: Configure Chat</permission>
 
     <state state_id="editable" title="Editable" i18n:attributes="title">
         <exit-transition transition_id="archive" />
@@ -12,6 +13,8 @@
             <permission-role>Anonymous</permission-role>
         </permission-map>
         <permission-map name="Modify portal content" acquired="True">
+        </permission-map>
+        <permission-map name="tud.addons.chat: Configure Chat" acquired="True">
         </permission-map>
     </state>
     <state state_id="archived" title="Archived" i18n:attributes="title">
@@ -21,6 +24,9 @@
             <permission-role>Manager</permission-role>
         </permission-map>
         <permission-map name="Modify portal content" acquired="False">
+            <permission-role>Manager</permission-role>
+        </permission-map>
+        <permission-map name="tud.addons.chat: Configure Chat" acquired="False">
             <permission-role>Manager</permission-role>
         </permission-map>
     </state>

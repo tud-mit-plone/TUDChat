@@ -86,14 +86,14 @@ Test Session Preconditions
     Set Text Field  password  secret
     Save Edit Form
     Go To  ${location}
-    Try Chat Login And Check For Error  Datenschutz
+    Try Chat Login And Check For Error  privacy
     Capture Page Screenshot
     Select Checkbox  agreement
-    Try Chat Login And Check For Error  Passwort
+    Try Chat Login And Check For Error  password
     Capture Page Screenshot
     Input Text  password  secret
     Input Text  username  t
-    Try Chat Login And Check For Error  Benutzername
+    Try Chat Login And Check For Error  username
     Capture Page Screenshot
     Input Text  username  test_user
     Wait Until Element Is Enabled  submit

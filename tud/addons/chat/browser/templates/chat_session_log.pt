@@ -1,5 +1,5 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
-  metal:use-macro="context/main_template/macros/master" i18n:domain="plone">
+  metal:use-macro="context/main_template/macros/master" i18n:domain="tud.addons.chat">
 <head>
 
 <metal:javascriptslot fill-slot="javascript_head_slot">
@@ -69,76 +69,77 @@
 
 </head>
 
-<body metal:fill-slot="main" i18n:domain="tudchat"
-      tal:define="session_info view/getSessionInformation;
+<body metal:fill-slot="main"
+      tal:define="toLocalizedTime nocall:context/@@plone/toLocalizedTime;
+                  session_info view/getSessionInformation;
                   chat_id session_info/chat_id;
                   log python: view.getLogs();"
       tal:condition="python: context_state.workflow_state() == 'archived'">
-    <h1>Chat-Log</h1>
+    <h1 i18n:translate="log">Chat Log</h1>
     <table id="infotable">
         <tr>
-          <th colspan="2">
-            Informationen zur Sitzung:
+          <th colspan="2" i18n:translate="log_session_information">
+            Information about session:
           </th>
         </tr>
         <tr>
-          <td>Chat-ID</td>
+          <td i18n:translate="log_session_chat_id">Chat ID</td>
           <td tal:content="session_info/chat_id"></td>
         </tr>
         <tr>
-          <td>Name</td>
+          <td i18n:translate="log_session_name">Name</td>
           <td tal:content="session_info/title"></td>
         </tr>
         <tr>
-          <td>Beschreibung</td>
+          <td i18n:translate="log_session_description">Description</td>
           <td tal:content="session_info/description"></td>
         </tr>
         <tr>
-          <td>Passwort</td>
+          <td i18n:translate="log_session_password">Password</td>
           <td>
             <tal:value condition="session_info/password" replace="session_info/password" />
             <tal:Altvalue condition="not:session_info/password">
-              <span class="info" tal:content="string:Kein Passwort" />
+              <span class="info" i18n:translate="log_session_no_password">No password</span>
             </tal:Altvalue>
           </td>
         </tr>
         <tr>
-          <td>maximale Benutzer</td>
+          <td i18n:translate="log_session_user_limit">User limit</td>
           <td>
             <tal:value condition="session_info/max_users" replace="session_info/max_users" />
             <tal:Altvalue condition="not:session_info/max_users">
-              <span class="info" tal:content="string:unbegrenzt" />
+              <span class="info" i18n:translate="log_session_no_limit">unlimited</span>
             </tal:Altvalue>
           </td>
         </tr>
         <tr>
-          <td>Startzeit</td>
+          <td i18n:translate="log_session_start">Begin</td>
           <td tal:define="chat_start session_info/start_date"
-              tal:content="python:chat_start.strftime('%d.%m.%Y, %H:%M Uhr')"></td>
+              tal:content="python:toLocalizedTime(chat_start, 'date_format_long')"></td>
         </tr>
         <tr>
-          <td>Endzeit</td>
+          <td i18n:translate="log_session_end">End</td>
           <td tal:define="chat_end session_info/end_date"
-              tal:content="python:chat_end.strftime('%d.%m.%Y, %H:%M Uhr')"></td>
+              tal:content="python:toLocalizedTime(chat_end, 'date_format_long')"></td>
         </tr>
     </table>
 
     <table id="logtable">
       <thead>
-        <th class="column_id">ID</th>
-        <th class="column_time">Zeit</th>
-        <th class="column_name">Name</th>
-        <th class="column_message">Nachricht</th>
+        <th class="column_id" i18n:translate="log_message_id">ID</th>
+        <th class="column_time" i18n:translate="log_message_time">Time</th>
+        <th class="column_name" i18n:translate="log_message_name">Name</th>
+        <th class="column_message" i18n:translate="log_message_message">Message</th>
       </thead>
       <tbody>
         <tr tal:repeat="message log">
           <tal:block define="admin_message python: message['action'] == 'mod_add_message' or message['u_action'] == 'mod_add_message'">
             <td tal:condition="admin_message" class="column_id"><b tal:content="message/id"></b></td>
-            <td tal:condition="admin_message" class="column_time"><b tal:content="python: message['date'].strftime('%d.%m.%Y, %H:%M:%S Uhr')"></b></td>
+            <td tal:condition="admin_message" class="column_time"><b tal:content="python: toLocalizedTime(message['date'], 'date_format_long')"></b></td>
             <td tal:condition="admin_message" class="column_name"><b tal:content="message/user"></b></td>
             <td tal:condition="admin_message" class="column_message"><b tal:content="message/message"></b></td>
             <td tal:condition="not:admin_message" class="column_id" tal:content="message/id"></td>
-            <td tal:condition="not:admin_message" class="column_time" tal:content="python: message['date'].strftime('%d.%m.%Y, %H:%M:%S Uhr')"></td>
+            <td tal:condition="not:admin_message" class="column_time" tal:content="python: toLocalizedTime(message['date'], 'date_format_long')"></td>
             <td tal:condition="not:admin_message" class="column_name" tal:content="message/user"></td>
             <td tal:condition="not:admin_message" class="column_message" tal:content="message/message"></td>
           </tal:block>
@@ -146,6 +147,6 @@
       </tbody>
     </table>
 
-    <p>Fett gedruckte Zeilen stellen Nachrichten von Moderatoren dar.</p>
+    <p i18n:translate="log_info_mod_messages">Bold lines represent messages from moderators.</p>
 </body>
 </html>

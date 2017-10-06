@@ -147,10 +147,10 @@ Try Chat Login And Check For Error
 #------------------------------------------------------------------------------
 
 Chat Window Should Be Visible
-    Page Should Contain Element  css=#chat
+    Wait Until Element Is Visible  css=#chat
 
 Chat Window Should Not Be Visible
-    Page Should Not Contain Element  css=#chat
+    Wait Until Element Is Not Visible  css=#chat
 
 Check User Count
     [Arguments]  ${count}
