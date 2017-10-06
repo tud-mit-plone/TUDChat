@@ -40,7 +40,7 @@
              class       = ".chat_session.ChatSessionLogView"
              template    = "templates/chat_session_log.pt"
              layer       = "tud.addons.chat.interfaces.IAddonInstalled"
-             permission  = "cmf.ModifyPortalContent"
+             permission  = "zope2.View"
      />
 
 </configure>

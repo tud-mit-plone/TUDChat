@@ -1,0 +1,105 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2017-09-18 19:51+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Language-Code: de\n"
+"Language-Name: German\n"
+"Preferred-Encodings: utf-8 latin1\n"
+"Domain: tud.addons.chat\n"
+"Language: de\n"
+"Last-Translator: David Voigt <david.voigt@tu-dresden.de>\n"
+"Language-Team: \n"
+"X-Generator: Poedit 2.0.3\n"
+
+#: skins/chat/tud_chat.js
+msgid "user_enters_room"
+msgstr "${user} hat die Chatsitzung betreten."
+
+#: skins/chat/tud_chat.js
+msgid "users_enter_room"
+msgstr "${users} und ${last_user} haben die Chatsitzung betreten."
+
+#: skins/chat/tud_chat.js
+msgid "user_leaves_room"
+msgstr "${user} hat die Chatsitzung verlassen."
+
+#: skins/chat/tud_chat.js
+msgid "users_leave_room"
+msgstr "${users} und ${last_user} haben die Chatsitzung verlassen."
+
+#: skins/chat/tud_chat.js
+msgid "message_edited_by"
+msgstr "Bearbeitet durch"
+
+#: skins/chat/tud_chat.js
+msgid "message_deleted_by"
+msgstr "Gelöscht durch"
+
+#: skins/chat/tud_chat.js
+msgid "link_warning_1"
+msgstr "Dieser Link wurde nicht von einem Moderator geschrieben. Die TU Dresden distanziert sich an dieser Stelle ausdrücklich vom Inhalt dieses Links."
+
+#: skins/chat/tud_chat.js
+msgid "link_warning_2"
+msgstr "Soll der Link ${link} wirklich geöffnet werden?"
+
+#: skins/chat/tud_chat.js
+msgid "button_yes"
+msgstr "Ja"
+
+#: skins/chat/tud_chat.js
+msgid "button_no"
+msgstr "Nein"
+
+#: skins/chat/tud_chat.js
+msgid "message_to"
+msgstr "Nachricht an: ${target}"
+
+#: skins/chat/tud_chat.js
+msgid "send_private_message"
+msgstr "Private Nachricht an ${user} schicken"
+
+#: skins/chat/tud_chat.js
+msgid "warning"
+msgstr "Verwarnung!"
+
+#: skins/chat/tud_chat.js skins/chat/tud_chat_admin.js
+msgid "button_ok"
+msgstr "Ok"
+
+#: skins/chat/tud_chat.js
+msgid "user_is_moderator"
+msgstr "${user} ist Moderator."
+
+#: skins/chat/tud_chat_user.js skins/chat/tud_chat_admin.js
+msgid "private_message_to"
+msgstr "Private Nachricht an"
+
+#: skins/chat/tud_chat_admin.js
+msgid "edit_message"
+msgstr "Nachricht bearbeiten"
+
+#: skins/chat/tud_chat_admin.js
+msgid "delete_message"
+msgstr "Nachricht löschen"
+
+#: skins/chat/tud_chat_admin.js
+msgid "new_message"
+msgstr "Neue Nachricht:"
+
+#: skins/chat/tud_chat_admin.js
+msgid "button_edit"
+msgstr "Bearbeiten"
+
+#: skins/chat/tud_chat_admin.js
+msgid "button_abort"
+msgstr "Abbrechen"
+
+#: skins/chat/tud_chat_admin.js
+msgid "delete_confirmation"
+msgstr "Wollen Sie diese Nachricht wirklich löschen?"

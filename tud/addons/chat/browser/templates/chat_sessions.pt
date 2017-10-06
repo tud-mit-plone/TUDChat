@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"
       lang="en-US"
       metal:use-macro="context/main_template/macros/master"
-      i18n:domain="contact">
+      i18n:domain="tud.addons.chat">
 
 <body>
 <metal:javascriptslot fill-slot="javascript_head_slot">
@@ -42,21 +42,22 @@
 
 </metal:cssslot>
 
-<metal:main fill-slot="main">
+<metal:main fill-slot="main"
+            tal:define="toLocalizedTime nocall:context/@@plone/toLocalizedTime">
 
-<h1 class="documentFirstHeading">Chatsitzungen verwalten</h1>
+<h1 class="documentFirstHeading" i18n:translate="management_manage_sessions">Manage chat sessions</h1>
 
 <div class="field">
   <table width="100%" id='sessions'>
     <tr>
-      <th>Status</th>
-      <th>Titel</th>
-      <th>Passwort</th>
-      <th>Benutzerlimit</th>
-      <th>Startzeit</th>
-      <th>Endzeit</th>
-      <th>Protokoll</th>
-      <th>Bearbeiten</th>
+      <th i18n:translate="management_session_state">State</th>
+      <th i18n:translate="management_session_title">Title</th>
+      <th i18n:translate="management_session_password">Password</th>
+      <th i18n:translate="management_session_max_users">User limit</th>
+      <th i18n:translate="management_session_start">Start</th>
+      <th i18n:translate="management_session_end">End</th>
+      <th i18n:translate="management_session_protocol">Protocol</th>
+      <th i18n:translate="management_session_edit">Edit</th>
     </tr>
     <tr tal:repeat="session python: view.getSessions()">
       <td>
@@ -68,28 +69,28 @@
       <td tal:define="password session/password|nothing">
         <tal:value condition="password" replace="password" />
         <tal:Altvalue condition="not:password">
-          <span class="info" tal:content="string:Kein Passwort" />
+          <span class="info" i18n:translate="management_session_no_password">No password</span>
         </tal:Altvalue>
       </td>
       <td tal:define="max_users session/max_users|nothing">
         <tal:value condition="max_users" replace="max_users" />
         <tal:Altvalue condition="not:max_users">
-          <span class="info" tal:content="string:unbegrenzt" />
+          <span class="info" i18n:translate="management_session_no_limit">unlimited</span>
         </tal:Altvalue>
       </td>
       <td>
         <span tal:define="chat_start session/start_date"
-              tal:replace="python:chat_start.strftime('%d.%m.%Y, %H:%M Uhr')"/>
+              tal:replace="python:toLocalizedTime(chat_start, 'date_format_long')"/>
       </td>
       <td>
         <span tal:define="chat_end session/end_date"
-              tal:replace="python:chat_end.strftime('%d.%m.%Y, %H:%M Uhr')"/>
+              tal:replace="python:toLocalizedTime(chat_end, 'date_format_long')"/>
       </td>
       <td>
-        <a tal:condition="python: view.getState(session) == 'archived'" tal:attributes="href python:session.absolute_url() + '/log'">Log ansehen</a>
+        <a tal:condition="python: view.getState(session) == 'archived'" tal:attributes="href python:session.absolute_url() + '/log'" i18n:translate="management_link_log">Show log</a>
       </td>
       <td>
-        <a tal:condition="python: view.getState(session) == 'editable'" tal:attributes="href python:session.absolute_url() + '/edit'">Bearbeiten</a>
+        <a tal:condition="python: view.getState(session) == 'editable'" tal:attributes="href python:session.absolute_url() + '/edit'" i18n:translate="management_link_edit">Edit</a>
       </td>
     </tr>
   </table>

@@ -4,6 +4,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
 
 from tud.addons.chat.interfaces import IChatSession
+from tud.addons.chat import chatMessageFactory as _
 
 class ChatView(BrowserView):
     """Default chat view
@@ -56,20 +57,20 @@ class ChatView(BrowserView):
         session = self.request.SESSION
 
         if session.has_key("chat_kick_message"):
-            message = "Sie wurden von einem Moderator des Chats verwiesen!"
+            message = self.context.translate(_(u'session_kicked', default = u'You have been kicked from the chat by a moderator!'))
 
             if session["chat_kick_message"]:
-                message += "<br /><br />Grund: {}".format(session["chat_kick_message"])
+                message += "<br /><br />" + self.context.translate(_(u'session_kicked_reason', default = u'Reason: ${reason}', mapping={u'reason': session["chat_kick_message"]}))
 
             del session["chat_kick_message"]
 
             return message
 
         if session.has_key("chat_ban_message"):
-            message = "Sie wurden von einem Moderator dauerhaft des Chats verwiesen!"
+            message = self.context.translate(_(u'session_banned', default = u'You have been banned from the chat by a moderator!'))
 
             if session["chat_ban_message"]:
-                message += "<br /><br />Grund: {}".format(session["chat_ban_message"])
+                message += "<br /><br />" + self.context.translate(_(u'session_banned_reason', default = u'Reason: ${reason}', mapping={u'reason': session["chat_ban_message"]}))
 
             del session["chat_ban_message"]
 
@@ -105,4 +106,4 @@ class ChatSessionsView(BrowserView):
         if workflows:
             for wf in workflows:
                 if state in wf.states:
-                    return wf.states[state].title or state
+                    return self.context.translate(wf.states[state].title or state)

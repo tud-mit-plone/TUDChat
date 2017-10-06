@@ -1,0 +1,739 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2017-10-06 00:07+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"Language-Code: en\n"
+"Language-Name: English\n"
+"Preferred-Encodings: utf-8 latin1\n"
+"Domain: DOMAIN\n"
+
+#: ./profiles/default/types/Chat.xml
+msgid "Chat"
+msgstr ""
+
+#: ./profiles/default/types/ChatSession.xml
+msgid "ChatSession"
+msgstr ""
+
+#. Default: "Username and messages of moderators will be marked with this color. The input must be made as HTML color code (e.g. #ff0000)"
+#: ./content/chat.py:106
+msgid "chat_admin_color_desc"
+msgstr ""
+
+#. Default: "Marking color for chat moderators"
+#: ./content/chat.py:105
+msgid "chat_admin_color_label"
+msgstr ""
+
+#. Default: "only cookie (recommended)"
+#: ./content/chat.py:41
+msgid "chat_ban_strategy_cookie"
+msgstr ""
+
+#. Default: "cookie and ip address (restrictive)"
+#: ./content/chat.py:43
+msgid "chat_ban_strategy_cookie_and_ip"
+msgstr ""
+
+#. Default: "Method to mark a user, which is permanently banned from the chat."
+#: ./content/chat.py:155
+msgid "chat_ban_strategy_desc"
+msgstr ""
+
+#. Default: "only ip address"
+#: ./content/chat.py:42
+msgid "chat_ban_strategy_ip"
+msgstr ""
+
+#. Default: "Ban strategy"
+#: ./content/chat.py:154
+msgid "chat_ban_strategy_label"
+msgstr ""
+
+#. Default: "Minimum time period between two messages from a user."
+#: ./content/chat.py:144
+msgid "chat_block_time_desc"
+msgstr ""
+
+#. Default: "Waiting time between messages (in seconds)"
+#: ./content/chat.py:143
+msgid "chat_block_time_label"
+msgstr ""
+
+#. Default: "Please enter the ID of the ZMySQL object. The object must be located in a sub-path of the chat object."
+#: ./content/chat.py:73
+msgid "chat_database_desc"
+msgstr ""
+
+#. Default: "database"
+#: ./content/chat.py:72
+msgid "chat_database_label"
+msgstr ""
+
+#. Default: "Please enter a prefix for tables in the database, e.g. institutionname"
+#: ./content/chat.py:86
+msgid "chat_database_prefix_desc"
+msgstr ""
+
+#. Default: "database prefix"
+#: ./content/chat.py:85
+msgid "chat_database_prefix_label"
+msgstr ""
+
+#. Default: "If you want a time stamp for each message, choose 'at every message'. If you choose 'maximum once per minute', the time is given maximally once per minute. If no time is to be given before messages, choose 'disabled'."
+#: ./content/chat.py:95
+msgid "chat_date_frequency_desc"
+msgstr ""
+
+#. Default: "disabled"
+#: ./content/chat.py:35
+msgid "chat_date_frequency_disabled"
+msgstr ""
+
+#. Default: "Time stamp in chat"
+#: ./content/chat.py:94
+msgid "chat_date_frequency_label"
+msgstr ""
+
+#. Default: "at every message"
+#: ./content/chat.py:37
+msgid "chat_date_frequency_message"
+msgstr ""
+
+#. Default: "maximum once per minute"
+#: ./content/chat.py:36
+msgid "chat_date_frequency_minute"
+msgstr ""
+
+#. Default: "Begin"
+#: ./browser/templates/chat_view.pt:198
+msgid "chat_future_session_begin"
+msgstr ""
+
+#. Default: "End"
+#: ./browser/templates/chat_view.pt:199
+msgid "chat_future_session_end"
+msgstr ""
+
+#. Default: "Title"
+#: ./browser/templates/chat_view.pt:197
+msgid "chat_future_session_title"
+msgstr ""
+
+#. Default: "The following chat sessions will be held in the future:"
+#: ./browser/templates/chat_view.pt:193
+msgid "chat_future_sessions"
+msgstr ""
+
+#. Default: "This text will be displayed at chat session selection."
+#: ./content/chat.py:60
+msgid "chat_introduction_desc"
+msgstr ""
+
+#. Default: "Welcoming text"
+#: ./content/chat.py:59
+msgid "chat_introduction_label"
+msgstr ""
+
+#. Default: "Maximum number of characters that a single chat message can consist of. Enter 0, if you do not want to restrict the message length."
+#: ./content/chat.py:135
+msgid "chat_max_message_length_desc"
+msgstr ""
+
+#. Default: "Maximum message length"
+#: ./content/chat.py:134
+msgid "chat_max_message_length_label"
+msgstr ""
+
+#. Default: "There is currently no active chat session."
+#: ./browser/templates/chat_view.pt:186
+msgid "chat_no_active_session"
+msgstr ""
+
+#. Default: "No database has been configured yet. You can specify the database in the chat settings."
+#: ./browser/templates/chat_view.pt:214
+msgid "chat_no_database"
+msgstr ""
+
+#. Default: "No further chat sessions are currently planned."
+#: ./browser/templates/chat_view.pt:187
+msgid "chat_no_future_sessions"
+msgstr ""
+
+#. Default: "Specifies the maximum number of recent messages displayed to a new participant when entering the chat session. Enter 0, if no recent messages should be shown."
+#: ./content/chat.py:165
+msgid "chat_old_messages_count_desc"
+msgstr ""
+
+#. Default: "Number of recent messages when entering a chat session"
+#: ./content/chat.py:164
+msgid "chat_old_messages_count_label"
+msgstr ""
+
+#. Default: "Specifies the maximum age of recent messages so that they will still be shown. Enter 0, if you want recent messages to be displayed regardless of their age. This setting is only used if the number of recent messages to be displayed is greater than 0."
+#: ./content/chat.py:174
+msgid "chat_old_messages_minutes_desc"
+msgstr ""
+
+#. Default: "Age of recent messages on entering a chat session (in minutes)"
+#: ./content/chat.py:173
+msgid "chat_old_messages_minutes_label"
+msgstr ""
+
+#. Default: "Specifies how often the chat display is updated."
+#: ./content/chat.py:126
+msgid "chat_refresh_rate_desc"
+msgstr ""
+
+#. Default: "Refresh rate (in seconds)"
+#: ./content/chat.py:125
+msgid "chat_refresh_rate_label"
+msgstr ""
+
+#. Default: "Chat session"
+#: ./browser/templates/chat_view.pt:134
+msgid "chat_session"
+msgstr ""
+
+#. Default: "If a participant has not communicated with the server during this time period, he or she will be removed automatically."
+#: ./content/chat.py:116
+msgid "chat_timeout_desc"
+msgstr ""
+
+#. Default: "Socket timeout (in seconds)"
+#: ./content/chat.py:115
+msgid "chat_timeout_label"
+msgstr ""
+
+#. Default: "When whispering, a private message is sent that only the sender and the recipient can see. If the mode 'only with moderators' is chosen, participants can only whisper with moderators, but not among themselves"
+#: ./content/chat.py:183
+msgid "chat_whisper_desc"
+msgstr ""
+
+#. Default: "disabled"
+#: ./content/chat.py:47
+msgid "chat_whisper_disabled"
+msgstr ""
+
+#. Default: "enabled"
+#: ./content/chat.py:49
+msgid "chat_whisper_enabled"
+msgstr ""
+
+#. Default: "Whisper"
+#: ./content/chat.py:182
+msgid "chat_whisper_label"
+msgstr ""
+
+#. Default: "only with moderators"
+#: ./content/chat.py:48
+msgid "chat_whisper_moderators"
+msgstr ""
+
+#. Default: "Data protection information"
+#: ./browser/templates/chat_view.pt:83
+msgid "data_protection_information"
+msgstr ""
+
+#. Default: "The chat sessions are limited in time and are moderated. When you send a message in the chat, all participants can see your chosen username and your message. ${old_messages_information} ${whisper_information} If you wish to transmit confidential information, please use the e-mail contact data on the websites. The messages are stored anonymously together with a time stamp beyond the chat time. Please note that personal information in the chat messages cannot be anonymized. An evaluation of the chat sessions by the moderators is made exclusively for the improvement of the offers. Three months after the chat session expires, the data will be automatically deleted."
+#: ./browser/templates/chat_view.pt:119
+msgid "data_protection_information_text"
+msgstr ""
+
+#. Default: "Please also note that new members of the chat session will see the last ${messages} messages."
+#: ./browser/templates/chat_view.pt:107
+msgid "data_protection_old_messages_many"
+msgstr ""
+
+#. Default: "Please also note that new members of the chat session will see the last ${messages} messages if they are not older than ${minutes} minutes."
+#: ./browser/templates/chat_view.pt:115
+msgid "data_protection_old_messages_many_minutes_many"
+msgstr ""
+
+#. Default: "Please also note that new members of the chat session will see the last ${messages} messages if they are not older than 1 minute."
+#: ./browser/templates/chat_view.pt:111
+msgid "data_protection_old_messages_many_minutes_one"
+msgstr ""
+
+#. Default: "Please also note that new members of the chat session will see the last message."
+#: ./browser/templates/chat_view.pt:91
+msgid "data_protection_old_messages_one"
+msgstr ""
+
+#. Default: "Please also note that new members of the chat session will see the last message if it is not older than ${minutes} minutes."
+#: ./browser/templates/chat_view.pt:101
+msgid "data_protection_old_messages_one_minutes_many"
+msgstr ""
+
+#. Default: "Please also note that new members of the chat session will see the last message if it is not older than 1 minute."
+#: ./browser/templates/chat_view.pt:95
+msgid "data_protection_old_messages_one_minutes_one"
+msgstr ""
+
+#. Default: "In this chat no private messages can be sent."
+#: ./browser/templates/chat_view.pt:120
+msgid "data_protection_whisper_off"
+msgstr ""
+
+#. Default: "In this chat you can send private messages that are only visible to you and the recipient."
+#: ./browser/templates/chat_view.pt:122
+msgid "data_protection_whisper_on"
+msgstr ""
+
+#. Default: "In this chat you can send private messages that are visible only to you and the moderator being addressed."
+#: ./browser/templates/chat_view.pt:121
+msgid "data_protection_whisper_restricted"
+msgstr ""
+
+#. Default: "Chat Log"
+#: ./browser/templates/chat_session_log.pt:78
+msgid "log"
+msgstr ""
+
+#. Default: "Bold lines represent messages from moderators."
+#: ./browser/templates/chat_session_log.pt:150
+msgid "log_info_mod_messages"
+msgstr ""
+
+#. Default: "ID"
+#: ./browser/templates/chat_session_log.pt:129
+msgid "log_message_id"
+msgstr ""
+
+#. Default: "Message"
+#: ./browser/templates/chat_session_log.pt:132
+msgid "log_message_message"
+msgstr ""
+
+#. Default: "Name"
+#: ./browser/templates/chat_session_log.pt:131
+msgid "log_message_name"
+msgstr ""
+
+#. Default: "Time"
+#: ./browser/templates/chat_session_log.pt:130
+msgid "log_message_time"
+msgstr ""
+
+#. Default: "Chat ID"
+#: ./browser/templates/chat_session_log.pt:86
+msgid "log_session_chat_id"
+msgstr ""
+
+#. Default: "Description"
+#: ./browser/templates/chat_session_log.pt:94
+msgid "log_session_description"
+msgstr ""
+
+#. Default: "End"
+#: ./browser/templates/chat_session_log.pt:121
+msgid "log_session_end"
+msgstr ""
+
+#. Default: "Information about session:"
+#: ./browser/templates/chat_session_log.pt:81
+msgid "log_session_information"
+msgstr ""
+
+#. Default: "Name"
+#: ./browser/templates/chat_session_log.pt:90
+msgid "log_session_name"
+msgstr ""
+
+#. Default: "unlimited"
+#: ./browser/templates/chat_session_log.pt:111
+msgid "log_session_no_limit"
+msgstr ""
+
+#. Default: "No password"
+#: ./browser/templates/chat_session_log.pt:102
+msgid "log_session_no_password"
+msgstr ""
+
+#. Default: "Password"
+#: ./browser/templates/chat_session_log.pt:98
+msgid "log_session_password"
+msgstr ""
+
+#. Default: "Begin"
+#: ./browser/templates/chat_session_log.pt:116
+msgid "log_session_start"
+msgstr ""
+
+#. Default: "User limit"
+#: ./browser/templates/chat_session_log.pt:107
+msgid "log_session_user_limit"
+msgstr ""
+
+#. Default: "User ${user}"
+#: ./adapter/chat_session.py:78
+msgid "log_user"
+msgstr ""
+
+#. Default: "I have read and understood the notes on data protection and I agree voluntarily to the processing of my personal data."
+#: ./browser/templates/chat_view.pt:175
+msgid "login_agreement"
+msgstr ""
+
+#. Default: "Login"
+#: ./browser/templates/chat_view.pt:180
+msgid "login_button"
+msgstr ""
+
+#. Default: "You were banned permanently."
+#: ./browser/chat_session.py:405
+msgid "login_err_banned"
+msgstr ""
+
+#. Default: "Reason: ${reason}"
+#: ./browser/chat_session.py:407
+msgid "login_err_banned_reason"
+msgstr ""
+
+#. Default: "Your username is too long and may not be longer than 20 characters."
+#: ./browser/chat_session.py:396
+msgid "login_err_long_name"
+msgstr ""
+
+#. Default: "The user limit for this chat session has been reached."
+#: ./browser/chat_session.py:387
+msgid "login_err_max_users"
+msgstr ""
+
+#. Default: "The username is already in use."
+#: ./browser/chat_session.py:402
+msgid "login_err_name_in_use"
+msgstr ""
+
+#. Default: "The entered password is not correct."
+#: ./browser/chat_session.py:383
+msgid "login_err_password"
+msgstr ""
+
+#. Default: "You will not be able to enter the chat without agreeing the privacy notice."
+#: ./browser/chat_session.py:379
+msgid "login_err_privacy"
+msgstr ""
+
+#. Default: "The chosen chat session is currently inactive."
+#: ./browser/chat_session.py:399
+msgid "login_err_session_inactive"
+msgstr ""
+
+#. Default: "Your username is too short and must be at least 3 characters long."
+#: ./browser/chat_session.py:390
+msgid "login_err_short_name"
+msgstr ""
+
+#. Default: "Password for the chat session"
+#: ./browser/templates/chat_view.pt:169
+msgid "login_password"
+msgstr ""
+
+#. Default: "Desired username"
+#: ./browser/templates/chat_view.pt:163
+msgid "login_username"
+msgstr ""
+
+#. Default: "To stay anonymous, please use a nickname as your username."
+#: ./browser/templates/chat_view.pt:164
+msgid "login_username_help"
+msgstr ""
+
+#. Default: "Edit"
+#: ./browser/templates/chat_sessions.pt:93
+msgid "management_link_edit"
+msgstr ""
+
+#. Default: "Show log"
+#: ./browser/templates/chat_sessions.pt:90
+msgid "management_link_log"
+msgstr ""
+
+#. Default: "Manage chat sessions"
+#: ./browser/templates/chat_sessions.pt:48
+msgid "management_manage_sessions"
+msgstr ""
+
+#. Default: "Edit"
+#: ./browser/templates/chat_sessions.pt:60
+msgid "management_session_edit"
+msgstr ""
+
+#. Default: "End"
+#: ./browser/templates/chat_sessions.pt:58
+msgid "management_session_end"
+msgstr ""
+
+#. Default: "User limit"
+#: ./browser/templates/chat_sessions.pt:56
+msgid "management_session_max_users"
+msgstr ""
+
+#. Default: "unlimited"
+#: ./browser/templates/chat_sessions.pt:78
+msgid "management_session_no_limit"
+msgstr ""
+
+#. Default: "No password"
+#: ./browser/templates/chat_sessions.pt:72
+msgid "management_session_no_password"
+msgstr ""
+
+#. Default: "Password"
+#: ./browser/templates/chat_sessions.pt:55
+msgid "management_session_password"
+msgstr ""
+
+#. Default: "Protocol"
+#: ./browser/templates/chat_sessions.pt:59
+msgid "management_session_protocol"
+msgstr ""
+
+#. Default: "Start"
+#: ./browser/templates/chat_sessions.pt:57
+msgid "management_session_start"
+msgstr ""
+
+#. Default: "State"
+#: ./browser/templates/chat_sessions.pt:53
+msgid "management_session_state"
+msgstr ""
+
+#. Default: "Title"
+#: ./browser/templates/chat_sessions.pt:54
+msgid "management_session_title"
+msgstr ""
+
+#. Default: "You have been banned from the chat by a moderator!"
+#: ./browser/chat.py:70
+msgid "session_banned"
+msgstr ""
+
+#. Default: "Reason: ${reason}"
+#: ./browser/chat.py:73
+msgid "session_banned_reason"
+msgstr ""
+
+#. Default: "Ban"
+#: ./browser/templates/chat_session_view.pt:73
+msgid "session_button_ban"
+msgstr ""
+
+#. Default: "Kick"
+#: ./browser/templates/chat_session_view.pt:72
+msgid "session_button_kick"
+msgstr ""
+
+#. Default: "Leave chat session"
+#: ./browser/templates/chat_session_view.pt:102
+msgid "session_button_leave"
+msgstr ""
+
+#. Default: "Submit"
+#: ./browser/templates/chat_session_view.pt:64
+msgid "session_button_send_message"
+msgstr ""
+
+#. Default: "Click or press 'Enter' to submit."
+#: ./browser/templates/chat_session_view.pt:64
+msgid "session_button_send_message_help"
+msgstr ""
+
+#. Default: "Warn"
+#: ./browser/templates/chat_session_view.pt:71
+msgid "session_button_warn"
+msgstr ""
+
+#. Default: "Unique database ID for this chat session. If you want to generate the ID, enter 0 (this works only during creation)."
+#: ./content/chat_session.py:83
+msgid "session_chat_id_desc"
+msgstr ""
+
+#. Default: "Chat ID"
+#: ./content/chat_session.py:82
+msgid "session_chat_id_label"
+msgstr ""
+
+#. Default: "Displayed above chat window."
+#: ./content/chat_session.py:30
+msgid "session_description_desc"
+msgstr ""
+
+#. Default: "Description"
+#: ./content/chat_session.py:29
+msgid "session_description_label"
+msgstr ""
+
+#. Default: "Date and time when the chat session end."
+#: ./content/chat_session.py:46
+msgid "session_end_date_desc"
+msgstr ""
+
+#. Default: "End"
+#: ./content/chat_session.py:45
+msgid "session_end_date_label"
+msgstr ""
+
+#. Default: "The chat session has expired."
+#: ./browser/chat_session.py:490
+msgid "session_expired"
+msgstr ""
+
+#. Default: "The chat session expires in less than 5 minutes."
+#: ./browser/chat_session.py:494
+msgid "session_expires_5_min"
+msgstr ""
+
+#. Default: "How to use it:"
+#: ./browser/templates/chat_session_view.pt:88
+msgid "session_how_to_use"
+msgstr ""
+
+#. Default: "This chat session is active until ${end_date} and will be closed automatically."
+#: ./browser/templates/chat_session_view.pt:92
+msgid "session_info_active_until"
+msgstr ""
+
+#. Default: "The chat session will be moderated by persons marked with ${mod-icon}. In case of misconduct, users can be warned, kicked from the chat or banned from the chat."
+#: ./browser/templates/chat_session_view.pt:91
+msgid "session_info_moderators"
+msgstr ""
+
+#. Default: "In this chat you can send private messages that are visible only to you and the recipient. To do this, click on the appropriate user name."
+#: ./browser/templates/chat_session_view.pt:96
+msgid "session_info_whisper_on"
+msgstr ""
+
+#. Default: "In this chat you can send private messages that are visible only to you and the moderator addressed. To do this, click on the appropriate user name."
+#: ./browser/templates/chat_session_view.pt:93
+msgid "session_info_whisper_restricted"
+msgstr ""
+
+#. Default: "You have been kicked from the chat by a moderator!"
+#: ./browser/chat.py:60
+msgid "session_kicked"
+msgstr ""
+
+#. Default: "Reason: ${reason}"
+#: ./browser/chat.py:63
+msgid "session_kicked_reason"
+msgstr ""
+
+#. Default: "Enter the maximum number of participants for this chat session if you want to limit it. If you enter 0, there is no restriction."
+#: ./content/chat_session.py:72
+msgid "session_max_users_desc"
+msgstr ""
+
+#. Default: "Maximum number of participants"
+#: ./content/chat_session.py:71
+msgid "session_max_users_label"
+msgstr ""
+
+#. Default: "Please enter your message here."
+#: ./browser/templates/chat_session_view.pt:55
+msgid "session_message_input_placeholder"
+msgstr ""
+
+#. Default: "Please log in to participate in a chat session."
+#: ./browser/chat_session.py:460
+msgid "session_not_authorized"
+msgstr ""
+
+#. Default: "Enter a password if you want to restrict access."
+#: ./content/chat_session.py:63
+msgid "session_password_desc"
+msgstr ""
+
+#. Default: "Password"
+#: ./content/chat_session.py:62
+msgid "session_password_label"
+msgstr ""
+
+#. Default: "Date and time when the chat session begins."
+#: ./content/chat_session.py:38
+msgid "session_start_date_desc"
+msgstr ""
+
+#. Default: "Begin"
+#: ./content/chat_session.py:37
+msgid "session_start_date_label"
+msgstr ""
+
+#. Default: "This message is displayed to each participant after entering chat session."
+#: ./content/chat_session.py:54
+msgid "session_welcome_message_desc"
+msgstr ""
+
+#. Default: "Welcome message"
+#: ./content/chat_session.py:53
+msgid "session_welcome_message_label"
+msgstr ""
+
+#. Default: "Start of the chat must be before its end."
+#: ./adapter/chat_session.py:125
+msgid "validation_end_before_start"
+msgstr ""
+
+#. Default: "End of the chat has no valid date format."
+#: ./adapter/chat_session.py:118
+msgid "validation_end_date_format_err"
+msgstr ""
+
+#. Default: "A valid HTML color code in hexadecimal format must be specified."
+#: ./validators.py:70
+msgid "validation_invalid_hex_color_code"
+msgstr ""
+
+#. Default: "A number must be entered."
+#: ./validators.py:29
+msgid "validation_no_number"
+msgstr ""
+
+#. Default: "The number must be ${number} or less than ${number}."
+#: ./validators.py:34
+msgid "validation_number_too_large"
+msgstr ""
+
+#. Default: "The number must be ${number} or greater than ${number}."
+#: ./validators.py:32
+msgid "validation_number_too_small"
+msgstr ""
+
+#. Default: "The chosen object is not a ZMySQL object."
+#: ./content/chat.py:271
+msgid "validation_object_is_not_zmysql_object"
+msgstr ""
+
+#. Default: "No object with this ID was found in any subpath."
+#: ./content/chat.py:274
+msgid "validation_object_not_found"
+msgstr ""
+
+#. Default: "The chosen prefix is already in use in this database. Please choose another prefix."
+#: ./content/chat.py:282
+msgid "validation_prefix_in_use"
+msgstr ""
+
+#. Default: "Start of the chat has no valid date format."
+#: ./adapter/chat_session.py:113
+msgid "validation_start_date_format_err"
+msgstr ""
+
+#. Default: "The length of this text cannot be above ${number} characters."
+#: ./validators.py:50
+msgid "validation_string_too_long"
+msgstr ""
+
+#. Default: "The length of this text cannot be below ${number} characters."
+#: ./validators.py:48
+msgid "validation_string_too_short"
+msgstr ""
+

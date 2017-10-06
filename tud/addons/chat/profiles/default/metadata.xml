@@ -3,5 +3,6 @@
     <version>1000</version>
     <dependencies>
         <dependency>profile-raptus.multilanguagefields:default</dependency>
+        <dependency>profile-jarn.jsi18n:default</dependency>
     </dependencies>
 </metadata>

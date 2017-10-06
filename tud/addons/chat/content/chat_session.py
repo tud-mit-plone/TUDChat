@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Python imports
 import logging
 
@@ -11,12 +9,13 @@ from Products.ATContentTypes.content import base, schemata
 from Products.Archetypes.atapi import Schema
 from Products.Archetypes.atapi import StringField, IntegerField, DateTimeField
 from Products.Archetypes.public import StringWidget, IntegerWidget, CalendarWidget
-from Products.validation.validators import ExpressionValidator, RegexValidator
 
 from raptus.multilanguagefields import fields as MultiLanguageFields
 from raptus.multilanguagefields import widgets as MultiLanguageWidgets
 
+from tud.addons.chat import chatMessageFactory as _
 from tud.addons.chat.interfaces import IChatSession
+from tud.addons.chat.validators import LengthValidator, MinMaxValidator
 
 logger = logging.getLogger('tud.addons.chat')
 
@@ -27,61 +26,61 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
         schemata           = 'default',
         default            = '',
         widget            = MultiLanguageWidgets.TextAreaWidget(
-            label        = "Beschreibung",
-            description  = "Wird über dem Chatfenster angezeigt."
+            label        = _(u'session_description_label', default = u'Description'),
+            description  = _(u'session_description_desc', default = u'Displayed above chat window.')
         )
     ),
     DateTimeField('start_date',
         required=True,
         searchable=False,
         widget=CalendarWidget(
-            label        = "Beginn",
-            description  = "Datum und Zeit, zu der die Chatsitzung beginnt."
+            label        = _(u'session_start_date_label', default = u'Begin'),
+            description  = _(u'session_start_date_desc', default = u'Date and time when the chat session begins.')
         )
     ),
     DateTimeField('end_date',
         required=True,
         searchable=False,
         widget=CalendarWidget(
-            label        = "Ende",
-            description  = "Datum und Zeit, zu der die Chatsitzung endet."
+            label        = _(u'session_end_date_label', default = u'End'),
+            description  = _(u'session_end_date_desc', default = u'Date and time when the chat session end.')
         )
     ),
     MultiLanguageFields.StringField('welcome_message',
         required           = False,
         default            = '',
         widget             = MultiLanguageWidgets.StringWidget(
-            label        = "Willkommensnachricht",
-            description  = "Diese Nachricht wird jedem Teilnehmer nach Betreten der Chatsitzung angezeigt."
+            label        = _(u'session_welcome_message_label', default = u'Welcome message'),
+            description  = _(u'session_welcome_message_desc', default = u'This message is displayed to each participant after entering chat session.')
         )
     ),
     StringField('password',
         required           = False,
         default            = '',
-        validators         = (ExpressionValidator('python: len(value) <= 30', 'Das Passwort darf maximal 30 Zeichen lang sein.'), ),
+        validators         = (LengthValidator('max_30_check', maximum = 30), ),
         widget             = StringWidget(
-            label        = "Passwort",
-            description  = "Geben Sie ein Passwort für die Chatsitzung an, falls Sie den Zugang beschränken wollen."
+            label        = _(u'session_password_label', default = u'Password'),
+            description  = _(u'session_password_desc', default = u'Enter a password if you want to restrict access.')
         )
     ),
     IntegerField('max_users',
         required           = False,
         default            = 0,
-        validators         = RegexValidator('checkNum', '^[0-9]+$', errmsg = 'Die maximale Benutzeranzahl muss eine Zahle groesser oder gleich 0 sein.'),
+        validators         = MinMaxValidator('min_0_check', minimum = 0),
         widget             = IntegerWidget(
-            label        = "maximale Teilnehmerzahl",
-            description  = "Geben Sie die maximale Anzahl an Teilnehmern der Chatsitzung ein, falls Sie diese limitieren möchten. Bei Eingabe von 0 gibt es keine Beschränkung."
+            label        = _(u'session_max_users_label', default = u'Maximum number of participants'),
+            description  = _(u'session_max_users_desc', default = u'Enter the maximum number of participants for this chat session if you want to limit it. If you enter 0, there is no restriction.')
         )
     ),
     IntegerField('chat_id',
         required           = True,
         default            = 0,
-        validators         = RegexValidator('checkNum', '^[0-9]+$', errmsg = 'Die Chat-ID muss eine Zahl groesser oder gleich 0 sein.'),
+        validators         = MinMaxValidator('min_0_check', minimum = 0),
         read_permission    = 'tud.addons.chat: Manage Chat',
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = StringWidget(
-            label        = "Chat-ID",
-            description  = "Eindeutige Datenbank-ID dieser Chatsitzung. Um die ID automatisch zu generieren, geben Sie an dieser Stelle 0 ein (funktioniert nur beim Anlegen)."
+            label        = _(u'session_chat_id_label', default = u'Chat ID'),
+            description  = _(u'session_chat_id_desc', default = u'Unique database ID for this chat session. If you want to generate the ID, enter 0 (this works only during creation).')
         )
     ),
 ),

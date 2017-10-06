@@ -1,5 +1,5 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
-  metal:use-macro="context/main_template/macros/master" i18n:domain="plone">
+  metal:use-macro="context/main_template/macros/master" i18n:domain="tud.addons.chat">
 
 
 <head>
@@ -28,10 +28,11 @@
 </head>
 
 
-<body metal:fill-slot="main" i18n:domain="tudchat" tal:define="chat_info view/getChatInformation;
-                                                               session_info view/getSessionInformation;
-                                                               whisper view/getWhisperOption;
-                                                               max_msg_length chat_info/maxMessageLength">
+<body metal:fill-slot="main" tal:define="toLocalizedTime nocall:context/@@plone/toLocalizedTime;
+                                         chat_info view/getChatInformation;
+                                         session_info view/getSessionInformation;
+                                         whisper view/getWhisperOption;
+                                         max_msg_length chat_info/maxMessageLength">
     <h1 class="documentFirstHeading" tal:content="session_info/title"></h1>
     <tal:block define="description session_info/description"
                condition="description">
@@ -51,14 +52,25 @@
         </div>
         <div id="chatMsg">
             <form id="chatMsgForm">
-                <textarea type="text" name="msg" id="chatMsgValue" autocomplete="off" rows="1" placeholder="Bitte geben Sie hier Ihre Nachricht ein." tal:attributes="maxlength python: max_msg_length > 0 and max_msg_length or None; style python: max_msg_length > 0 and 'padding-right: 80px' or None"></textarea>
+                <textarea type="text"
+                          name="msg"
+                          id="chatMsgValue"
+                          autocomplete="off"
+                          rows="1"
+                          placeholder="Please enter your message here."
+                          tal:attributes="maxlength python: max_msg_length > 0 and max_msg_length or None; style python: max_msg_length > 0 and 'padding-right: 80px' or None"
+                          i18n:attributes="placeholder session_message_input_placeholder"></textarea>
                 <span id="counter" tal:condition="python: max_msg_length > 0">0</span>
-                <button id="chatMsgSubmit" type="submit" title="Zum Absenden klicken oder mit 'Enter' bestätigen.">Absenden</button>
+                <button id="chatMsgSubmit"
+                        type="submit"
+                        title="Click or press 'Enter' to submit."
+                        i18n:attributes="title session_button_send_message_help"
+                        i18n:translate="session_button_send_message">Submit</button>
                 <span id='chatMsgMoreButtons' tal:condition="view/isAdmin"><button class='moreButtonsExpand icon-down'></button>
                     <span class="buttonsWrapper">
-                      <button data-method="warnUser" class='chatMsgMoreButton'>Warn</button>
-                        <button data-method="kickUser" class='chatMsgMoreButton'>Kick</button>
-                        <button data-method="banUser" class='chatMsgMoreButton'>Ban</button>
+                        <button data-method="warnUser" class='chatMsgMoreButton' i18n:translate="session_button_warn">Warn</button>
+                        <button data-method="kickUser" class='chatMsgMoreButton' i18n:translate="session_button_kick">Kick</button>
+                        <button data-method="banUser" class='chatMsgMoreButton' i18n:translate="session_button_ban">Ban</button>
                     </span>
                 </span>
             </form>
@@ -73,21 +85,21 @@
     </div>
     <div id="chatAppendix">
 
-        <h2>Hinweise zur Benutzung:</h2>
+        <h2 i18n:translate="session_how_to_use">How to use it:</h2>
         <p tal:define="chat_end session_info/end_date;
-                       chat_end python: chat_end.strftime('%d.%m.%Y, %H:%M Uhr')">
-            Die Chatsitzungen werden von den <span class='admin icon-view'>gekennzeichneten Personen</span> moderiert. Chatnutzer können bei Fehlverhalten verwarnt, aus dem Chat entfernt oder permanent verwiesen werden.
-            <span class="chatDuration" tal:content="string: Diese Chatsitzung ist bis zum ${chat_end} aktiv und wird anschließend automatisch geschlossen."></span>
-            <tal:block condition="python: whisper == 'restricted'">
-                In diesem Chat können Sie private Nachrichten verschicken, die nur für Sie und den adressierten Moderatoren sichtbar sind. Klicken Sie dafür auf den entsprechenden Nutzernamen.
+                       chat_end python: toLocalizedTime(chat_end, 'date_format_long')">
+            <tal:block i18n:translate="session_info_moderators">The chat session will be moderated by persons marked with <span class='admin icon-view' i18n:name="mod-icon"></span>. In case of misconduct, users can be warned, kicked from the chat or banned from the chat.</tal:block>
+            <span class="chatDuration" i18n:translate="session_info_active_until">This chat session is active until <tal:block tal:content="chat_end" i18n:name="end_date"></tal:block> and will be closed automatically.</span>
+            <tal:block condition="python: whisper == 'restricted'" i18n:translate="session_info_whisper_restricted">
+                In this chat you can send private messages that are visible only to you and the moderator addressed. To do this, click on the appropriate user name.
             </tal:block>
-            <tal:block condition="python: whisper == 'on'">
-                In diesem Chat können Sie private Nachrichten verschicken, die nur für Sie und den Adressaten sichtbar sind. Klicken Sie dafür auf den entsprechenden Nutzernamen.
+            <tal:block condition="python: whisper == 'on'" i18n:translate="session_info_whisper_on">
+                In this chat you can send private messages that are visible only to you and the recipient. To do this, click on the appropriate user name.
             </tal:block>
         </p>
 
         <p>
-            <button id="logout">Chatsitzung verlassen</button>
+            <button id="logout" i18n:translate="session_button_leave">Leave chat session</button>
         </p>
     </div>
 </body>

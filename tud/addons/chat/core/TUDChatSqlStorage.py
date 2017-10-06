@@ -8,7 +8,6 @@ from DateTime import DateTime
 
 # Products imports
 from Products.ZSQLMethods.SQL import SQL as ZSQL
-from tud.addons.chat.core.PersistenceInterface import ITUDChatStorage
 
 import logging
 logger = logging.getLogger('tud.addons.chat-sql')
@@ -217,7 +216,6 @@ class TUDChatSqlStorage(Globals.Persistent, Acquisition.Implicit):
     TUDChat SQL storage
     """
 
-    __implements__ = (ITUDChatStorage,)
     security = ClassSecurityInfo()
     _message_names = ('date', 'id', 'member', 'message')
     _database_datetimeformat = "%Y/%m/%d %H:%M:%S"

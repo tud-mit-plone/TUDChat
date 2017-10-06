@@ -70,7 +70,7 @@ var getUnameLink = function(username, options) {
     notSelf: true, // only print the link if the user is not the current user
     afterStart: true, // only print the link if we are not in the firstGetActions phase
     checkOnline: false, // check if the username is 'online'
-    linkTitle: "Private Nachricht an " + username + " schicken", // title of the link
+    linkTitle: _('send_private_message', {user: username}), // title of the link
     preText: "", // text that will be prepended (before the link)
     fallback: false // fallback as alternative to the link
   };
@@ -163,7 +163,7 @@ var updateCheck = function(welcome_message){
 
     if (data.status.code == 5) { // Warned
       //$.doTimeout( 'updateCheck' ); // stop updateCheck
-      $.notification.warn("Verwarnung! <br/><br/> <em>" + data.status.message+"</em>", false, [{"name" :"Ok",
+      $.notification.warn(_('warning') + "<br/><br/> <em>" + data.status.message+"</em>", false, [{"name" :_('button_ok'),
                                                                           "click":function(){
                                                                             $.notification.close($(this).closest(".notification").attr("id"));
                                                                           }},
@@ -188,7 +188,7 @@ var updateCheck = function(welcome_message){
           var username = usernames[i];
           var role = users[i]['is_admin'] ? 'admin' : 'user';
           var added = false;
-          element = $(printNewUser(username, role)).attr({"data-uname": username, "title": role == 'admin' ? username + " ist Moderator." : ""});
+          element = $(printNewUser(username, role)).attr({"data-uname": username, "title": role == 'admin' ? _('user_is_moderator', {user: username}) : ""});
 
           $("#userContainer").children().each(function(){ // Enumerate all existing names and insert alphabetically
             var otherRole = $(this).hasClass('adminrole');
@@ -208,10 +208,10 @@ var updateCheck = function(welcome_message){
           // Notification: User has entered the room
           if (!firstGetActions){
             if (usernames.length == 1)
-              $("#chatContent").append("<div class='chat-info'><span class='username'>"+usernames+"</span> hat die Chatsitzung betreten.</div>");
+              $("#chatContent").append("<div class='chat-info'>" + _('user_enters_room', {user: "<span class='username'>"+usernames+"</span>"}) + "</div>");
             else if (usernames.length != 0) {
               last_user = usernames.pop();
-              $("#chatContent").append("<div class='chat-info'><span class='username'>"+usernames.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben die Chatsitzung betreten.</div>");
+              $("#chatContent").append("<div class='chat-info'>" + _('users_enter_room', {users: "<span class='username'>"+usernames.join(', ')+"</span>", last_user: "<span class='username'>"+last_user+"</span>"}) + "</div>");
             }
           }
         }
@@ -224,10 +224,10 @@ var updateCheck = function(welcome_message){
           // Notification: User has left the room
           if (!firstGetActions){
             if (user.length == 1)
-              $("#chatContent").append("<div class='chat-info'><span class='username'>"+user+"</span> hat die Chatsitzung verlassen.</div>");
+              $("#chatContent").append("<div class='chat-info'>" + _('user_leaves_room', {user: "<span class='username'>"+user+"</span>"}) + "</div>");
             else if (user.length != 0) {
               last_user = user.pop();
-              $("#chatContent").append("<div class='chat-info'><span class='username'>"+user.join(', ')+"</span> und <span class='username'>"+last_user+"</span> haben die Chatsitzung verlassen.</div>");
+              $("#chatContent").append("<div class='chat-info'>" + _('users_leave_room', {users: "<span class='username'>"+user.join(', ')+"</span>", last_user: "<span class='username'>"+last_user+"</span>"}) + "</div>");
             }
           }
         }
@@ -337,11 +337,11 @@ var applyAttributes = function (message, attributes) {
     if(typeof(attributes)!="undefined"){
         for (var i = 0; i < attributes.length; i++) {
             if (attributes[i].a_action == 'mod_edit_message') {
-                additional_content += getUnameLink(attributes[i].a_name, { preText: " Bearbeitet durch ", toAdmin: true });
+                additional_content += getUnameLink(attributes[i].a_name, { preText: _('message_edited_by') + " ", toAdmin: true });
                 entry_classes += " admin_edit";
             }
             if (attributes[i].a_action == 'mod_delete_message') {
-                additional_content = getUnameLink(attributes[i].a_name, { preText: "Gel&ouml;scht durch ", toAdmin: true });
+                additional_content = getUnameLink(attributes[i].a_name, { preText: _('message_deleted_by') + " ", toAdmin: true });
                 entry_classes += " admin_delete";
             }
             if (attributes[i].admin_message == true) {
@@ -368,6 +368,9 @@ var removeTarget = function() {
 
 $(document).ready(
     function(){
+
+      jarn.i18n.loadCatalog('tud.addons.chat.js');
+      _ = jarn.i18n.MessageFactory('tud.addons.chat.js');
 
       // read the data-settings on the chat DOM-object
       dateFrequency = $('#chat').data('date_frequency');
@@ -422,13 +425,13 @@ $(document).ready(
        // security information for user links
         $("#chatContent").delegate(".message_content a", "click", function(e) {
             if(!$(this).hasClass("username") && !$(e.target.parentNode.parentNode).hasClass('admin_message')){
-                $.notification.warn("Dieser Link wurde nicht von einem Moderator geschrieben. Die TU Dresden distanziert sich an dieser Stelle ausdrücklich vom Inhalt dieses Links.<br/><br/> Soll der Link <tt>" + e.target.href + "</tt> wirklich geöffnet werden?", false,
-                                                                        [{"name" :"Ja",
+                $.notification.warn(_('link_warning_1') + "<br/><br/>" + _('link_warning_2', {link: "<tt>" + e.target.href + "</tt>"}), false,
+                                                                        [{"name" :_('button_yes'),
                                                                             "click":function(){
                                                                               window.open(e.target.href,"_blank")
                                                                               $.notification.clear();
                                                                             }},
-                                                                        {"name" :"Nein", "click": $.notification.clear },
+                                                                        {"name" :_('button_no'), "click": $.notification.clear },
                                                                          ]);
                 e.preventDefault();
             }
@@ -445,7 +448,7 @@ $(document).ready(
 
       target = $(e.target).data("uname");
 
-      var $targetContent = $('<span id="chatMsgTarget">Nachricht an: ' + target + ' <a href="#" class="close"></a></span>');
+      var $targetContent = $('<span id="chatMsgTarget">' + _('message_to', {target: target}) + ' <a href="#" class="close"></a></span>');
       var $chatMsgValue = $('#chatMsgForm #chatMsgValue');
 
       $('#chatMsgForm').prepend($targetContent);

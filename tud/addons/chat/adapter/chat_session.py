@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import re
 
 from DateTime import DateTime
@@ -7,6 +6,7 @@ from OFS.interfaces import IObjectClonedEvent
 from plone.indexer.decorator import indexer
 
 from tud.addons.chat.interfaces import IChat, IChatSession
+from tud.addons.chat import chatMessageFactory as _
 
 @indexer(IChatSession)
 def startDateIndexer(object, **kw):
@@ -75,10 +75,10 @@ def action_succeeded_handler(obj, event):
                 old_name = user
 
                 i += 1
-                new_name = "Benutzer "+str(i)
+                new_name = obj.translate(_(u'log_user', default = u'User ${user}', mapping = {u'user' : str(i)}))
                 while new_name in users:
                     i += 1
-                    new_name = "Benutzer "+str(i)
+                    new_name = obj.translate(_(u'log_user', default = u'User ${user}', mapping = {u'user' : str(i)}))
 
                 chat_storage.updateUserName(chat_id, old_name, new_name)
 
@@ -110,18 +110,18 @@ class StartEndDateValidator(object):
         try:
             start = DateTime(start_date)
         except:
-            errors['start_date'] = u'Der Beginn des Chats hat kein gültiges Datumsformat.'
+            errors['start_date'] = self.context.translate(_(u'validation_start_date_format_err', default = u'Start of the chat has no valid date format.'))
 
         try:
             end = DateTime(end_date)
         except:
-            errors['end_date'] = u'Das Ende des Chats hat kein gültiges Datumsformat.'
+            errors['end_date'] = self.context.translate(_(u'validation_end_date_format_err', default = u'End of the chat has no valid date format.'))
 
         if 'start_date' in errors or 'end_date' in errors:
             # No point in validating bad input
             return errors
 
         if start > end:
-            errors['end_date'] = u'Der Beginn des Chats muss vor dessen Ende liegen.'
+            errors['end_date'] = self.context.translate(_(u'validation_end_before_start', default = u'Start of the chat must be before its end.'))
 
         return errors and errors or None
