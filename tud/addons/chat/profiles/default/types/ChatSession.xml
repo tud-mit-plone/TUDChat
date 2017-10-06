@@ -5,7 +5,7 @@
         i18n:domain="tud.addons.chat">
     <property name="title" i18n:translate="">ChatSession</property>
     <property name="description"></property>
-    <property name="content_icon"></property>
+    <property name="content_icon">content_icon.gif</property>
     <property name="content_meta_type">ChatSession</property>
     <property name="product">tud.addons.chat</property>
     <property name="factory">addChatSession</property>
