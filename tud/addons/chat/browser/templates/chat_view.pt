@@ -118,11 +118,11 @@
         </tal:block>
         <tal:block i18n:name="whisper_information">
             <tal:block condition="python: whisper == 'off'" i18n:translate="data_protection_whisper_off">In this chat no private messages can be sent.</tal:block>
-            <tal:block condition="python: whisper == 'restricted'" i18n:translate="data_protection_whisper_restricted">In this chat you can send private messages that are visible only to you and the moderator addressed.</tal:block>
+            <tal:block condition="python: whisper == 'restricted'" i18n:translate="data_protection_whisper_restricted">In this chat you can send private messages that are visible only to you and the moderator being addressed.</tal:block>
             <tal:block condition="python: whisper == 'on'" i18n:translate="data_protection_whisper_on">In this chat you can send private messages that are only visible to you and the recipient.</tal:block>
         </tal:block>
         If you wish to transmit confidential information, please use the e-mail contact data on the websites.
-        The messages are stored anonymously together with a time stamp beyond the chat time. Please note that personal information in the chat messages cannot be anonymized. An evaluation of the chat sessions by the moderators is made exclusively for the improvement of the offers. Three months after the chat session expires, the data is automatically deleted.
+        The messages are stored anonymously together with a time stamp beyond the chat time. Please note that personal information in the chat messages cannot be anonymized. An evaluation of the chat sessions by the moderators is made exclusively for the improvement of the offers. Three months after the chat session expires, the data will be automatically deleted.
     </p>
 </tal:block>
 
@@ -160,7 +160,7 @@
         </div>
 
         <div>
-          <label for="username" i18n:translate="login_username">desired username</label>
+          <label for="username" i18n:translate="login_username">Desired username</label>
           <span class="formHelp" id="username_help" i18n:translate="login_username_help">To stay anonymous, please use a nickname as your username.</span>
           <input type="text" name="username" id="username" maxlength="20" />
         </div>

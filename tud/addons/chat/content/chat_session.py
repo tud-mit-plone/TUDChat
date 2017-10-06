@@ -79,8 +79,8 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
         read_permission    = 'tud.addons.chat: Manage Chat',
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = StringWidget(
-            label        = _(u'session_chat_id_label', default = u'Chat id'),
-            description  = _(u'session_chat_id_desc', default = u'Unique database id for this chat session. If you want to generate the ID, enter 0 (this works only during creation).')
+            label        = _(u'session_chat_id_label', default = u'Chat ID'),
+            description  = _(u'session_chat_id_desc', default = u'Unique database ID for this chat session. If you want to generate the ID, enter 0 (this works only during creation).')
         )
     ),
 ),

@@ -57,7 +57,7 @@ class ChatView(BrowserView):
         session = self.request.SESSION
 
         if session.has_key("chat_kick_message"):
-            message = self.context.translate(_(u'session_kicked', default = u'You\'ve been kicked from the chat by a moderator!'))
+            message = self.context.translate(_(u'session_kicked', default = u'You have been kicked from the chat by a moderator!'))
 
             if session["chat_kick_message"]:
                 message += "<br /><br />" + self.context.translate(_(u'session_kicked_reason', default = u'Reason: ${reason}', mapping={u'reason': session["chat_kick_message"]}))
@@ -67,7 +67,7 @@ class ChatView(BrowserView):
             return message
 
         if session.has_key("chat_ban_message"):
-            message = self.context.translate(_(u'session_banned', default = u'You\'ve been banned from the chat by a moderator!'))
+            message = self.context.translate(_(u'session_banned', default = u'You have been banned from the chat by a moderator!'))
 
             if session["chat_ban_message"]:
                 message += "<br /><br />" + self.context.translate(_(u'session_banned_reason', default = u'Reason: ${reason}', mapping={u'reason': session["chat_ban_message"]}))

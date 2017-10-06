@@ -376,7 +376,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         user = user.strip()
 
         if agreement == "false":
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_privacy', default = u'You will not be able to enter the chat without agreeing to the privacy notice.'))}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_privacy', default = u'You will not be able to enter the chat without agreeing the privacy notice.'))}}
 
         chat_password = context.getField('password').get(context)
         if chat_password and chat_password != password:
@@ -387,13 +387,13 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_max_users', default = u'The user limit for this chat session has been reached.'))}}
 
         if len(re.findall(u"[a-zA-ZäöüÄÖÜ]",user))<3:
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_short_name', default = u'Your username is too short; it must be at least 3 characters long.'))}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_short_name', default = u'Your username is too short and must be at least 3 characters long.'))}}
 
         if len(user) < 3:
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_short_name', default = u'Your username is too short; it must be at least 3 characters long.'))}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_short_name', default = u'Your username is too short and must be at least 3 characters long.'))}}
 
         if len(user) > 20:
-            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_long_name', default = u'Your username is too long, it may not be longer than 20 characters.'))}}
+            return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_long_name', default = u'Your username is too long and may not be longer than 20 characters.'))}}
 
         if not self.isActive():
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_session_inactive', default = u'The chosen chat session is currently inactive.'))}}

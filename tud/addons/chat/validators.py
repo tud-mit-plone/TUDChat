@@ -45,9 +45,9 @@ class LengthValidator(MinMaxValidator):
         value = unicode(value, "utf8")
 
         if self.minimum is not None and len(value) < self.minimum:
-            return instance.translate(_(u'validation_string_too_short', default = u'A length of ${number} characters must not be undercut.', mapping={u'number': self.minimum}))
+            return instance.translate(_(u'validation_string_too_short', default = u'The length of this text cannot be below ${number} characters.', mapping={u'number': self.minimum}))
         if self.maximum is not None and len(value) > self.maximum:
-            return instance.translate(_(u'validation_string_too_long', default = u'A length of ${number} characters must not be exceeded.', mapping={u'number': self.maximum}))
+            return instance.translate(_(u'validation_string_too_long', default = u'The length of this text cannot be above ${number} characters.', mapping={u'number': self.maximum}))
 
         return True
 

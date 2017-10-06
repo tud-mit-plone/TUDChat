@@ -57,7 +57,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         default            = '',
         widget            = MultiLanguageWidgets.TextAreaWidget(
             label        = _(u'chat_introduction_label', default = u'Welcoming text'),
-            description  = _(u'chat_introduction_desc', default = u'Displayed at chat session selection')
+            description  = _(u'chat_introduction_desc', default = u'This text will be displayed at chat session selection.')
         )
     ),
     StringField("connector_id",
@@ -70,7 +70,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = StringWidget(
             label        = _(u'chat_database_label', default = u'database'),
-            description  = _(u'chat_database_desc', default = u'Please enter ID of ZMySQL object. The object must be located in a sub-path of the chat object.')
+            description  = _(u'chat_database_desc', default = u'Please enter the ID of the ZMySQL object. The object must be located in a sub-path of the chat object.')
         )
     ),
     StringField("database_prefix",
@@ -91,8 +91,8 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         default            = 'minute',
         vocabulary         = DATE_FREQUENCIES,
         widget             = SelectionWidget(
-            label        = _(u'chat_date_frequency_label', default = u'Time information in chat'),
-            description  = _(u'chat_date_frequency_desc', default = u'If you want a time information for each message, choose \'at every message\'. If you choose \'maximum once per minute\', the time is given maximally once per minute. If no time is to be given before messages, choose \'disabled\'.'),
+            label        = _(u'chat_date_frequency_label', default = u'Time stamp in chat'),
+            description  = _(u'chat_date_frequency_desc', default = u'If you want a time stamp for each message, choose \'at every message\'. If you choose \'maximum once per minute\', the time is given maximally once per minute. If no time is to be given before messages, choose \'disabled\'.'),
             format       = "select",
         )
     ),
@@ -113,7 +113,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         write_permission   = 'tud.addons.chat: Manage Chat',
         widget             = IntegerWidget(
             label        = _(u'chat_timeout_label', default = u'Socket timeout (in seconds)'),
-            description  = _(u'chat_timeout_desc', default = u'If a participant has not communicated with the server during this time period, it will be removed automatically.')
+            description  = _(u'chat_timeout_desc', default = u'If a participant has not communicated with the server during this time period, he or she will be removed automatically.')
         )
     ),
     IntegerField('refreshRate',
@@ -132,7 +132,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         validators         = (MinMaxValidator('min_0_check', minimum = 0), ),
         widget             = IntegerWidget(
             label        = _(u'chat_max_message_length_label', default = u'Maximum message length'),
-            description  = _(u'chat_max_message_length_desc', default = u'Maximum number of characters that a single chat message can consist of. Enter 0, if you don\'t want to restrict the message length.')
+            description  = _(u'chat_max_message_length_desc', default = u'Maximum number of characters that a single chat message can consist of. Enter 0, if you do not want to restrict the message length.')
         )
     ),
     IntegerField('blockTime',
@@ -141,7 +141,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         validators         = (MinMaxValidator('min_0_check', minimum = 0), ),
         widget             = IntegerWidget(
             label        = _(u'chat_block_time_label', default = u'Waiting time between messages (in seconds)'),
-            description  = _(u'chat_block_time_desc', default = u'Minimum time period between two messages of a user.')
+            description  = _(u'chat_block_time_desc', default = u'Minimum time period between two messages from a user.')
         )
     ),
     StringField('banStrategy',
@@ -268,7 +268,7 @@ class Chat(base.ATCTFolder):
                 try:
                     zmysql = getattr(self, connector_id)
                     if not isinstance(zmysql, Connection):
-                        errors['connector_id'] = _(u'validation_object_is_not_zmysql_object', default = u'The chosen object isn\'t a ZMySQL object.')
+                        errors['connector_id'] = _(u'validation_object_is_not_zmysql_object', default = u'The chosen object is not a ZMySQL object.')
                         zmysql = None
                 except AttributeError:
                     errors['connector_id'] = _(u'validation_object_not_found', default = u'No object with this ID was found in any subpath.')
