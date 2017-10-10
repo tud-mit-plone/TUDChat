@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2017-10-06 00:07+0000\n"
+"POT-Creation-Date: 2017-10-10 12:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,92 +26,92 @@ msgid "ChatSession"
 msgstr ""
 
 #. Default: "Username and messages of moderators will be marked with this color. The input must be made as HTML color code (e.g. #ff0000)"
-#: ./content/chat.py:106
+#: ./content/chat.py:99
 msgid "chat_admin_color_desc"
 msgstr ""
 
 #. Default: "Marking color for chat moderators"
-#: ./content/chat.py:105
+#: ./content/chat.py:98
 msgid "chat_admin_color_label"
 msgstr ""
 
 #. Default: "only cookie (recommended)"
-#: ./content/chat.py:41
+#: ./content/chat.py:34
 msgid "chat_ban_strategy_cookie"
 msgstr ""
 
 #. Default: "cookie and ip address (restrictive)"
-#: ./content/chat.py:43
+#: ./content/chat.py:36
 msgid "chat_ban_strategy_cookie_and_ip"
 msgstr ""
 
 #. Default: "Method to mark a user, which is permanently banned from the chat."
-#: ./content/chat.py:155
+#: ./content/chat.py:148
 msgid "chat_ban_strategy_desc"
 msgstr ""
 
 #. Default: "only ip address"
-#: ./content/chat.py:42
+#: ./content/chat.py:35
 msgid "chat_ban_strategy_ip"
 msgstr ""
 
 #. Default: "Ban strategy"
-#: ./content/chat.py:154
+#: ./content/chat.py:147
 msgid "chat_ban_strategy_label"
 msgstr ""
 
 #. Default: "Minimum time period between two messages from a user."
-#: ./content/chat.py:144
+#: ./content/chat.py:137
 msgid "chat_block_time_desc"
 msgstr ""
 
 #. Default: "Waiting time between messages (in seconds)"
-#: ./content/chat.py:143
+#: ./content/chat.py:136
 msgid "chat_block_time_label"
 msgstr ""
 
 #. Default: "Please enter the ID of the ZMySQL object. The object must be located in a sub-path of the chat object."
-#: ./content/chat.py:73
+#: ./content/chat.py:66
 msgid "chat_database_desc"
 msgstr ""
 
 #. Default: "database"
-#: ./content/chat.py:72
+#: ./content/chat.py:65
 msgid "chat_database_label"
 msgstr ""
 
 #. Default: "Please enter a prefix for tables in the database, e.g. institutionname"
-#: ./content/chat.py:86
+#: ./content/chat.py:79
 msgid "chat_database_prefix_desc"
 msgstr ""
 
 #. Default: "database prefix"
-#: ./content/chat.py:85
+#: ./content/chat.py:78
 msgid "chat_database_prefix_label"
 msgstr ""
 
 #. Default: "If you want a time stamp for each message, choose 'at every message'. If you choose 'maximum once per minute', the time is given maximally once per minute. If no time is to be given before messages, choose 'disabled'."
-#: ./content/chat.py:95
+#: ./content/chat.py:88
 msgid "chat_date_frequency_desc"
 msgstr ""
 
 #. Default: "disabled"
-#: ./content/chat.py:35
+#: ./content/chat.py:28
 msgid "chat_date_frequency_disabled"
 msgstr ""
 
 #. Default: "Time stamp in chat"
-#: ./content/chat.py:94
+#: ./content/chat.py:87
 msgid "chat_date_frequency_label"
 msgstr ""
 
 #. Default: "at every message"
-#: ./content/chat.py:37
+#: ./content/chat.py:30
 msgid "chat_date_frequency_message"
 msgstr ""
 
 #. Default: "maximum once per minute"
-#: ./content/chat.py:36
+#: ./content/chat.py:29
 msgid "chat_date_frequency_minute"
 msgstr ""
 
@@ -136,22 +136,22 @@ msgid "chat_future_sessions"
 msgstr ""
 
 #. Default: "This text will be displayed at chat session selection."
-#: ./content/chat.py:60
+#: ./content/chat.py:53
 msgid "chat_introduction_desc"
 msgstr ""
 
 #. Default: "Welcoming text"
-#: ./content/chat.py:59
+#: ./content/chat.py:52
 msgid "chat_introduction_label"
 msgstr ""
 
 #. Default: "Maximum number of characters that a single chat message can consist of. Enter 0, if you do not want to restrict the message length."
-#: ./content/chat.py:135
+#: ./content/chat.py:128
 msgid "chat_max_message_length_desc"
 msgstr ""
 
 #. Default: "Maximum message length"
-#: ./content/chat.py:134
+#: ./content/chat.py:127
 msgid "chat_max_message_length_label"
 msgstr ""
 
@@ -171,32 +171,32 @@ msgid "chat_no_future_sessions"
 msgstr ""
 
 #. Default: "Specifies the maximum number of recent messages displayed to a new participant when entering the chat session. Enter 0, if no recent messages should be shown."
-#: ./content/chat.py:165
+#: ./content/chat.py:158
 msgid "chat_old_messages_count_desc"
 msgstr ""
 
 #. Default: "Number of recent messages when entering a chat session"
-#: ./content/chat.py:164
+#: ./content/chat.py:157
 msgid "chat_old_messages_count_label"
 msgstr ""
 
 #. Default: "Specifies the maximum age of recent messages so that they will still be shown. Enter 0, if you want recent messages to be displayed regardless of their age. This setting is only used if the number of recent messages to be displayed is greater than 0."
-#: ./content/chat.py:174
+#: ./content/chat.py:167
 msgid "chat_old_messages_minutes_desc"
 msgstr ""
 
 #. Default: "Age of recent messages on entering a chat session (in minutes)"
-#: ./content/chat.py:173
+#: ./content/chat.py:166
 msgid "chat_old_messages_minutes_label"
 msgstr ""
 
 #. Default: "Specifies how often the chat display is updated."
-#: ./content/chat.py:126
+#: ./content/chat.py:119
 msgid "chat_refresh_rate_desc"
 msgstr ""
 
 #. Default: "Refresh rate (in seconds)"
-#: ./content/chat.py:125
+#: ./content/chat.py:118
 msgid "chat_refresh_rate_label"
 msgstr ""
 
@@ -206,37 +206,37 @@ msgid "chat_session"
 msgstr ""
 
 #. Default: "If a participant has not communicated with the server during this time period, he or she will be removed automatically."
-#: ./content/chat.py:116
+#: ./content/chat.py:109
 msgid "chat_timeout_desc"
 msgstr ""
 
 #. Default: "Socket timeout (in seconds)"
-#: ./content/chat.py:115
+#: ./content/chat.py:108
 msgid "chat_timeout_label"
 msgstr ""
 
 #. Default: "When whispering, a private message is sent that only the sender and the recipient can see. If the mode 'only with moderators' is chosen, participants can only whisper with moderators, but not among themselves"
-#: ./content/chat.py:183
+#: ./content/chat.py:176
 msgid "chat_whisper_desc"
 msgstr ""
 
 #. Default: "disabled"
-#: ./content/chat.py:47
+#: ./content/chat.py:40
 msgid "chat_whisper_disabled"
 msgstr ""
 
 #. Default: "enabled"
-#: ./content/chat.py:49
+#: ./content/chat.py:42
 msgid "chat_whisper_enabled"
 msgstr ""
 
 #. Default: "Whisper"
-#: ./content/chat.py:182
+#: ./content/chat.py:175
 msgid "chat_whisper_label"
 msgstr ""
 
 #. Default: "only with moderators"
-#: ./content/chat.py:48
+#: ./content/chat.py:41
 msgid "chat_whisper_moderators"
 msgstr ""
 
@@ -556,32 +556,32 @@ msgid "session_button_warn"
 msgstr ""
 
 #. Default: "Unique database ID for this chat session. If you want to generate the ID, enter 0 (this works only during creation)."
-#: ./content/chat_session.py:83
+#: ./content/chat_session.py:75
 msgid "session_chat_id_desc"
 msgstr ""
 
 #. Default: "Chat ID"
-#: ./content/chat_session.py:82
+#: ./content/chat_session.py:74
 msgid "session_chat_id_label"
 msgstr ""
 
 #. Default: "Displayed above chat window."
-#: ./content/chat_session.py:30
+#: ./content/chat_session.py:22
 msgid "session_description_desc"
 msgstr ""
 
 #. Default: "Description"
-#: ./content/chat_session.py:29
+#: ./content/chat_session.py:21
 msgid "session_description_label"
 msgstr ""
 
 #. Default: "Date and time when the chat session end."
-#: ./content/chat_session.py:46
+#: ./content/chat_session.py:38
 msgid "session_end_date_desc"
 msgstr ""
 
 #. Default: "End"
-#: ./content/chat_session.py:45
+#: ./content/chat_session.py:37
 msgid "session_end_date_label"
 msgstr ""
 
@@ -631,12 +631,12 @@ msgid "session_kicked_reason"
 msgstr ""
 
 #. Default: "Enter the maximum number of participants for this chat session if you want to limit it. If you enter 0, there is no restriction."
-#: ./content/chat_session.py:72
+#: ./content/chat_session.py:64
 msgid "session_max_users_desc"
 msgstr ""
 
 #. Default: "Maximum number of participants"
-#: ./content/chat_session.py:71
+#: ./content/chat_session.py:63
 msgid "session_max_users_label"
 msgstr ""
 
@@ -651,32 +651,32 @@ msgid "session_not_authorized"
 msgstr ""
 
 #. Default: "Enter a password if you want to restrict access."
-#: ./content/chat_session.py:63
+#: ./content/chat_session.py:55
 msgid "session_password_desc"
 msgstr ""
 
 #. Default: "Password"
-#: ./content/chat_session.py:62
+#: ./content/chat_session.py:54
 msgid "session_password_label"
 msgstr ""
 
 #. Default: "Date and time when the chat session begins."
-#: ./content/chat_session.py:38
+#: ./content/chat_session.py:30
 msgid "session_start_date_desc"
 msgstr ""
 
 #. Default: "Begin"
-#: ./content/chat_session.py:37
+#: ./content/chat_session.py:29
 msgid "session_start_date_label"
 msgstr ""
 
 #. Default: "This message is displayed to each participant after entering chat session."
-#: ./content/chat_session.py:54
+#: ./content/chat_session.py:46
 msgid "session_welcome_message_desc"
 msgstr ""
 
 #. Default: "Welcome message"
-#: ./content/chat_session.py:53
+#: ./content/chat_session.py:45
 msgid "session_welcome_message_label"
 msgstr ""
 
@@ -691,7 +691,7 @@ msgid "validation_end_date_format_err"
 msgstr ""
 
 #. Default: "A valid HTML color code in hexadecimal format must be specified."
-#: ./validators.py:70
+#: ./validators.py:69
 msgid "validation_invalid_hex_color_code"
 msgstr ""
 
@@ -711,18 +711,13 @@ msgid "validation_number_too_small"
 msgstr ""
 
 #. Default: "The chosen object is not a ZMySQL object."
-#: ./content/chat.py:271
+#: ./content/chat.py:264
 msgid "validation_object_is_not_zmysql_object"
 msgstr ""
 
 #. Default: "No object with this ID was found in any subpath."
-#: ./content/chat.py:274
+#: ./content/chat.py:267
 msgid "validation_object_not_found"
-msgstr ""
-
-#. Default: "The chosen prefix is already in use in this database. Please choose another prefix."
-#: ./content/chat.py:282
-msgid "validation_prefix_in_use"
 msgstr ""
 
 #. Default: "Start of the chat has no valid date format."
@@ -738,5 +733,10 @@ msgstr ""
 #. Default: "The length of this text cannot be below ${number} characters."
 #: ./validators.py:48
 msgid "validation_string_too_short"
+msgstr ""
+
+#. Default: "The chosen prefix is already in use in this database. If you don't want use the already used prefix, please change it!"
+#: ./content/chat.py:276
+msgid "warning_prefix_in_use"
 msgstr ""
 
