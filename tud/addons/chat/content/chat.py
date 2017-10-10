@@ -1,6 +1,3 @@
-# Python imports
-import logging
-
 from OFS.CopySupport import CopyError
 
 # Zope imports
@@ -25,8 +22,6 @@ from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
 from tud.addons.chat import chatMessageFactory as _
 from tud.addons.chat.interfaces import IChat
 from tud.addons.chat.validators import MinMaxValidator, HexColorCodeValidator
-
-logger = logging.getLogger('tud.addons.chat')
 
 DATE_FREQUENCIES = DisplayList((
     ('off', _(u'chat_date_frequency_disabled', default = u'disabled')),

@@ -1,10 +1,6 @@
-import logging
-
 from zope.container.interfaces import IContainerModifiedEvent
 
 from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
-
-logger = logging.getLogger('tud.addons.chat')
 
 def edited_handler(obj, event):
     # ignore addition, removal and reordering of sub-objects
@@ -21,5 +17,3 @@ def edited_handler(obj, event):
         obj.own_database_prefixes[connector_id].add(database_prefix)
     else:
         obj.own_database_prefixes[connector_id] = set([database_prefix])
-
-    logger.info("TUDChat: connector_id = %s" % (connector_id,))

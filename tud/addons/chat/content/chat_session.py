@@ -1,6 +1,3 @@
-# Python imports
-import logging
-
 # Zope imports
 from zope.interface import implementer
 
@@ -13,8 +10,6 @@ from Products.Archetypes.public import StringWidget, TextAreaWidget, IntegerWidg
 from tud.addons.chat import chatMessageFactory as _
 from tud.addons.chat.interfaces import IChatSession
 from tud.addons.chat.validators import LengthValidator, MinMaxValidator
-
-logger = logging.getLogger('tud.addons.chat')
 
 ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
     TextField('description',
