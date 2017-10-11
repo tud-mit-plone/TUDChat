@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
-import simplejson
+import json
 import urllib
 
 from zope.component import getUtility, getAdapter
@@ -110,10 +110,10 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         parameters = self.request.form
 
         if not parameters.get('method'):
-            return simplejson.dumps("ERROR: Parameter 'method' is required")
+            return json.dumps("ERROR: Parameter 'method' is required")
 
         if len(parameters.get('method')) <= 1:
-            return simplejson.dumps("ERROR: Parameter 'method' is invalid")
+            return json.dumps("ERROR: Parameter 'method' is invalid")
 
         method = "ajax{}{}".format(parameters.get('method')[0].upper(), parameters.get('method')[1:])
         del parameters['method']
@@ -126,15 +126,15 @@ class ChatSessionAjaxView(ChatSessionBaseView):
                     try:
                         parameters[key] = parameters[key].decode("utf-8")
                     except ValueError:
-                        return simplejson.dumps("ERROR: Parameter '{}' is no valid utf-8 string".format(key))
+                        return json.dumps("ERROR: Parameter '{}' is no valid utf-8 string".format(key))
 
                     for forbiddenchar in self.forbiddenchars:
                         parameters[key] = parameters[key].replace(forbiddenchar, '')
 
             result = getattr(self, method)(**parameters)
-            return simplejson.dumps(result)
+            return json.dumps(result)
         else:
-            return simplejson.dumps("ERROR: Method not available")
+            return json.dumps("ERROR: Method not available")
 
     ## @brief get IP address from a request
     #  @return string IP address as a string or None if not available

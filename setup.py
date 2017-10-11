@@ -27,7 +27,6 @@ setup(name='tud.addons.chat',
           'setuptools',
           'plone.api',
           'Products.ZMySQLDA',
-          'simplejson',
           'collective.beaker',
           'python-dateutil',
           'jarn.jsi18n'
