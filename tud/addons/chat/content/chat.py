@@ -4,6 +4,7 @@ from OFS.CopySupport import CopyError
 from AccessControl import ClassSecurityInfo
 from zope.interface import implementer
 from zope.security import checkPermission
+from zope.component import getAdapters, getAdapter
 
 # CMF imports
 from Products.CMFCore.utils import getToolByName
@@ -14,14 +15,12 @@ from Products.Archetypes.atapi import Schema
 from Products.Archetypes.atapi import StringField, TextField, IntegerField
 from Products.Archetypes.public import StringWidget, TextAreaWidget, SelectionWidget, IntegerWidget
 from Products.Archetypes.public import DisplayList
-from Products.ZMySQLDA.DA import Connection
-
 from plone import api
 
 from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
 
 from tud.addons.chat import chatMessageFactory as _
-from tud.addons.chat.interfaces import IChat
+from tud.addons.chat.interfaces import IChat, IDatabaseObject
 from tud.addons.chat.validators import MinMaxValidator, HexColorCodeValidator
 
 DATE_FREQUENCIES = DisplayList((
@@ -51,6 +50,18 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
         widget            = TextAreaWidget(
             label        = _(u'chat_introduction_label', default = u'Welcoming text'),
             description  = _(u'chat_introduction_desc', default = u'This text will be displayed at chat session selection.')
+        )
+    ),
+    StringField('database_adapter',
+        required           = True,
+        default            = 'mysql',
+        vocabulary         = 'getDatabaseAdapters',
+        read_permission    = 'tud.addons.chat: Manage Chat',
+        write_permission   = 'tud.addons.chat: Manage Chat',
+        widget            = SelectionWidget(
+            label        = _(u'chat_database_adapter_label', default = u'Database adapter'),
+            description  = _(u'chat_database_adapter_desc', default = u'Adapter that manages the chat session data persistence'),
+            format       = "select",
         )
     ),
     StringField("connector_id",
@@ -220,8 +231,6 @@ class Chat(base.ATCTFolder):
 
     security = ClassSecurityInfo()
 
-    chat_storage = None
-
     ## @brief class constructor which prepares the database connection
     #  @param oid the identifier of the chat object
     def __init__(self, oid, **kwargs):
@@ -254,30 +263,27 @@ class Chat(base.ATCTFolder):
         It's called after the field validation passes.
         """
         if not REQUEST.get('post_validated'):
+            adapter_name = REQUEST.get('database_adapter')
             connector_id = REQUEST.get('connector_id')
             database_prefix_new = REQUEST.get('database_prefix')
             database_prefix_old = self.getField('database_prefix').get(self)
             if checkPermission('tud.addons.chat.ManageChat', self) and connector_id and not errors:
+                dbo = getAdapter(self, IDatabaseObject, adapter_name)
                 try:
-                    zmysql = getattr(self, connector_id)
-                    if not isinstance(zmysql, Connection):
-                        errors['connector_id'] = _(u'validation_object_is_not_zmysql_object', default = u'The chosen object is not a ZMySQL object.')
-                        zmysql = None
-                except AttributeError:
-                    errors['connector_id'] = _(u'validation_object_not_found', default = u'No object with this ID was found in any subpath.')
-                    zmysql = None
+                    dbo.validate(REQUEST)
 
-
-                if zmysql and database_prefix_old != database_prefix_new:
-                    dbc = zmysql()
-                    tables = [table['table_name'] for table in dbc.tables() if table['table_type'] == 'table']
-                    used_prefixes = [table[:-7].encode('utf-8') for table in tables if table.endswith(u'_action')]
-                    if database_prefix_new in used_prefixes: # check if the prefix is free
+                    if database_prefix_old != database_prefix_new and dbo.prefixInUse(REQUEST):
                         api.portal.show_message(_(u'warning_prefix_in_use', default= u'The chosen prefix is already in use in this database. If you don\'t want use the already used prefix, please change it!'), REQUEST, 'warning')
+
+                except ValueError as e:
+                    errors['connector_id'] = e.args[0]
             REQUEST.set('post_validated', True)
 
     security.declarePublic("show_id")
 
+    def getDatabaseAdapters(self):
+        values = tuple((adapter[0], adapter[0],) for adapter in getAdapters((self,), IDatabaseObject))
+        return DisplayList(values)
 
     def show_id(self,):
         """

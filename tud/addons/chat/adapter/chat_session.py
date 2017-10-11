@@ -1,11 +1,12 @@
 import re
 
+from zope.component import getAdapter
 from DateTime import DateTime
 
 from OFS.interfaces import IObjectClonedEvent
 from plone.indexer.decorator import indexer
 
-from tud.addons.chat.interfaces import IChat, IChatSession
+from tud.addons.chat.interfaces import IChat, IChatSession, IDatabaseObject
 from tud.addons.chat import chatMessageFactory as _
 
 @indexer(IChatSession)
@@ -22,14 +23,16 @@ def generate_chat_id(obj, event):
     """
     chat = obj.getParentNode()
 
-    if not IChat.providedBy(chat) or not chat.chat_storage:
+    if not IChat.providedBy(chat):
         return
+
+    dbo = getAdapter(chat, IDatabaseObject, chat.getField('database_adapter').get(chat))
 
     if obj.getField('chat_id').get(obj) != 0 and not IObjectClonedEvent.providedBy(event):
         return
 
     max_id_content = max([int(session.getField('chat_id').get(session)) for session in chat.getChildNodes()])
-    max_id_table = chat.chat_storage.getMaxSessionId()
+    max_id_table = dbo.getMaxSessionId()
     max_id = max((max_id_content, max_id_table,))
     new_id = max_id + 1
 
@@ -41,8 +44,10 @@ def removed_handler(obj, event):
     Deletes actions of removed chat in action table
     """
     chat_id = obj.getField('chat_id').get(obj)
-    chat_storage = obj.getChatStorage()
-    chat_storage.deleteActions(chat_id)
+    chat = obj.getParentNode()
+
+    dbo = getAdapter(chat, IDatabaseObject, chat.getField('database_adapter').get(chat))
+    dbo.deleteActions(chat_id)
 
 ## @brief this function obfuscates user names of closed and not already archived chat sessions
 #  @return bool True
@@ -53,21 +58,19 @@ def action_succeeded_handler(obj, event):
     """
     if event.action == 'archive':
         chat = obj.getParentNode()
-        chat_storage = chat.chat_storage
         chat_id = obj.getField('chat_id').get(obj)
 
-        if not chat_storage:
-            raise Exception("Can't archive without storage!")
+        dbo = getAdapter(chat, IDatabaseObject, chat.getField('database_adapter').get(chat))
 
         now = DateTime().timeTime()
 
         #archive only chat sessions that are closed for more than five minutes
         if obj.getField('end_date').get(obj) < now - 300:
-            users = [user['user'] for user in chat_storage.getUsersBySessionId(chat_id)]
+            users = [user['user'] for user in dbo.getUsersBySessionId(chat_id)]
             #replace long user names before short user names
             #this is import for user names that containing other user names (for example: "Max" and "Max Mustermann")
             users.sort(cmp = lambda a, b: len(a)-len(b), reverse = True)
-            actions = chat_storage.getRawActionContents(chat_id)
+            actions = dbo.getRawActionContents(chat_id)
             i = 0
 
             #obfuscate user names
@@ -80,14 +83,14 @@ def action_succeeded_handler(obj, event):
                     i += 1
                     new_name = obj.translate(_(u'log_user', default = u'User ${user}', mapping = {u'user' : str(i)}))
 
-                chat_storage.updateUserName(chat_id, old_name, new_name)
+                dbo.updateUserName(chat_id, old_name, new_name)
 
                 old_name = re.compile(re.escape(old_name), re.IGNORECASE)
                 for action in actions:
                     action['content'] = old_name.sub(new_name, action['content'])
 
             for action in actions:
-                chat_storage.updateActionContent(action['id'], action['content'])
+                dbo.updateActionContent(action['id'], action['content'])
         else:
             raise Exception("Chat session has to be closed for more than 5 minutes!")
 

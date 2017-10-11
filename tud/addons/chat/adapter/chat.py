@@ -1,14 +1,15 @@
 from zope.container.interfaces import IContainerModifiedEvent
+from zope.component import getAdapter
 
-from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
+from tud.addons.chat.interfaces import IDatabaseObject
 
 def edited_handler(obj, event):
     # ignore addition, removal and reordering of sub-objects
     if IContainerModifiedEvent.providedBy(event):
         return
 
-    connector_id = obj.getField('connector_id').get(obj)
-    database_prefix = obj.getField('database_prefix').get(obj)
+    adapter_name = obj.getField('database_adapter').get(obj)
 
-    obj.chat_storage = TUDChatSqlStorage(connector_id, database_prefix)
-    obj.chat_storage.createTables()
+    db_adapter = getAdapter(obj, interface=IDatabaseObject, name=adapter_name)
+    obj._v_db_adapter = db_adapter
+    obj._v_db_adapter.createTables()

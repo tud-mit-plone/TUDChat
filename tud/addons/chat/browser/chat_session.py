@@ -3,7 +3,7 @@ import re
 import simplejson
 import urllib
 
-from zope.component import getUtility
+from zope.component import getUtility, getAdapter
 from zope.security import checkPermission
 from DateTime import DateTime
 
@@ -14,6 +14,9 @@ from plone.uuid.interfaces import IUUID
 from collective.beaker.interfaces import ICacheManager
 
 from tud.addons.chat import chatMessageFactory as _
+from tud.addons.chat.interfaces import IDatabaseObject
+
+marker = object()
 
 class UserStatus:
     OK, NOT_AUTHORIZED, KICKED, BANNED, LOGIN_ERROR, WARNED, CHAT_WARN = range(7)
@@ -41,6 +44,18 @@ class ChatSessionBaseView(BrowserView):
             self.cache.set_value('banned_chat_users', {})
         if not self.cache.has_key('check_timestamp'):
             self.cache.set_value('check_timestamp', DateTime().timeTime())
+
+        self._dbo = self.getDatabaseObject()
+
+    def getDatabaseObject(self):
+        chat = self.context.getParentNode()
+        dbo = getattr(chat, '_v_db_adapter', marker)
+        if dbo != marker:
+            return dbo
+        else:
+            dbo = getAdapter(chat, IDatabaseObject, chat.getField('database_adapter').get(chat))
+            chat._v_db_adapter = dbo
+            return dbo
 
     def getSessionInformation(self):
         result = {}
@@ -410,8 +425,8 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         session = self.request.SESSION
         old_messages_count = chat.getField('oldMessagesCount').get(chat)
         old_messages_minutes = chat.getField('oldMessagesMinutes').get(chat)
-        start_action_id = self.context.getChatStorage().getStartAction(chat_id, old_messages_count, old_messages_minutes)
-        start_action_whisper_id = self.context.getChatStorage().getLastAction(chat_id)
+        start_action_id = self._dbo.getStartAction(chat_id, old_messages_count, old_messages_minutes)
+        start_action_whisper_id = self._dbo.getLastAction(chat_id)
         self.checkForInactiveUsers()
 
         # Clean username
@@ -448,7 +463,6 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             Also performs several checks. """
         session=self.request.SESSION
         context = self.context
-        chat_storage = context.getChatStorage()
         chat = context.getParentNode()
 
         if self.isBanned():
@@ -502,7 +516,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             limit = 30
         else:
             limit = 0
-        list_actions = chat_storage.getActions(chat_id = chat_id, last_action = last_action, start_action = start_action, start_action_whisper = start_action_whisper, user = user, limit = limit)
+        list_actions = self._dbo.getActions(chat_id = chat_id, last_action = last_action, start_action = start_action, start_action_whisper = start_action_whisper, user = user, limit = limit)
         # build a list of extra attributes
         for i in range(len(list_actions)):
             list_actions[i]['attr'] = []
@@ -603,7 +617,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         if max_message_length:
             message = message[:max_message_length]
-        msgid = self.context.getChatStorage().sendAction(chat_id = chat_id,
+        msgid = self._dbo.sendAction(chat_id = chat_id,
                             user = user,
                             action = self.isAdmin() and 'mod_add_message' or 'user_add_message',
                             content = self.html_escape(message),
@@ -624,7 +638,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         self.userHeartbeat()
         if not message:
             return
-        self.context.getChatStorage().sendAction(chat_id = self.context.getField('chat_id').get(self.context),
+        self._dbo.sendAction(chat_id = self.context.getField('chat_id').get(self.context),
                                     user = session.get('user_properties').get('name'),
                                     action = 'mod_edit_message',
                                     content = self.html_escape(message),
@@ -641,7 +655,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return
         self.userHeartbeat()
 
-        self.context.getChatStorage().sendAction(chat_id = self.context.getField('chat_id').get(self.context),
+        self._dbo.sendAction(chat_id = self.context.getField('chat_id').get(self.context),
                                     user = session.get('user_properties').get('name'),
                                     action = 'mod_delete_message',
                                     target = message_id)
@@ -752,4 +766,4 @@ class ChatSessionLogView(ChatSessionBaseView):
     def getLogs(self, REQUEST = None):
         """ Retrieve the whole and fully parsed chat log """
         chat_id = self.context.getField('chat_id').get(self.context)
-        return self.context.getChatStorage().getActions(chat_id, 0, 0, 0, '')[:-1]
+        return self._dbo.getActions(chat_id, 0, 0, 0, '')[:-1]

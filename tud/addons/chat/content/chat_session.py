@@ -115,8 +115,4 @@ class ChatSession(base.ATCTContent):
     #: Archetype schema
     schema = ChatSessionSchema
 
-    def getChatStorage(self):
-        chat = self.getParentNode()
-        return chat.chat_storage
-
 atapi.registerType(ChatSession, 'tud.addons.chat')
