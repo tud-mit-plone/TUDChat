@@ -19,7 +19,7 @@ from tud.addons.chat.interfaces import IDatabaseObject
 marker = object()
 
 class UserStatus:
-    OK, NOT_AUTHORIZED, KICKED, BANNED, LOGIN_ERROR, WARNED, CHAT_WARN = range(7)
+    OK, NOT_AUTHORIZED, KICKED, BANNED, LOGIN_ERROR, WARNED = range(6)
 
 class BanStrategy:
     COOKIE, IP, COOKIE_AND_IP = ('COOKIE', 'IP', 'COOKIE_AND_IP')
@@ -502,10 +502,6 @@ class ChatSessionAjaxView(ChatSessionBaseView):
                 self.removeUser(user)
                 session.set('user_properties', user_properties)
                 return {'status': {'code': UserStatus.KICKED, 'message': _(u'session_expired', default = u'The chat session has expired.')}}
-            if not user_properties.get('chatInactiveWarning') and context.getField('end_date').get(context).timeTime() - now < 300: # warn user 5 minutes before the chat will close
-                user_properties['chatInactiveWarning'] = True
-                session.set('user_properties', user_properties)
-                return {'status': {'code': UserStatus.CHAT_WARN, 'message': _(u'session_expires_5_min', default = u'The chat session expires in less than 5 minutes.')}}
 
         # Lookup last action
         start_action = user_properties.get('start_action')

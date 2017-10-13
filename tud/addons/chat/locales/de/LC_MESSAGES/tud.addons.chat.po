@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2017-10-11 10:21+0000\n"
+"POT-Creation-Date: 2017-10-13 18:45+0000\n"
 "PO-Revision-Date: 2017-10-10 21:59+0200\n"
 "Last-Translator: David Voigt <david.voigt@tu-dresden.de>\n"
 "Language-Team: \n"
@@ -535,32 +535,32 @@ msgid "session_banned_reason"
 msgstr "Grund: ${reason}"
 
 #. Default: "Ban"
-#: ./browser/templates/chat_session_view.pt:73
+#: ./browser/templates/chat_session_view.pt:75
 msgid "session_button_ban"
 msgstr "Bannen"
 
 #. Default: "Kick"
-#: ./browser/templates/chat_session_view.pt:72
+#: ./browser/templates/chat_session_view.pt:74
 msgid "session_button_kick"
 msgstr "Kicken"
 
 #. Default: "Leave chat session"
-#: ./browser/templates/chat_session_view.pt:102
+#: ./browser/templates/chat_session_view.pt:104
 msgid "session_button_leave"
 msgstr "Chatsitzung verlassen"
 
 #. Default: "Submit"
-#: ./browser/templates/chat_session_view.pt:64
+#: ./browser/templates/chat_session_view.pt:66
 msgid "session_button_send_message"
 msgstr "Absenden"
 
 #. Default: "Click or press 'Enter' to submit."
-#: ./browser/templates/chat_session_view.pt:64
+#: ./browser/templates/chat_session_view.pt:66
 msgid "session_button_send_message_help"
 msgstr "Zum Absenden klicken oder mit 'Enter' bestätigen."
 
 #. Default: "Warn"
-#: ./browser/templates/chat_session_view.pt:71
+#: ./browser/templates/chat_session_view.pt:73
 msgid "session_button_warn"
 msgstr "Verwarnen"
 
@@ -599,33 +599,28 @@ msgstr "Ende"
 msgid "session_expired"
 msgstr "Die Chatsitzung ist abgelaufen."
 
-#. Default: "The chat session expires in less than 5 minutes."
-#: ./browser/chat_session.py:508
-msgid "session_expires_5_min"
-msgstr "Die Chatsitzung läuft in weniger als 5 Minuten ab."
-
 #. Default: "How to use it:"
-#: ./browser/templates/chat_session_view.pt:88
+#: ./browser/templates/chat_session_view.pt:90
 msgid "session_how_to_use"
 msgstr "Hinweise zur Benutzung:"
 
 #. Default: "This chat session is active until ${end_date} and will be closed automatically."
-#: ./browser/templates/chat_session_view.pt:92
+#: ./browser/templates/chat_session_view.pt:94
 msgid "session_info_active_until"
 msgstr "Diese Chatsitzung ist bis zum ${end_date} Uhr aktiv und wird anschließend automatisch geschlossen."
 
 #. Default: "The chat session will be moderated by persons marked with ${mod-icon}. In case of misconduct, users can be warned, kicked from the chat or banned from the chat."
-#: ./browser/templates/chat_session_view.pt:91
+#: ./browser/templates/chat_session_view.pt:93
 msgid "session_info_moderators"
 msgstr "Die Chatsitzungen werden von den mit ${mod-icon} gekennzeichneten Personen moderiert. Chatnutzer können bei Fehlverhalten verwarnt, aus dem Chat entfernt oder permanent verwiesen werden."
 
 #. Default: "In this chat you can send private messages that are visible only to you and the recipient. To do this, click on the appropriate user name."
-#: ./browser/templates/chat_session_view.pt:96
+#: ./browser/templates/chat_session_view.pt:98
 msgid "session_info_whisper_on"
 msgstr "In diesem Chat können Sie private Nachrichten verschicken, die nur für Sie und den Adressaten sichtbar sind. Klicken Sie dafür auf den entsprechenden Nutzernamen."
 
 #. Default: "In this chat you can send private messages that are visible only to you and the moderator addressed. To do this, click on the appropriate user name."
-#: ./browser/templates/chat_session_view.pt:93
+#: ./browser/templates/chat_session_view.pt:95
 msgid "session_info_whisper_restricted"
 msgstr "In diesem Chat können Sie private Nachrichten verschicken, die nur für Sie und den adressierten Moderatoren sichtbar sind. Klicken Sie dafür auf den entsprechenden Nutzernamen."
 
@@ -650,7 +645,7 @@ msgid "session_max_users_label"
 msgstr "maximale Teilnehmerzahl"
 
 #. Default: "Please enter your message here."
-#: ./browser/templates/chat_session_view.pt:55
+#: ./browser/templates/chat_session_view.pt:57
 msgid "session_message_input_placeholder"
 msgstr "Bitte geben Sie hier Ihre Nachricht ein."
 

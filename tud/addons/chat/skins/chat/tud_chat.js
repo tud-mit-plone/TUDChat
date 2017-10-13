@@ -289,11 +289,7 @@
                     ]);
                 }
 
-                if (data.status.code == 6) { // Warned (to show in chat)
-                    $("#chatContent").append("<div class='chat-info'>"+data.status.message+"</div>");
-                }
-
-                if (data.status.code > 6) // != OK
+                if (data.status.code > 5) // != OK
                 return;
 
                 // handle user information
