@@ -52,31 +52,31 @@ button#chatMsgSubmit {
 }
 
 a.edit {
-    background-image: url('tud_chat_images/pen.png');
+    background-image: url('img/pen.png');
     background-repeat:
     no-repeat; background-position: center center;
 }
 
 a.delete {
-    background-image: url('tud_chat_images/false.png');
+    background-image: url('img/false.png');
     background-repeat: no-repeat;
     background-position: center center;
 }
 
 a.kick {
-    background-image: url('tud_chat_images/false_22.png');
+    background-image: url('img/false_22.png');
     background-repeat: no-repeat;
     background-position: center top;
 }
 
 a.ban {
-    background-image: url('tud_chat_images/flag_red_22.png');
+    background-image: url('img/flag_red_22.png');
     background-repeat: no-repeat;
     background-position: center top;
 }
 
 a.warn {
-    background-image: url('tud_chat_images/warning.png');
+    background-image: url('img/warning.png');
     background-repeat: no-repeat;
     background-position: center top;
 }

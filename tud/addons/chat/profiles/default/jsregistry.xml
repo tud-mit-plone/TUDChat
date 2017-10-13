@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<object name="portal_javascripts">
+    <javascript id="++resource++tud.addons.chat/tud_chat.js"
+            cacheable="True"
+            compression="safe"
+            cookable="True"
+            enabled="True"
+            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession')"
+            inline="False"
+            insert-after="*"/>
+
+    <javascript id="++resource++tud.addons.chat/hyperlink.js"
+            cacheable="True"
+            compression="safe"
+            cookable="True"
+            enabled="True"
+            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession')"
+            inline="False"
+            insert-before="++resource++tud.addons.chat/tud_chat.js" />
+
+    <javascript id="++resource++tud.addons.chat/jquery.notification.js"
+            cacheable="True"
+            compression="safe"
+            cookable="True"
+            enabled="True"
+            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession')"
+            inline="False"
+            insert-before="++resource++tud.addons.chat/tud_chat.js" />
+
+    <javascript id="++resource++tud.addons.chat/jquery.scroll.js"
+            cacheable="True"
+            compression="safe"
+            cookable="True"
+            enabled="True"
+            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession')"
+            inline="False"
+            insert-before="++resource++tud.addons.chat/tud_chat.js" />
+
+    <javascript id="++resource++tud.addons.chat/tud_chat_admin.js"
+            cacheable="True"
+            compression="safe"
+            cookable="True"
+            enabled="True"
+            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') and not here.portal_membership.isAnonymousUser()"
+            inline="False"
+            insert-after="++resource++tud.addons.chat/tud_chat.js" />
+</object>

@@ -5,17 +5,7 @@
 <head>
   <title>Chat</title>
 
-<metal:block metal:fill-slot="javascript_head_slot">
-    <script language="javascript" src="hyperlink.js"></script>
-    <script language="javascript" src="jquery.notification.js"></script>
-    <script language="javascript" src="jquery.scroll.js"></script>
-    <script language="javascript" tal:condition="view/isAdmin" src="tud_chat_admin.js"></script>
-    <script language="javascript" src="tud_chat.js"></script>
-</metal:block>
-
 <metal:block metal:fill-slot="style_slot">
-    <link rel="stylesheet" type="text/css" href="tud_chat.css" />
-    <link rel="stylesheet" type="text/css" tal:condition="view/isAdmin" href="tud_chat_admin.css" />
     <link rel="stylesheet" type="text/css" tal:attributes="href string:${context/absolute_url}/tud_chat_additional.css" />
 </metal:block>
 

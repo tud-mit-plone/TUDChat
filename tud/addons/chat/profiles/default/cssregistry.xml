@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<object name="portal_css">
+    <stylesheet
+            id="++resource++tud.addons.chat/tud_chat.css"
+            enabled="1"
+            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') or here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChat')"
+            conditionalcomment=""
+            media=""
+            rel="stylesheet"
+            rendering="link"
+            insert-before="*"
+            cookable="True"
+            applyPrefix="True"
+    />
+    <stylesheet
+            id="++resource++tud.addons.chat/tud_chat_admin.css"
+            enabled="1"
+            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') and not here.portal_membership.isAnonymousUser()"
+            conditionalcomment=""
+            media=""
+            rel="stylesheet"
+            rendering="link"
+            insert-before="*"
+            cookable="True"
+            applyPrefix="True"
+    />
+</object>
