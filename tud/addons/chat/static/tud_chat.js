@@ -54,7 +54,7 @@
 
             sendMessageBlock = true;
 
-            $("#chatMsgSubmit").attr("disabled", "disabled");
+            $("#chatMsgSubmit").attr("disabled", "disabled").attr("isSending", true);
             $("#chatMsgValue").val("").keyup();
 
             // set the target
@@ -72,7 +72,7 @@
             );
 
             window.setTimeout(function() {
-                $("#chatMsgSubmit").removeAttr("disabled");
+                $("#chatMsgSubmit").removeAttr("disabled, isSending");
                 $("#chatMsgValue").focus();
                 sendMessageBlock = false;
             }, options.blockTime);
@@ -267,7 +267,10 @@
 
             $.post(options.ajaxUrl, {'method': 'getActions'}, function(data){
                 lastUpdate = new Date();
-                $("#chatMsgSubmit").removeAttr("disabled");
+
+                if(!$("#chatMsgSubmit[isSending]").length) {
+                    $("#chatMsgSubmit").removeAttr("disabled");
+                }
                 $("#chat .serverError:visible").fadeOut(400);
 
                 // Status
@@ -457,12 +460,6 @@
         };
 
         var stopUpdateChecker = function() {
-            if(typeof(updateIntervalId) != null) {
-                clearInterval(updateIntervalId);
-            }
-        }
-
-        var slowDownUpdateChecker = function() {
             if(typeof(updateIntervalId) != null) {
                 clearInterval(updateIntervalId);
             }
