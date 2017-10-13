@@ -747,7 +747,7 @@ class ChatSessionView(ChatSessionBaseView):
         return result
 
     def getWelcomeMessage(self):
-        return self.context.getField('welcome_message').get(self.context)
+        return self.context.getField('welcome_message').get(self.context) or None
 
     def getWhisperOption(self):
         chat = self.context.getParentNode()
