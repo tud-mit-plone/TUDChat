@@ -3,7 +3,6 @@
 <head>
 
 <metal:block metal:fill-slot="javascript_head_slot">
-    <script language="javascript" src="jquery.ba-dotimeout.min.js"></script>
     <script language="javascript">
     $(document).ready(
         function() {
@@ -16,9 +15,9 @@
 
               $.getJSON(chat_url + "/@@chatajax", {method: 'registerMe', user: $("input[name='username']").val(), agreement: $("[name='agreement']").prop("checked"), password: $("#password").val() }, function(response) {
 
-                $.doTimeout( 'enableSubmitButton', 2000, function(){
+                window.setTimeout(function() {
                     $("input[type='submit']").removeAttr("disabled");
-                });
+                }, 2000);
 
                 if (response == true) {
                     window.location = chat_url + "?" + new Date().getTime();

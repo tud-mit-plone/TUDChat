@@ -10,8 +10,10 @@
         };
 
         var knownIds            = {},
-            sendMessageBlock    = false,
+            lastUpdate          = new Date(),
+            updateIntervalId    = null,
             updateCheckBlock    = false,
+            sendMessageBlock    = false,
             scrollBlock         = false,
             firstGetActions     = true,
             dateLastMinute      = new Date(0).setSeconds(0, 0),
@@ -68,11 +70,12 @@
                     updateCheck();
                 }
             );
-            $.doTimeout( 'remove_sendMessageBlock', options.blockTime, function(){
+
+            window.setTimeout(function() {
                 $("#chatMsgSubmit").removeAttr("disabled");
                 $("#chatMsgValue").focus();
                 sendMessageBlock = false;
-            });
+            }, options.blockTime);
         };
 
         var goHierarchieUp = function(){
@@ -263,20 +266,24 @@
             updateCheckBlock = true;
 
             $.post(options.ajaxUrl, {'method': 'getActions'}, function(data){
+                lastUpdate = new Date();
+                $("#chatMsgSubmit").removeAttr("disabled");
+                $("#chat .serverError:visible").fadeOut(400);
+
                 // Status
                 if (data.status.code == 1) { // Not authorized
-                    $.doTimeout( 'updateCheck'); // stop updateCheck
+                    stopUpdateChecker();
                     goHierarchieUp();
                     return;
                 }
                 if (data.status.code == 2) { // Kicked
-                    $.doTimeout( 'updateCheck' ); // stop updateCheck
+                    stopUpdateChecker();
                     goHierarchieUp();
                     return;
                 }
 
                 if (data.status.code == 3) { // Banned
-                    $.doTimeout( 'updateCheck' ); // stop updateCheck
+                    stopUpdateChecker();
                     goHierarchieUp();
                     return;
                 }
@@ -423,21 +430,43 @@
                 if (!scrollBlock) {
                     performScrollMode();
                 }
+
+                // end of ajax success handling
+            })
+            .fail(function() {
+                updateCheckBlock = false;
+                $("#chatMsgSubmit").attr("disabled", "disabled");
+                $("#chat .serverError:hidden").fadeIn(400);
             });
         };
 
-        var updateCheckTimeout = function(first_run){
-            if(first_run){
-                if(options.welcomeMessage){
-                    updateCheck(options.welcomeMessage);
-                }else{
-                    updateCheck();
-                }
-            }else{
-                updateCheck();
+        var startUpdateChecker = function() {
+            if(typeof(updateIntervalId) != null) {
+                clearInterval(updateIntervalId);
             }
-            $.doTimeout( 'updateCheck', options.refreshRate, updateCheckTimeout);
+
+            // in case the server doesn't respond,
+            // slow down the updateChecker
+            var errorTime = (new Date() - lastUpdate) / 2;
+            var timeout = Math.max(options.refreshRate, errorTime);
+
+            updateIntervalId = window.setTimeout(function() {
+                updateCheck();
+                startUpdateChecker();
+            }, Math.min(timeout, 10000));
         };
+
+        var stopUpdateChecker = function() {
+            if(typeof(updateIntervalId) != null) {
+                clearInterval(updateIntervalId);
+            }
+        }
+
+        var slowDownUpdateChecker = function() {
+            if(typeof(updateIntervalId) != null) {
+                clearInterval(updateIntervalId);
+            }
+        }
 
         /* Automatic scrollbar behaviour
            */
@@ -523,7 +552,12 @@
             });
 
             $.post(options.ajaxUrl, {'method': 'resetLastAction'}, function(data){
-                updateCheckTimeout(true);
+                if(options.welcomeMessage){
+                    updateCheck(options.welcomeMessage);
+                }else{
+                    updateCheck();
+                }
+                startUpdateChecker();
             });
 
             $("#logout").click(function() {

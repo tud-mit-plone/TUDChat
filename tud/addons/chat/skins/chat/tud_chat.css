@@ -1,3 +1,65 @@
+#chat {
+    position: relative;
+}
+
+/* serverError
+ * the chat error overlay
+*/
+#chat .serverError {
+    display: none;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(255,255,255,0.75);
+    z-index: 1;
+}
+#chat .serverError > div {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50%;
+    text-align: center;
+    transform: translate3d(-50%,-50%,0);
+    padding-left: 40px;
+    font-weight: bold;
+}
+
+#chat .serverError > div:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    margin-top: -20px;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    background-color: #000;
+
+    border-radius: 100%;
+    -webkit-animation: error-scaleout 1.5s infinite ease-in-out;
+    animation: error-scaleout 1.5s infinite ease-in-out;
+}
+
+@-webkit-keyframes error-scaleout {
+    0% { -webkit-transform: scale(0) }
+    100% {
+        -webkit-transform: scale(1.0);
+        opacity: 0;
+    }
+}
+
+@keyframes error-scaleout {
+  0% {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  } 100% {
+    -webkit-transform: scale(1.5);
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
 /* chatContent
  * the chat messages container
 */

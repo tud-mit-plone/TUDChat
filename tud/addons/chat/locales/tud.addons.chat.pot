@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2017-10-13 18:45+0000\n"
+"POT-Creation-Date: 2017-10-13 19:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,6 +23,10 @@ msgstr ""
 
 #: ./profiles/default/types/ChatSession.xml
 msgid "ChatSession"
+msgstr ""
+
+#: ./configure.zcml:35
+msgid "TUD addon that provides a chat system"
 msgstr ""
 
 #. Default: "Username and messages of moderators will be marked with this color. The input must be made as HTML color code (e.g. #ff0000)"
@@ -126,22 +130,22 @@ msgid "chat_date_frequency_minute"
 msgstr ""
 
 #. Default: "Begin"
-#: ./browser/templates/chat_view.pt:198
+#: ./browser/templates/chat_view.pt:197
 msgid "chat_future_session_begin"
 msgstr ""
 
 #. Default: "End"
-#: ./browser/templates/chat_view.pt:199
+#: ./browser/templates/chat_view.pt:198
 msgid "chat_future_session_end"
 msgstr ""
 
 #. Default: "Title"
-#: ./browser/templates/chat_view.pt:197
+#: ./browser/templates/chat_view.pt:196
 msgid "chat_future_session_title"
 msgstr ""
 
 #. Default: "The following chat sessions will be held in the future:"
-#: ./browser/templates/chat_view.pt:193
+#: ./browser/templates/chat_view.pt:192
 msgid "chat_future_sessions"
 msgstr ""
 
@@ -166,17 +170,17 @@ msgid "chat_max_message_length_label"
 msgstr ""
 
 #. Default: "There is currently no active chat session."
-#: ./browser/templates/chat_view.pt:186
+#: ./browser/templates/chat_view.pt:185
 msgid "chat_no_active_session"
 msgstr ""
 
 #. Default: "No database has been configured yet. You can specify the database in the chat settings."
-#: ./browser/templates/chat_view.pt:214
+#: ./browser/templates/chat_view.pt:213
 msgid "chat_no_database"
 msgstr ""
 
 #. Default: "No further chat sessions are currently planned."
-#: ./browser/templates/chat_view.pt:187
+#: ./browser/templates/chat_view.pt:186
 msgid "chat_no_future_sessions"
 msgstr ""
 
@@ -211,7 +215,7 @@ msgid "chat_refresh_rate_label"
 msgstr ""
 
 #. Default: "Chat session"
-#: ./browser/templates/chat_view.pt:134
+#: ./browser/templates/chat_view.pt:133
 msgid "chat_session"
 msgstr ""
 
@@ -251,57 +255,57 @@ msgid "chat_whisper_moderators"
 msgstr ""
 
 #. Default: "Data protection information"
-#: ./browser/templates/chat_view.pt:83
+#: ./browser/templates/chat_view.pt:82
 msgid "data_protection_information"
 msgstr ""
 
 #. Default: "The chat sessions are limited in time and are moderated. When you send a message in the chat, all participants can see your chosen username and your message. ${old_messages_information} ${whisper_information} If you wish to transmit confidential information, please use the e-mail contact data on the websites. The messages are stored anonymously together with a time stamp beyond the chat time. Please note that personal information in the chat messages cannot be anonymized. An evaluation of the chat sessions by the moderators is made exclusively for the improvement of the offers. Three months after the chat session expires, the data will be automatically deleted."
-#: ./browser/templates/chat_view.pt:119
+#: ./browser/templates/chat_view.pt:118
 msgid "data_protection_information_text"
 msgstr ""
 
 #. Default: "Please also note that new members of the chat session will see the last ${messages} messages."
-#: ./browser/templates/chat_view.pt:107
+#: ./browser/templates/chat_view.pt:106
 msgid "data_protection_old_messages_many"
 msgstr ""
 
 #. Default: "Please also note that new members of the chat session will see the last ${messages} messages if they are not older than ${minutes} minutes."
-#: ./browser/templates/chat_view.pt:115
+#: ./browser/templates/chat_view.pt:114
 msgid "data_protection_old_messages_many_minutes_many"
 msgstr ""
 
 #. Default: "Please also note that new members of the chat session will see the last ${messages} messages if they are not older than 1 minute."
-#: ./browser/templates/chat_view.pt:111
+#: ./browser/templates/chat_view.pt:110
 msgid "data_protection_old_messages_many_minutes_one"
 msgstr ""
 
 #. Default: "Please also note that new members of the chat session will see the last message."
-#: ./browser/templates/chat_view.pt:91
+#: ./browser/templates/chat_view.pt:90
 msgid "data_protection_old_messages_one"
 msgstr ""
 
 #. Default: "Please also note that new members of the chat session will see the last message if it is not older than ${minutes} minutes."
-#: ./browser/templates/chat_view.pt:101
+#: ./browser/templates/chat_view.pt:100
 msgid "data_protection_old_messages_one_minutes_many"
 msgstr ""
 
 #. Default: "Please also note that new members of the chat session will see the last message if it is not older than 1 minute."
-#: ./browser/templates/chat_view.pt:95
+#: ./browser/templates/chat_view.pt:94
 msgid "data_protection_old_messages_one_minutes_one"
 msgstr ""
 
 #. Default: "In this chat no private messages can be sent."
-#: ./browser/templates/chat_view.pt:120
+#: ./browser/templates/chat_view.pt:119
 msgid "data_protection_whisper_off"
 msgstr ""
 
 #. Default: "In this chat you can send private messages that are only visible to you and the recipient."
-#: ./browser/templates/chat_view.pt:122
+#: ./browser/templates/chat_view.pt:121
 msgid "data_protection_whisper_on"
 msgstr ""
 
 #. Default: "In this chat you can send private messages that are visible only to you and the moderator being addressed."
-#: ./browser/templates/chat_view.pt:121
+#: ./browser/templates/chat_view.pt:120
 msgid "data_protection_whisper_restricted"
 msgstr ""
 
@@ -391,12 +395,12 @@ msgid "log_user"
 msgstr ""
 
 #. Default: "I have read and understood the notes on data protection and I agree voluntarily to the processing of my personal data."
-#: ./browser/templates/chat_view.pt:175
+#: ./browser/templates/chat_view.pt:174
 msgid "login_agreement"
 msgstr ""
 
 #. Default: "Login"
-#: ./browser/templates/chat_view.pt:180
+#: ./browser/templates/chat_view.pt:179
 msgid "login_button"
 msgstr ""
 
@@ -446,17 +450,17 @@ msgid "login_err_short_name"
 msgstr ""
 
 #. Default: "Password for the chat session"
-#: ./browser/templates/chat_view.pt:169
+#: ./browser/templates/chat_view.pt:168
 msgid "login_password"
 msgstr ""
 
 #. Default: "Desired username"
-#: ./browser/templates/chat_view.pt:163
+#: ./browser/templates/chat_view.pt:162
 msgid "login_username"
 msgstr ""
 
 #. Default: "To stay anonymous, please use a nickname as your username."
-#: ./browser/templates/chat_view.pt:164
+#: ./browser/templates/chat_view.pt:163
 msgid "login_username_help"
 msgstr ""
 
@@ -525,6 +529,16 @@ msgstr ""
 msgid "management_session_title"
 msgstr ""
 
+#. Default: "Please wait a moment!"
+#: ./browser/templates/chat_session_view.pt:55
+msgid "please_wait"
+msgstr ""
+
+#. Default: "The server doesn't respond."
+#: ./browser/templates/chat_session_view.pt:54
+msgid "server_no_reponse"
+msgstr ""
+
 #. Default: "You have been banned from the chat by a moderator!"
 #: ./browser/chat.py:70
 msgid "session_banned"
@@ -536,32 +550,32 @@ msgid "session_banned_reason"
 msgstr ""
 
 #. Default: "Ban"
-#: ./browser/templates/chat_session_view.pt:75
+#: ./browser/templates/chat_session_view.pt:80
 msgid "session_button_ban"
 msgstr ""
 
 #. Default: "Kick"
-#: ./browser/templates/chat_session_view.pt:74
+#: ./browser/templates/chat_session_view.pt:79
 msgid "session_button_kick"
 msgstr ""
 
 #. Default: "Leave chat session"
-#: ./browser/templates/chat_session_view.pt:104
+#: ./browser/templates/chat_session_view.pt:109
 msgid "session_button_leave"
 msgstr ""
 
 #. Default: "Submit"
-#: ./browser/templates/chat_session_view.pt:66
+#: ./browser/templates/chat_session_view.pt:71
 msgid "session_button_send_message"
 msgstr ""
 
 #. Default: "Click or press 'Enter' to submit."
-#: ./browser/templates/chat_session_view.pt:66
+#: ./browser/templates/chat_session_view.pt:71
 msgid "session_button_send_message_help"
 msgstr ""
 
 #. Default: "Warn"
-#: ./browser/templates/chat_session_view.pt:73
+#: ./browser/templates/chat_session_view.pt:78
 msgid "session_button_warn"
 msgstr ""
 
@@ -601,27 +615,27 @@ msgid "session_expired"
 msgstr ""
 
 #. Default: "How to use it:"
-#: ./browser/templates/chat_session_view.pt:90
+#: ./browser/templates/chat_session_view.pt:95
 msgid "session_how_to_use"
 msgstr ""
 
 #. Default: "This chat session is active until ${end_date} and will be closed automatically."
-#: ./browser/templates/chat_session_view.pt:94
+#: ./browser/templates/chat_session_view.pt:99
 msgid "session_info_active_until"
 msgstr ""
 
 #. Default: "The chat session will be moderated by persons marked with ${mod-icon}. In case of misconduct, users can be warned, kicked from the chat or banned from the chat."
-#: ./browser/templates/chat_session_view.pt:93
+#: ./browser/templates/chat_session_view.pt:98
 msgid "session_info_moderators"
 msgstr ""
 
 #. Default: "In this chat you can send private messages that are visible only to you and the recipient. To do this, click on the appropriate user name."
-#: ./browser/templates/chat_session_view.pt:98
+#: ./browser/templates/chat_session_view.pt:103
 msgid "session_info_whisper_on"
 msgstr ""
 
 #. Default: "In this chat you can send private messages that are visible only to you and the moderator addressed. To do this, click on the appropriate user name."
-#: ./browser/templates/chat_session_view.pt:95
+#: ./browser/templates/chat_session_view.pt:100
 msgid "session_info_whisper_restricted"
 msgstr ""
 
@@ -646,7 +660,7 @@ msgid "session_max_users_label"
 msgstr ""
 
 #. Default: "Please enter your message here."
-#: ./browser/templates/chat_session_view.pt:57
+#: ./browser/templates/chat_session_view.pt:62
 msgid "session_message_input_placeholder"
 msgstr ""
 
@@ -683,6 +697,10 @@ msgstr ""
 #. Default: "Welcome message"
 #: ./content/chat_session.py:45
 msgid "session_welcome_message_label"
+msgstr ""
+
+#: ./configure.zcml:35
+msgid "tud.addons.chat"
 msgstr ""
 
 #. Default: "Start of the chat must be before its end."
@@ -744,4 +762,3 @@ msgstr ""
 #: ./content/chat.py:276
 msgid "warning_prefix_in_use"
 msgstr ""
-

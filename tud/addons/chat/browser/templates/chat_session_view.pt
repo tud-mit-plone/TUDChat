@@ -6,7 +6,6 @@
   <title>Chat</title>
 
 <metal:block metal:fill-slot="javascript_head_slot">
-    <script language="javascript" src="jquery.ba-dotimeout.min.js"></script>
     <script language="javascript" src="hyperlink.js"></script>
     <script language="javascript" src="jquery.notification.js"></script>
     <script language="javascript" src="jquery.scroll.js"></script>
@@ -50,6 +49,12 @@
                                    data-whisper             whisper;
                                    data-date-frequency      view/getDateFrequencyOption;
                                    data-admin               python: view.isAdmin() or None">
+        <div class="serverError">
+            <div>
+                <div i18n:translate="server_no_reponse">The server doesn't respond.</div>
+                <div i18n:translate="please_wait">Please wait a moment!</div>
+            </div>
+        </div>
         <div id="chatContent">
         </div>
         <div id="chatMsg">
