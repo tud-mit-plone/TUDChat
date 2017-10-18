@@ -72,7 +72,7 @@
             );
 
             window.setTimeout(function() {
-                $("#chatMsgSubmit").removeAttr("disabled, isSending");
+                $("#chatMsgSubmit").removeAttr("disabled isSending");
                 $("#chatMsgValue").focus();
                 sendMessageBlock = false;
             }, options.blockTime);
