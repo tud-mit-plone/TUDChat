@@ -30,6 +30,9 @@ develop =
    ...
    src/tud.addons.chat
 ```
+
+For plone 4 write `tud.addons.chat[plone4]` in 'eggs' area.
+
 Furthermore "collective.beaker" has to be configured. A development configuration can look like this:
 ```
 [instance]
@@ -65,7 +68,7 @@ The following dependencies are defined in the [setup.py](./setup.py) of this pro
 *   **Products.ZMySQLDA** – allows communication with mysql databases
 *   **collective.beaker** – provides session and cache handling
 *   **python-dateutil** – provides extensions for standard datetime module
-*   **jarn.jsi18n** – allows internationalization in javascript
+*   **jarn.jsi18n** – allows internationalization in javascript (optional, needed in plone 4)
 
 ## Tests
 This product contains robot tests for browser based integration tests to ensure low production bug rates. If you want to run the tests you need a running mysql server.

@@ -40,4 +40,13 @@
             provides        = "Products.GenericSetup.interfaces.EXTENSION"
             />
 
+    <!-- Register additional import step for installation -->
+    <genericsetup:importStep
+            name            = "tud.addons.chat.various"
+            title           = "tud.addons.chat: miscellaneous import steps"
+            description     = "Various import steps"
+            handler         = "tud.addons.chat.setuphandlers.setupVarious">
+    </genericsetup:importStep>
+
+
 </configure>

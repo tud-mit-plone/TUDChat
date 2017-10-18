@@ -28,11 +28,11 @@ setup(name='tud.addons.chat',
           'plone.api',
           'Products.ZMySQLDA',
           'collective.beaker',
-          'python-dateutil',
-          'jarn.jsi18n'
+          'python-dateutil'
           # -*- Extra requirements: -*-
       ],
-      extras_require={'test': ['plone.app.robotframework']},
+      extras_require={'test': ['plone.app.robotframework'],
+                      'plone4' : ['jarn.jsi18n']},
       entry_points="""
       # -*- Entry points: -*-
 
