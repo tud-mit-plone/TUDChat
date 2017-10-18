@@ -2,6 +2,7 @@
 import re
 import json
 import urllib
+import inspect
 
 from zope.component import getUtility, getAdapter
 from zope.security import checkPermission
@@ -119,19 +120,37 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         del parameters['method']
 
         if hasattr(self, method):
+            method = getattr(self, method)
+            method_args = {}
 
-            # decode string parameters to unicode parameters and remove forbidden chars
-            for key in parameters.keys():
-                if isinstance(parameters[key], str):
-                    try:
-                        parameters[key] = parameters[key].decode("utf-8")
-                    except ValueError:
-                        return json.dumps("ERROR: Parameter '{}' is no valid utf-8 string".format(key))
+            argspec = inspect.getargspec(method)
+            arg_len = len(argspec[0])
+            if argspec[3]:
+                arg_defaults_len = len(argspec[3])
+            else:
+                arg_defaults_len = 0
 
-                    for forbiddenchar in self.forbiddenchars:
-                        parameters[key] = parameters[key].replace(forbiddenchar, '')
+            for arg_num in range(1, arg_len):
+                arg_name = argspec[0][arg_num]
 
-            result = getattr(self, method)(**parameters)
+                if arg_name in parameters:
+                    # decode string parameters to unicode parameters and remove forbidden chars
+                    if isinstance(parameters[arg_name], str):
+                        try:
+                            parameters[arg_name] = parameters[arg_name].decode("utf-8")
+                        except ValueError:
+                            return json.dumps("ERROR: Parameter '{}' is no valid utf-8 string".format(arg_name))
+
+                        for forbiddenchar in self.forbiddenchars:
+                            parameters[arg_name] = parameters[arg_name].replace(forbiddenchar, '')
+
+                    method_args[arg_name] = parameters[arg_name]
+
+                # stop execution if parameter is required
+                elif arg_num < arg_len - arg_defaults_len:
+                    return json.dumps("ERROR: Not all required parameters have been given")
+
+            result = method(**method_args)
             return json.dumps(result)
         else:
             return json.dumps("ERROR: Method not available")
