@@ -46,6 +46,7 @@
             title           = "tud.addons.chat: miscellaneous import steps"
             description     = "Various import steps"
             handler         = "tud.addons.chat.setuphandlers.setupVarious">
+        <depends name="registry"/>
     </genericsetup:importStep>
 
 

@@ -1,4 +1,11 @@
+from zope.component import getUtility
 from Products.CMFCore.utils import getToolByName
+from plone.registry.interfaces import IRegistry
+
+try:
+    from Products.CMFPlone.resources.browser.cook import cookWhenChangingSettings
+except ImportError:
+    pass
 
 try:
     import jarn.jsi18n
@@ -26,6 +33,7 @@ def setupVarious(context):
     logger = context.getLogger('tud.addons.chat')
     site = context.getSite()
     setup = getToolByName(site, 'portal_setup')
+    registry = getUtility(IRegistry)
 
     if HAVE_JARN_JSI18N:
         if not HAVE_MOCKUP:
@@ -33,3 +41,10 @@ def setupVarious(context):
     else:
         if not HAVE_MOCKUP:
             logger.warning('No product for javascript internationalization found! Please install jarn.jsi18n!')
+
+    # remove chat css and javascript resources from legacy bundle (plone 5)
+    if 'plone.bundles/plone-legacy.resources' in registry.records:
+        legacy_resources = registry.records['plone.bundles/plone-legacy.resources']
+        legacy_resources.value = [legacy_resource for legacy_resource in legacy_resources.value if not legacy_resource.startswith('resource-tud-addons-chat-')]
+
+        cookWhenChangingSettings(site)
