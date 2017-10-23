@@ -255,12 +255,16 @@ class Chat(base.ATCTFolder):
 
     # override the default actions
 
-    ## @brief check and apply admin settings
-    #  @param error list of errors
     def post_validate(self, REQUEST, errors):
         """
-        This function checks the edit form values in context.
-        It's called after the field validation passes.
+        Checks edit form values in context. It's called after field validation.
+        This method delegates validation for database connection to configured database adapter.
+        If the configured prefix is in use, a warning is shown.
+
+        :param REQUEST: request with form data
+        :type REQUEST: ZPublisher.HTTPRequest.HTTPRequest
+        :param errors: list of field errors, which can be modified if needed
+        :type errors: list
         """
         if not REQUEST.get('post_validated'):
             adapter_name = REQUEST.get('database_adapter')

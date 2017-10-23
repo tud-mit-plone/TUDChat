@@ -23,10 +23,13 @@ class ChatView(BrowserView):
         return {'count' : self.context.getField('oldMessagesCount').get(self.context),
                 'minutes' : self.context.getField('oldMessagesMinutes').get(self.context)}
 
-    ## @brief this function generates a list of all chat sessions which were active
-    #  @return list of chat session objects
     def getActiveChatSessions(self):
-        """ Get a list of all active chat sessions. """
+        """
+        Generates a list of all active chat sessions.
+
+        :return: list of chat session objects
+        :rtype: list[tud.addons.chat.content.chat_session.ChatSession]
+        """
         catalog = getToolByName(self.context, 'portal_catalog')
         query = {
             'object_provides': IChatSession.__identifier__,
@@ -37,10 +40,13 @@ class ChatView(BrowserView):
             }
         return [brain.getObject() for brain in catalog(query)]
 
-    ## @brief this function generates a list of all chat sessions which were planned
-    #  @return list of chat session objects
     def getNextChatSessions(self):
-        """ Get the next chat session, which will start. """
+        """
+        Generates a list of all chat sessions which were planned.
+
+        :return: list of chat session objects
+        :rtype: list[tud.addons.chat.content.chat_session.ChatSession]
+        """
         catalog = getToolByName(self.context, 'portal_catalog')
         query = {
             'object_provides': IChatSession.__identifier__,

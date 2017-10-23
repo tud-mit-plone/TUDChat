@@ -66,23 +66,33 @@ class ChatSessionBaseView(BrowserView):
 
         return result
 
-    ## @brief check, if a user is admin for this chat
-    #  @return bool True, if user is admin, otherwise False
     def isAdmin(self):
-        """ Check, if a user is admin for this chat. """
+        """
+        Checks, if current user is a moderator.
+
+        :return: True, if user is a moderator, otherwise False
+        :rtype: bool
+        """
         return checkPermission('tud.addons.chat.ModerateChat', self.context)
 
-    ## @brief this function checks if an user is in a specific room
-    #  @param user str user name to check
-    #  @return bool true if the user in the room, otherwise false
     def hasUser(self, user):
-        """ Check for the existence of a user. """
+        """
+        Checks, if given user exists in respective chat session.
+
+        :param user: user name to check
+        :type user: str
+        :return: True if the user exists, otherwise False
+        :rtype: bool
+        """
         return user in self.cache['chat_users'].keys()
 
-    ## @brief Check, if a user is registered to a chat session
-    #  @return bool True, if user is registered, otherwise False
     def isRegistered(self):
-        """ Check, if a user is registered to a chat session. """
+        """
+        Checks, if current user is registered to a chat session.
+
+        :return: True, if user is registered, otherwise False
+        :rtype: bool
+        """
         session = self.request.SESSION
 
         if session.get('user_properties'):
@@ -99,10 +109,12 @@ class ChatSessionBaseView(BrowserView):
         return now > chat_start and now < chat_end
 
 class ChatSessionAjaxView(ChatSessionBaseView):
-    ## @brief replacements for special html chars (char "&" is in function included)
-    htmlspecialchars         = {'"':'&quot;', '\'':'&#039;', '<':'&lt;', '>':'&gt;'} # {'"':'&quot;'} this comment is needed, because there is a bug in doxygen
+    """
+    :cvar htmlspecialchars: replacements for special html chars (char "&" is in function included)
+    :cvar forbiddenchars: list of chars, which aren't allowed in ajax parameters (star marks moderators)
+    """
 
-    ## @brief list of chars, which aren't allowed in ajax parameters (star marks moderators)
+    htmlspecialchars         = {'"':'&quot;', '\'':'&#039;', '<':'&lt;', '>':'&gt;'}
     forbiddenchars           = [u"★", u"☆"]
 
     def __call__(self):
@@ -155,12 +167,12 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         else:
             return json.dumps("ERROR: Method not available")
 
-    ## @brief get IP address from a request
-    #  @return string IP address as a string or None if not available
-    def getIp(self): # see: http://dev.menttes.com/collective.developermanual/serving/http_request_and_response.html#request-client-ip
-        """  Extract the client IP address from the HTTP request in a proxy compatible way.
+    def getIp(self):
+        """Extract the client IP address from the HTTP request in a proxy compatible way.
+           see: http://dev.menttes.com/collective.developermanual/serving/http_request_and_response.html#request-client-ip
 
-        @return: IP address as a string or None if not available
+        :return: IP address as a string or None if not available
+        :rtype: str or None
         """
 
         if "HTTP_X_FORWARDED_FOR" in self.request.environ:
@@ -182,10 +194,10 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             tmptext = tmptext.replace(key, self.htmlspecialchars[key])
         return tmptext
 
-    ## @brief this function tells the system, that the user is active
     def userHeartbeat(self):
-        """ Updates the activity timestamp of the user.
-            The user information will be retrieved from the request """
+        """
+        Updates the activity timestamp of the current user to tell the system, that the user is active.
+        """
         session = self.request.SESSION
         user_properties = session.get('user_properties')
         name = user_properties.get('name')
@@ -193,9 +205,11 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         chat_users[name]['date'] = DateTime().timeTime()
         self.cache['chat_users'] = chat_users
 
-    ## @brief this function removes users who doesn't call the heart beat method for a defined timeout time
     def checkForInactiveUsers(self):
-        """ Check for inactive users and kick them. """
+        """
+        Removes users who don't call the heart beat method for a defined timeout.
+        The check will only be performed, if the last check was more than 5 seconds ago.
+        """
         chat = self.context.getParentNode()
         timeout = chat.getField('timeout').get(chat)
 
@@ -206,10 +220,13 @@ class ChatSessionAjaxView(ChatSessionBaseView):
                     self.removeUser(user)
             self.cache['check_timestamp'] = now
 
-    ## @brief check, if a user is banned from this chat
-    #  @return bool True, if user is banned, otherwise False
     def isBanned(self):
-        """ Check, if a user is banned.  """
+        """
+        Checks, if current user is banned.
+
+        :return: True, if user is banned, otherwise False
+        :rtype: bool
+        """
         #ip_address = self.getIp(self.request)
         chat = self.context.getParentNode()
         ban_strategy = chat.getField('banStrategy').get(chat)
@@ -246,10 +263,13 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         return False
 
-    ## @brief tell the client the reason for the ban, if the client was banned
-    #  @return str ban reason
     def getBanReason(self):
-        """ Helper method to get ban reason """
+        """
+        Tells the client the reason for the ban, if the client was banned.
+
+        :return: ban reason, if the client was banned, otherwise None
+        :rtype: str or None
+        """
         #ip_address = self.getIp(self.request)
         chat = self.context.getParentNode()
         ban_strategy = chat.getField('banStrategy').get(chat)
@@ -272,12 +292,17 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         """
         return
 
-    ## @brief this function adds an user to an existing chat session
-    #  @param user str user name to add
-    #  @param is_admin bool true if the user has admin privileges
-    #  @return bool true on success or false if the user is already in the room
     def addUser(self, user, is_admin):
-        """ Add yourself to the user list. """
+        """
+        Adds a user to the respective chat session.
+
+        :param user: user name to add
+        :type user: str
+        :param is_admin: True, if user is moderator
+        :type is_admin: bool
+        :return: True on success or False, if the user is already in the session
+        :rtype: bool
+        """
         chat_users = self.cache['chat_users']
         if not chat_users.has_key(user):
             chat_users[user] = {'date': DateTime().timeTime(), 'last_message_sent' : 0, 'is_admin' : is_admin }
@@ -285,27 +310,38 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return True
         return False
 
-    ## @brief this function removes an user from a specific room
-    #  @param user str user name to remove
     def removeUser(self, user):
-        """ Remove a single user by its name. """
+        """
+        Removes a user from respective chat session.
+
+        :param user: user name to remove
+        :type user: str
+        """
         chat_users = self.cache['chat_users']
         if chat_users.has_key(user):
             del chat_users[user]
             self.cache['chat_users'] = chat_users
 
-    ## @brief this function returns all users of a specific room
-    #  @return list users of the chat room
     def getUsers(self):
-        """ Return the list of all user names in a chat room. """
+        """
+        Returns all user names of respective chat session.
+
+        :return: user names of the chat session
+        :rtype: list[str]
+        """
         return self.cache['chat_users'].keys()
 
-    ## @brief this function returns all users of a specific room
-    #  @param user str user name to be banned
-    #  @param reason str reason for banning the user
-    #  @return bool true if the user was banned succesfully, otherwise false
     def addBannedUser(self, user, reason):
-        """ Ban a user with a given reason. """
+        """
+        Flags ban for user with given reason.
+
+        :param user: user name to ban
+        :type user: str
+        :param reason: reason for banning the user
+        :type reason: str
+        :return: True, if the flag was added, otherwise False
+        :rtype: bool
+        """
         banned_chat_users = self.cache['banned_chat_users']
         if not user in banned_chat_users.keys() and user in self.cache['chat_users'].keys():
             banned_chat_users[user] = {'reason': reason}
@@ -314,11 +350,15 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return True
         return False
 
-    ## @brief this function removes a user from the list of banned users
-    #  @param user str user name to remove from the banned user list
-    #  @return bool true if the user was removed from the banned user list, otherwise false (the user wasn't in the list of banned users of the given room)
     def removeBannedUser(self, user):
-        """ Unban a user. """
+        """
+        Removes a user from the dict of banned users.
+
+        :param user: user name to remove from the banned users dict
+        :type user: str
+        :return: True, if the user was removed from the banned users dict, otherwise False (the user wasn't in the dict of banned users)
+        :rtype: bool
+        """
         banned_chat_users = self.cache['banned_chat_users']
         if user in banned_chat_users.keys():
             del banned_chat_users[user]
@@ -326,13 +366,18 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return True
         return False
 
-    ## @brief this function stores a warning message for a given user in a given chat room
-    #  @param user str user name to be warned
-    #  @param warning str message which would send to the user
-    #  @return bool true if the user was found in the given room and if there is no other warning message for the user, otherwise false
     def addWarnedUser(self, user, warning):
-        """ Warn a user with a given text.
-            The user gets the message after calling the getActions method. """
+        """
+        Flags warning for user with given text.
+        The user gets the message after calling the 'getActions' method.
+
+        :param user: user name to warn
+        :type user: str
+        :param warning: message which would be send to the user
+        :type warning: str
+        :return: True, if no warning flag exists for the user and if the user was found in respective chat session, otherwise False
+        :rtype: bool
+        """
         warned_chat_users = self.cache['warned_chat_users']
         if not user in warned_chat_users.keys() and user in self.cache['chat_users'].keys():
             warned_chat_users[user] = { 'warning': warning }
@@ -340,12 +385,15 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return True
         return False
 
-    ## @brief this function removes a warning message for a given user in a given chat room
-    #  @param user str user name of the warned user
-    #  @return bool true if the warning message was found in the given room, otherwise false
     def removeWarnedUser(self, user):
-        """ Remove the warning message for a given user.
-            This is usually done in the message sending process. """
+        """
+        Removes warning flag for the given user.
+
+        :param user: user name to remove from the warned users dict
+        :type user: str
+        :return: True, if a warning flag exists for the user, otherwise False
+        :rtype: bool
+        """
         warned_chat_users = self.cache['warned_chat_users']
         if user in warned_chat_users.keys():
             del warned_chat_users[user]
@@ -353,13 +401,18 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return True
         return False
 
-    ## @brief this function stores the given user in the kicked users dict
-    #  @param user str name of user to be kicked
-    #  @param reason str reason for kicking the user
-    #  @return bool true if the user was added successfully, otherwise false
     def addKickedUser(self, user, reason):
-        """ Kicks a user with given message.
-            The user gets the message after calling the getActions method. """
+        """
+        Flags kick for user with given reason.
+        The user will be kicked after calling the 'getActions' method.
+
+        :param user: name of user to kick
+        :type user: str
+        :param reason: reason for kicking the user
+        :type reason: str
+        :return: True, if the flag was added, otherwise False
+        :rtype: bool
+        """
         kicked_chat_users = self.cache['kicked_chat_users']
         if not user in kicked_chat_users.keys() and user in self.cache['chat_users'].keys():
             kicked_chat_users[user] = {'reason': reason}
@@ -367,11 +420,15 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return True
         return False
 
-    ## @brief this function removes the given user from the kicked users dict
-    #  @param user str user name to remove from the kicked users dict
-    #  @return bool true if the user was removed successfully, otherwise false (the user wasn't in the kicked users dict)
     def removeKickedUser(self, user):
-        """ Removes user from kicked users dict. """
+        """
+        Removes kick flag for the given user.
+
+        :param user: user name to remove from the kicked users dict
+        :type user: str
+        :return: True, if the user was removed from the kicked users dict, otherwise False (the user wasn't in the kicked users dict)
+        :rtype: bool
+        """
         kicked_chat_users = self.cache['kicked_chat_users']
         if user in kicked_chat_users.keys():
             del kicked_chat_users[user]
@@ -379,11 +436,13 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return True
         return False
 
-    ## @brief this function removes an user from a chat room
-    #  @return bool true if the user was successfully removed from the room, otherwise false
     def logout(self):
-        """ Logout yourself.
-            The associated room will be retrieved from the user session. """
+        """
+        Removes current user from respective chat session.
+
+        :return: always True
+        :rtype: bool
+        """
         session=self.request.SESSION
         if session.get('user_properties'):
             user = session.get('user_properties').get('name')
@@ -392,15 +451,20 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             self.removeUser(user)
         return True
 
-    ## @brief this function registers an user to a chat room
-    #  @param user str proposed name of the user
-    #  @param chatroom int id of the room where the user want to enter
-    #  @param password str optional password of the room
-    #  @return bool true if the user was successfully added to the room, otherwise false
     def ajaxRegisterMe(self, user, agreement="false", password=None):
-        """ Register a user to a chat room.
-            Before the user was added, this function will check the pre-conditions to enter the room (password, user limit, user name restrictions, banned users, room state)
-            If the room does not exist in the room list, it will be created here. """
+        """
+        Registers user to respective chat session.
+        Before the user was added, this function checks the pre-conditions for entering the session (data protection information agreement, password, user limit, user name restrictions, session state, user ban state).
+
+        :param user: proposed name of the user
+        :type user: str
+        :param agreement: agreement to data protection information
+        :type agreement: str
+        :param password: optional password of the session
+        :type password: str
+        :return: True, if the user was successfully added to the session, otherwise False
+        :rtype: bool
+        """
         self.request.SESSION.set('user_properties', None)
 
         context = self.context
@@ -462,9 +526,10 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return True
         return False
 
-    ## @brief this function resets the last action to the start action of the user's chat room
     def ajaxResetLastAction(self):
-        """ Reset last_action to get all messages from the beginning. """
+        """
+        Resets last action to start action to get all messages from the beginning.
+        """
         session = self.request.SESSION
         if session.get('user_properties'):
             user_properties = session.get('user_properties')
@@ -475,11 +540,14 @@ class ChatSessionAjaxView(ChatSessionBaseView):
     def ajaxLogout(self):
         return self.logout()
 
-    ## @brief this function returns all updates specific to the calling user since the last time this method was called
-    #  @return dict special JSON dictonary that contains either a special state or message and user updates
     def ajaxGetActions(self):
-        """ This function returns all actions specific to the calling user since the last function call.
-            Also performs several checks. """
+        """
+        Returns all actions specific to the calling user since last function call.
+        This function also performs several checks.
+
+        :return: dictionary that contains either state information or message and user updates
+        :rtype: dict
+        """
         session=self.request.SESSION
         context = self.context
         chat = context.getParentNode()
@@ -585,14 +653,17 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         return return_dict
 
-    ## @brief this function adds a message to the chat room of the user
-    #  @param message str message to send
-    #  @param target_user str user name of whisper target (optional)
     def ajaxSendMessage(self, message, target_user = None):
-        """ Send a message to the chat room of the user.
-            If the user sends to many messages in a pre-defined interval, the message will be ignored.
-            The maximum message length will be also checked (if the message length is to high, it will be truncated). """
+        """
+        Sends a message to all users, if not target user is given. Otherwise the message is only send to the specified user.
+        If the pre-defined minimum delay between two messages wasn't respected, the message will be ignored.
+        The maximum message length will be also checked (if the message is too long, it will be truncated).
 
+        :param message: message to send
+        :type message: str
+        :param target_user: optional user name of whisper target
+        :type target_user: str or None
+        """
         if not self.isRegistered():
             return
 
@@ -640,12 +711,16 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         self.cache['chat_users'] = chat_users
 
-    ## @brief this function edits an already sent message
-    #  @param message int id of the message to edit
-    #  @param message str text of the new message
     def ajaxEditMessage(self, message_id, message):
-        """ Edit a message.
-            This action can only performed by admins. """
+        """
+        Edits an already sent message.
+        This action can only performed by moderators.
+
+        :param message_id: id of message to edit
+        :type message_id: str
+        :param message: text of new message
+        :type message: str
+        """
         session = self.request.SESSION
 
         if not self.isAdmin():
@@ -659,11 +734,14 @@ class ChatSessionAjaxView(ChatSessionBaseView):
                                     content = self.html_escape(message),
                                     target = message_id)
 
-    ## @brief this function deletes an already sent message
-    #  @param message int id of the message to delete
     def ajaxDeleteMessage(self, message_id):
-        """ Delete a message by its id.
-            This action can only performed by admins. """
+        """
+        Deletes an already sent message.
+        This action can only performed by moderators.
+
+        :param message_id: id of message to delete
+        :type message_id: str
+        """
         session = self.request.SESSION
 
         if not self.isAdmin():
@@ -675,11 +753,15 @@ class ChatSessionAjaxView(ChatSessionBaseView):
                                     action = 'mod_delete_message',
                                     target = message_id)
 
-    ## @brief this function removes an user from the chat room where the admin is inside
-    #  @param target_user str name of the user to kick
-    #  @param message str message text which will be send to the user
     def ajaxKickUser(self, target_user, message = ""):
-        """ Kick a user. """
+        """
+        Removes a user from respective chat session.
+
+        :param target_user: name of user to kick
+        :type target_user: str
+        :param message: message text which will be send to the user
+        :type message: str
+        """
         target_user = self.html_escape(target_user)
         session=self.request.SESSION
 
@@ -694,12 +776,17 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         self.addKickedUser(target_user, message)
 
-    ## @brief this function warns an user in the chat room where the admin is inside
-    #  @param target_user str name of the user to warn
-    #  @param message str message text which will be send to the user
-    #  @return bool true if the warning message is stored otherwise false
     def ajaxWarnUser(self, target_user, message = ""):
-        """ Warn a user. """
+        """
+        Warns a user in respective chat session.
+
+        :param target_user: name of user to warn
+        :type target_user: str
+        :param message: message text which will be send to the user
+        :type message: str
+        :return: True, if warning flag is set, otherwise False
+        :rtype: bool
+        """
         target_user = self.html_escape(target_user)
         session=self.request.SESSION
 
@@ -713,12 +800,17 @@ class ChatSessionAjaxView(ChatSessionBaseView):
 
         return self.addWarnedUser(target_user, message)
 
-    ## @brief this function bans an user from the chat room where the admin is inside
-    #  @param target_user str name of the user to ban
-    #  @param message str reason text which will be displayed additionally to the ban
-    #  @return bool true if the ban is stored otherwise false
     def ajaxBanUser(self, target_user, message = ""):
-        """ Ban a user. """
+        """
+        Bans a user from respective chat session.
+
+        :param target_user: name of user to ban
+        :type target_user: str
+        :param message: reason text which will be additionally displayed
+        :type message: str
+        :return: True, if ban flag is set, otherwise False
+        :rtype: bool
+        """
         target_user = self.html_escape(target_user)
         session=self.request.SESSION
 
@@ -776,9 +868,16 @@ class ChatSessionLogView(ChatSessionBaseView):
     """Chat session log view
     """
 
-    ## @brief this function returns all chat messages about a specific chat session
-    #  @return list of dictionaries, the following information are in every dict: id, action, date, user, message, target, a_action, a_name
     def getLogs(self, REQUEST = None):
-        """ Retrieve the whole and fully parsed chat log """
+        """
+        Returns all public chat messages of respective chat session.
+        Edited messages will be shown in version of last edit.
+        Deleted messages will be shown as empty messages.
+
+        :param REQUEST: request
+        :type REQUEST: ZPublisher.HTTPRequest.HTTPRequest
+        :return: message list with following information for every message: id, action, date, user, message, target, a_action, a_name
+        :rtype: list[dict]
+        """
         chat_id = self.context.getField('chat_id').get(self.context)
         return self._dbo.getActions(chat_id, 0, 0, 0, '')[:-1]

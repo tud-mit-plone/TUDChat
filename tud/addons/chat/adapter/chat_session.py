@@ -49,12 +49,17 @@ def removed_handler(obj, event):
     dbo = getAdapter(chat, IDatabaseObject, chat.getField('database_adapter').get(chat))
     dbo.deleteActions(chat_id)
 
-## @brief this function obfuscates user names of closed and not already archived chat sessions
-#  @return bool True
 def action_succeeded_handler(obj, event):
     """
     Obfuscates user names of message senders and in messages.
-    Only a chat session that is closed for more than five minutes will be processed.
+    Only a chat session that is not already archived and that is closed for more than five minutes will be processed.
+
+    :param obj: respective chat session
+    :type obj: tud.addons.chat.content.chat_session.ChatSession
+    :param event: event object with information about workflow transition
+    :type event: Products.CMFCore.WorkflowCore.ActionSucceededEvent
+    :return: always True
+    :rtype: bool
     """
     if event.action == 'archive':
         chat = obj.getParentNode()
