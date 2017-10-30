@@ -16,11 +16,11 @@ msgstr ""
 "Language: de\n"
 "X-Generator: Poedit 2.0.3\n"
 
-#: ./profiles/default/types/Chat.xml
+#: ./profiles/base/types/Chat.xml
 msgid "Chat"
 msgstr "Chat"
 
-#: ./profiles/default/types/ChatSession.xml
+#: ./profiles/base/types/ChatSession.xml
 msgid "ChatSession"
 msgstr "Chatsitzung"
 

@@ -16,26 +16,26 @@ msgstr ""
 "Language-Team: \n"
 "X-Generator: Poedit 2.0.3\n"
 
-#: profiles/default/workflows/chat_session_workflow/definition.xml
+#: profiles/base/workflows/chat_session_workflow/definition.xml
 msgid "Archive"
 msgstr "Archivieren"
 
-#: profiles/default/workflows/chat_session_workflow/definition.xml
+#: profiles/base/workflows/chat_session_workflow/definition.xml
 msgid "Archived"
 msgstr "Archiviert"
 
-#: profiles/default/workflows/chat_session_workflow/definition.xml
+#: profiles/base/workflows/chat_session_workflow/definition.xml
 msgid "Chat Session Workflow"
 msgstr "Chatsitzungs-Workflow"
 
-#: profiles/default/workflows/chat_session_workflow/definition.xml
+#: profiles/base/workflows/chat_session_workflow/definition.xml
 msgid "Editable"
 msgstr "Bearbeitbar"
 
-#: profiles/default/workflows/types/Chat.xml
+#: profiles/base/workflows/types/Chat.xml
 msgid "Manage chat sessions"
 msgstr "Chatsitzungen verwalten"
 
-#: profiles/default/workflows/chat_session_workflow/definition.xml
+#: profiles/base/workflows/chat_session_workflow/definition.xml
 msgid "Reactivate"
 msgstr "Reaktivieren"

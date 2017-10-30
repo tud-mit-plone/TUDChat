@@ -14,11 +14,11 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: DOMAIN\n"
 
-#: ./profiles/default/types/Chat.xml
+#: ./profiles/base/types/Chat.xml
 msgid "Chat"
 msgstr ""
 
-#: ./profiles/default/types/ChatSession.xml
+#: ./profiles/base/types/ChatSession.xml
 msgid "ChatSession"
 msgstr ""
 

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<metadata>
+  <version>1</version>
+  <dependencies>
+    <dependency>profile-Products.Archetypes:Archetypes</dependency>
+    <dependency>profile-Products.ATContentTypes:base</dependency>
+    <dependency>profile-tud.addons.chat:install-base</dependency>
+  </dependencies>
+</metadata>
