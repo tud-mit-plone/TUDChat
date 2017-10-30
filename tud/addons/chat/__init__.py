@@ -20,6 +20,12 @@ chatMessageFactory = MessageFactory('tud.addons.chat')
 
 # Initialization method
 def initialize(context):
+    """
+    Initializes content types.
+
+    :param context: product context
+    :type context: App.ProductContext.ProductContext
+    """
     listOfTypes = listTypes('tud.addons.chat')
     content_types, constructors, ftis = process_types(listOfTypes, 'tud.addons.chat')
 

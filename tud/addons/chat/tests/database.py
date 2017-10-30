@@ -6,7 +6,26 @@ from transaction import commit
 from plone.app.robotframework.remote import RemoteLibrary
 
 class DatabaseHelper(RemoteLibrary):
+    """
+    This class provides helper methods to create a database object and to clear a database.
+    """
+
     def zmysql_add_object(self, zmysql_id, db_server, db_user, db_password, db_name):
+        """
+        Adds zmysql object inside plone site root to provide database access.
+
+        :param zmysql_id: id of zmysql object, which have to be created
+        :type zmysql_id: str
+        :param db_server: address of database server
+        :type db_server: str
+        :param db_user: name of database user
+        :type db_user: str
+        :param db_password: password of given database user
+        :type db_password: str
+        :param db_name: name of database
+        :type db_name: str
+        """
+
         title = 'Z MySQL Database Connection'
         connection_string = "{}@{} {} {}".format(db_name, db_server, db_user, db_password)
 
@@ -21,6 +40,12 @@ class DatabaseHelper(RemoteLibrary):
         commit()
 
     def zmysql_clear_database(self, zmysql_id):
+        """
+        Removes all tables in database of zmysql object, which is determined from given zmysql id.
+
+        :param zmysql_id: id of zmysql object, whose database is to be cleared
+        :type zmysql_id: str
+        """
         site = getSite()
         zmysql = getattr(site, zmysql_id, None)
         if zmysql is None:

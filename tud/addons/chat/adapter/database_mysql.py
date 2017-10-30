@@ -8,18 +8,43 @@ from tud.addons.chat import chatMessageFactory as _
 from tud.addons.chat.interfaces import IDatabaseObject
 
 class SQL(ZSQL):
+    """
+    This class provides database access in form of a stored sql statement.
+    """
 
     def __init__(self, id, title, connection_id, arguments, template):
+        """
+        Saves sql statement and removes result row limitation.
+
+        :param id: id of sql object
+        :type id: str
+        :param title: title of sql object
+        :type title: str
+        :param connection_id: id of object, which provides database access
+        :type connection_id: str
+        :param arguments: parameters of sql statement (multiple parameters have to be separated by spaces)
+        :type arguments: str
+        :param template: sql statement
+        :type template: str
+        """
         self.id=str(id)
         self.manage_edit(title, connection_id, arguments, template)
         self.max_rows_ = 0
 
 class TUDChatSqlMethods():
-    """Class containing all sql methods"""
+    """
+    This class contains all sql methods.
+    """
 
     def __init__(self, sql_connector_id, prefix):
-        """ """
+        """
+        Creates needed sql objects.
 
+        :param sql_connector_id: id of object, which provides database access
+        :type sql_connector_id: str
+        :param prefix: prefix, which is used in database (for action table)
+        :type prefix: str
+        """
         self.tableCheck = SQL('tableCheck', 'Check for the existence of the action table with a given prefix',
             sql_connector_id, '',
             """
@@ -206,10 +231,16 @@ class TUDChatSqlMethods():
 @implementer(IDatabaseObject)
 class DatabaseMySQL():
     """
-    Implementation for MySQL database
+    Implementation for MySQL databases
     """
 
     def __init__(self, chat):
+        """
+        Prepares database access. Needed information is obtained from chat object.
+
+        :param chat: chat object
+        :type chat: tud.addons.chat.content.chat.Chat
+        """
         self.chat = chat
 
         sql_connector_id = chat.getField('connector_id').get(chat)
@@ -221,6 +252,13 @@ class DatabaseMySQL():
             setattr(self.sql_methods, query_name, query.__of__(self.chat))
 
     def validate(self, REQUEST):
+        """
+        Validates connector id, which is given via request.
+        An error is raised if no object with given id could be found or if object found has wrong type.
+
+        :param REQUEST: request with form data
+        :type REQUEST: ZPublisher.HTTPRequest.HTTPRequest
+        """
         sql_connector_id = REQUEST.get('connector_id', '')
         try:
             zmysql = getattr(self.chat, sql_connector_id)
@@ -230,6 +268,14 @@ class DatabaseMySQL():
             raise ValueError(_(u'validation_object_not_found', default = u'No object with this ID was found in any subpath.'))
 
     def prefixInUse(self, REQUEST):
+        """
+        Checks if prefix (received from request) is in use in the database.
+
+        :param REQUEST: request with form data
+        :type REQUEST: ZPublisher.HTTPRequest.HTTPRequest
+        :return: True, if prefix is in use, otherwise False
+        :rtype: bool
+        """
         sql_connector_id = REQUEST.get('connector_id', '')
         prefix = REQUEST.get('database_prefix', '')
 
@@ -240,6 +286,12 @@ class DatabaseMySQL():
         return prefix in used_prefixes
 
     def createTables(self):
+        """
+        Creates action table, if it not exists, with configured prefix.
+
+        :return: True, if action table was created, otherwise False
+        :rtype: bool
+        """
         if len(self.sql_methods.tableCheck().dictionaries())<1:
             self.sql_methods.createTableChatAction()
             return True
@@ -247,12 +299,26 @@ class DatabaseMySQL():
             return False
 
     def getMaxSessionId(self):
+        """
+        Determines maximum session id.
+
+        :return: maximum session id, if at least one entry exists in action table, otherwise None
+        :rtype: int or None
+        """
         result = self.sql_methods.getMaxSessionId().tuples()[0][0]
         if result:
             result = int(result)
         return result
 
     def getLastAction(self, chat_id):
+        """
+        Determines largest action id for a given chat session id.
+
+        :param chat_id: id of chat session
+        :type chat_id: int
+        :return: largest action id
+        :rtype: int
+        """
         result = self.sql_methods.getLastChatAction(chat_id = chat_id)
         last_action = result.tuples()[0][0]
         if last_action is None:
@@ -261,6 +327,21 @@ class DatabaseMySQL():
         return last_action
 
     def getStartAction(self, chat_id, old_messages_count = 0, old_messages_minutes = 0):
+        """
+        Determines id of first relevant action. This id is important, for example, when entering chat session.
+        If count of old messages is 0 then last action represents the start action id. The parameter for the message age is ignored in this case.
+        If count of old messages is larger than 0, then the id of the start action is determined in such a way that the configured maximum number of messages is displayed.
+        If count of old messages is larger than 0 and the parameter for message age is larger than 0, only messages that are not older than the configured number of minutes are displayed.
+
+        :param chat_id: id of chat session
+        :type chat_id: int
+        :param old_messages_count: number of recent messages to show
+        :type old_messages_count: int
+        :param old_messages_minutes: maximum age of recent messages in minutes
+        :type old_messages_minutes: int
+        :return: start action id
+        :rtype: int
+        """
         if old_messages_count != 0:
             if old_messages_minutes == 0:
                 result = self.sql_methods.getStartAction(chat_id = chat_id, old_messages_count = old_messages_count)
@@ -284,6 +365,25 @@ class DatabaseMySQL():
         return start_action
 
     def getActions(self, chat_id, last_action, start_action, start_action_whisper, user, limit = 0):
+        """
+        Returns list of new actions since last request.
+        A detailed description can be found in database documentation.
+
+        :param chat_id: id of chat session
+        :type chat_id: int
+        :param last_action: largest action id for this chat session in last request
+        :type last_action: int
+        :param start_action: smallest relevant action id (actions, which reference actions with a smaller id than this, will be ignored)
+        :type start_action: int
+        :param start_action_whisper: smallest action id for private messages (no private message with a smaller id will be shown)
+        :type start_action_whisper: int
+        :param user: name of the user (needed to get private messages)
+        :type user: str
+        :param limit: maximum amount of actions to retrieve
+        :type limit: int
+        :return: actions
+        :rtype: list[dict]
+        """
         results = self.sql_methods.getActions(chat_id = chat_id,
                                                 last_action = last_action,
                                                 start_action = start_action,
@@ -298,6 +398,16 @@ class DatabaseMySQL():
             return []
 
     def getRawActionContents(self, chat_id):
+        """
+        Returns all actions of specified chat session.
+        No actions like editing or deleting of messages will be interpreted.
+        This method is used for anonymization.
+
+        :param chat_id: id of chat session
+        :type chat_id: int
+        :return: raw actions
+        :rtype: list[dict]
+        """
         results = self.sql_methods.getRawActionContents(chat_id = chat_id)
         if results:
             return self.dictFromSql(results, names=["id", "content"])
@@ -305,6 +415,24 @@ class DatabaseMySQL():
             return []
 
     def sendAction(self, chat_id, user, action, content = "", target = None, whisper_target = None):
+        """
+        Adds specified action to the database.
+
+        :param chat_id: id of chat session
+        :type chat_id: int
+        :param user: name of invoking user
+        :type user: str
+        :param action: action type (have to be one of: 'user_add_message', 'mod_add_message', 'mod_edit_message', 'mod_delete_message')
+        :type action: str
+        :param content: content of new or edited message (empty on delete action)
+        :type content: str
+        :param target: id of referenced action (only for action types 'mod_edit_message' and 'mod_delete_message')
+        :type target: int or None
+        :param whisper_target: recipient name for private messages
+        :type whisper_target: str or None
+        :return: id of added action
+        :rtype: int
+        """
         newid = self.sql_methods.sendAction(chat_id = chat_id,
                                     user = user,
                                     action = action,
@@ -314,6 +442,15 @@ class DatabaseMySQL():
         return int(self.dictFromSql(newid, names=('newid',))[0]['newid'])
 
     def getUsersBySessionId(self, chat_id):
+        """
+        Returns all names of users, which have at least one action transmitted in the specified session.
+        This method is used for anonymization.
+
+        :param chat_id: id of chat session
+        :type chat_id: int
+        :return: user names (every dictionary contains only the key 'user')
+        :rtype: list[dict]
+        """
         results = self.sql_methods.getUsersBySessionId(chat_id = chat_id)
         if results:
             return self.dictFromSql(results, ('user',))
@@ -321,20 +458,63 @@ class DatabaseMySQL():
             return []
 
     def updateUserName(self, chat_id, old_name, new_name):
+        """
+        Changes user names in column 'user' of action table for specified session.
+        This method is used for anonymization.
+
+        :param chat_id: id of chat session
+        :type chat_id: int
+        :param old_name: user name to be replaced
+        :type old_name: str
+        :param new_name: user name to replaced with
+        :type new_name: str
+        :return: always True
+        :rtype: bool
+        """
         self.sql_methods.updateUserName(chat_id = chat_id, old_name = old_name, new_name = new_name)
         return True
 
     def updateActionContent(self, action_id, new_content):
+        """
+        Updates value of 'content' column of action table for specified session and action.
+        This method is used for anonymization.
+
+        :param chat_id: id of chat session
+        :type chat_id: int
+        :param action_id: id of concerned action
+        :type action_id: int
+        :param new_content: new value for 'content' column
+        :type new_content: str
+        :return: always True
+        :rtype: bool
+        """
         self.sql_methods.updateActionContent(action_id = action_id, new_content = new_content)
         return True
 
     def deleteActions(self, chat_id):
+        """
+        Deletes all actions of specified chat session.
+        This method is called on session deletion.
+
+        :param chat_id: id of chat session
+        :type chat_id: int
+        :return: always True
+        :rtype: bool
+        """
         self.sql_methods.deleteActions(chat_id = chat_id)
         return True
 
     def dictFromSql(self, results=(), names=()):
         """
-        Convert a list of SQL rows to a list of dictionnaries
+        Converts a list of SQL rows to a list of dictionaries.
+        During this process the time zone of DateTime objects will be fixed.
+
+        :param results: sql result object
+        :type results: tuple or Shared.DC.ZRDB.Results.Results
+        :param names: wanted keys of result dictionaries
+        :type names: tuple or list
+        :return: dictionaries with keys defined in parameter 'names'
+        :rtype: list[dict]
         """
         rows = []
         for sql_row in results.dictionaries():

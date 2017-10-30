@@ -20,14 +20,34 @@ from tud.addons.chat.interfaces import IDatabaseObject
 marker = object()
 
 class UserStatus:
+    """
+    Inside this class are different user states defined. These states will be used for ajax responses.
+    """
     OK, NOT_AUTHORIZED, KICKED, BANNED, LOGIN_ERROR, WARNED = range(6)
 
 class BanStrategy:
+    """
+    Inside this class are different ban strategies defined. Currently only the cookie strategy is used.
+    """
     COOKIE, IP, COOKIE_AND_IP = ('COOKIE', 'IP', 'COOKIE_AND_IP')
 
 class ChatSessionBaseView(BrowserView):
+    """
+    This base class for session views prepares cache and database access and introduces some helper methods.
+
+    :ivar cache: storage for cached data (shared between all chat session users)
+    :ivar _dbo: database object to communicate with the database
+    """
 
     def __init__(self, context, request):
+        """
+        Prepares cache and database access.
+
+        :param context: chat session
+        :type context: tud.addons.chat.content.chat_session.ChatSession
+        :param request: request
+        :type request: ZPublisher.HTTPRequest.HTTPRequest
+        """
         super(ChatSessionBaseView, self).__init__(context, request)
 
         cacheManager = getUtility(ICacheManager)
@@ -49,6 +69,14 @@ class ChatSessionBaseView(BrowserView):
         self._dbo = self.getDatabaseObject()
 
     def getDatabaseObject(self):
+        """
+        Returns database object which provides database access.
+        Primary the database object will be obtained from the chat object. The success is not guaranteed, because the database object is stored as volatile attribute in the chat object.
+        If the database object could not be obtained from the chat object, a new database object will be instantiated.
+
+        :return: database object
+        :rtype: tud.addons.chat.interfaces.IDatabaseObject
+        """
         chat = self.context.getParentNode()
         dbo = getattr(chat, '_v_db_adapter', marker)
         if dbo != marker:
@@ -59,6 +87,12 @@ class ChatSessionBaseView(BrowserView):
             return dbo
 
     def getSessionInformation(self):
+        """
+        Returns following information about chat session: title, description, chat id (used in database), password, maximum users, start date, end date and session url
+
+        :return: chat session information
+        :rtype: dict
+        """
         result = {}
         for field in ('title', 'description', 'chat_id', 'password', 'max_users', 'start_date', 'end_date',):
             result[field] = self.context.getField(field).get(self.context)
@@ -103,6 +137,12 @@ class ChatSessionBaseView(BrowserView):
         return False
 
     def isActive(self):
+        """
+        Checks, if chat session is currently active.
+
+        :return: True, if session is active, otherwise False
+        :rtype: bool
+        """
         chat_start = self.context.getField('start_date').get(self.context)
         chat_end = self.context.getField('end_date').get(self.context)
         now = DateTime()
@@ -110,6 +150,8 @@ class ChatSessionBaseView(BrowserView):
 
 class ChatSessionAjaxView(ChatSessionBaseView):
     """
+    This view class represents the endpoint for javascript requests. All methods prefixed with "ajax" can be accessed from outside.
+
     :cvar htmlspecialchars: replacements for special html chars (char "&" is in function included)
     :cvar forbiddenchars: list of chars, which aren't allowed in ajax parameters (star marks moderators)
     """
@@ -118,6 +160,14 @@ class ChatSessionAjaxView(ChatSessionBaseView):
     forbiddenchars           = [u"★", u"☆"]
 
     def __call__(self):
+        """
+        Determines and calls the requested method.
+        If the method could not be found or if required parameters are missing, an error is returned.
+        String parameters get a special handling. First they will be decoded to unicode objects. Second forbidden characters (see class variable 'forbiddenchars') will be removed.
+
+        :return: error message or return value of desired method (result is in every case json formatted)
+        :rtype: str
+        """
         self.request.response.setHeader("Content-type", "application/json")
 
         parameters = self.request.form
@@ -174,7 +224,6 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         :return: IP address as a string or None if not available
         :rtype: str or None
         """
-
         if "HTTP_X_FORWARDED_FOR" in self.request.environ:
             # Virtual host
             ip = self.request.environ["HTTP_X_FORWARDED_FOR"]
@@ -188,7 +237,14 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         return ip
 
     def html_escape(self, text):
-        """ Escape html characters """
+        """
+        Escapes html characters.
+
+        :param text: text with possibly not escaped html characters
+        :type text: str
+        :return: text with escaped html characters
+        :rtype: str
+        """
         tmptext = text.replace('&','&amp;')
         for key in self.htmlspecialchars:
             tmptext = tmptext.replace(key, self.htmlspecialchars[key])
@@ -538,6 +594,12 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             session.set('user_properties', user_properties)
 
     def ajaxLogout(self):
+        """
+        Logs user from respective chat session out.
+
+        :return: always True
+        :rtype: bool
+        """
         return self.logout()
 
     def ajaxGetActions(self):
@@ -756,6 +818,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
     def ajaxKickUser(self, target_user, message = ""):
         """
         Removes a user from respective chat session.
+        This action can only performed by moderators.
 
         :param target_user: name of user to kick
         :type target_user: str
@@ -779,6 +842,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
     def ajaxWarnUser(self, target_user, message = ""):
         """
         Warns a user in respective chat session.
+        This action can only performed by moderators.
 
         :param target_user: name of user to warn
         :type target_user: str
@@ -803,6 +867,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
     def ajaxBanUser(self, target_user, message = ""):
         """
         Bans a user from respective chat session.
+        This action can only performed by moderators.
 
         :param target_user: name of user to ban
         :type target_user: str
@@ -825,10 +890,18 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         return self.addBannedUser(target_user, message)
 
 class ChatSessionView(ChatSessionBaseView):
-    """Default chat session view
+    """
+    Default chat session view
     """
 
     def __call__(self):
+        """
+        Returns rendered chat session template if requesting user is registered for respective chat session.
+        If no registration can be found in the user session, the user will be redirected to the chat overview page.
+
+        :return: rendered template, if user is registered, otherwise None
+        :rtype: str or None
+        """
         if self.isRegistered():
             return super(ChatSessionView, self).__call__()
         else:
@@ -844,6 +917,12 @@ class ChatSessionView(ChatSessionBaseView):
             return
 
     def getChatInformation(self):
+        """
+        Returns following general chat information: refresh rate, block time, maximum message length, url of chat
+
+        :return: chat information
+        :rtype: dict
+        """
         chat = self.context.getParentNode()
 
         result = {}
@@ -854,18 +933,37 @@ class ChatSessionView(ChatSessionBaseView):
         return result
 
     def getWelcomeMessage(self):
+        """
+        Returns configured welcome message, if it exists.
+
+        :return: welcome message, if it is defined, otherwise None
+        :rtype: str or None
+        """
         return self.context.getField('welcome_message').get(self.context) or None
 
     def getWhisperOption(self):
+        """
+        Returns configured whisper option of chat object.
+
+        :return: whisper option ('on', 'restricted' or 'off')
+        :rtype: str
+        """
         chat = self.context.getParentNode()
         return chat.getField('whisper').get(chat)
 
     def getDateFrequencyOption(self):
+        """
+        Returns configured date frequency option of chat object. This option decides how often timestamps have to be shown in chat session window.
+
+        :return: date frequency option ('message', 'minute' or 'off')
+        :rtype: str
+        """
         chat = self.context.getParentNode()
         return chat.getField('date_frequency').get(chat)
 
 class ChatSessionLogView(ChatSessionBaseView):
-    """Chat session log view
+    """
+    Chat session log view
     """
 
     def getLogs(self, REQUEST = None):

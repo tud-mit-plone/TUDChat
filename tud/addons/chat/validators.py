@@ -10,10 +10,26 @@ from tud.addons.chat import chatMessageFactory as _
 
 @implementer(IValidator)
 class MinMaxValidator(object):
-    """Checks that a number is within the defined value range.
+    """
+    Checks that a number is within a defined value range.
     """
 
     def __init__(self, name='min_max_check', title='', description='', minimum = None, maximum = None):
+        """
+        Sets some data.
+
+        :param name: name of validator
+        :type name: str
+        :param title: title of validator
+        :type title: str
+        :param description: description of validator
+        :type description: str
+        :param minimum: minimum allowed number
+        :type minimum: int
+        :param maximum: maximum allowed number
+        :type maximum: int
+        """
+
         self.name = name
         self.title = title or name
         self.description = description
@@ -21,6 +37,15 @@ class MinMaxValidator(object):
         self.maximum = maximum
 
     def __call__(self, value, *args, **kwargs):
+        """
+        Validates given value.
+
+        :param value: value to validate
+        :type value: str
+        :return: True, if validation succeeds, otherwise error message
+        :rtype: bool or str
+        """
+
         instance = kwargs.get('instance', None)
 
         try:
@@ -36,10 +61,20 @@ class MinMaxValidator(object):
         return True
 
 class LengthValidator(MinMaxValidator):
-    """Checks that a string is within the defined length range.
+    """
+    Checks that a string is within a defined length range.
     """
 
     def __call__(self, value, *args, **kwargs):
+        """
+        Validates given value.
+
+        :param value: value to validate
+        :type value: str
+        :return: True, if validation succeeds, otherwise error message
+        :rtype: bool or str
+        """
+
         instance = kwargs.get('instance', None)
 
         value = unicode(value, "utf8")
@@ -53,15 +88,36 @@ class LengthValidator(MinMaxValidator):
 
 @implementer(IValidator)
 class HexColorCodeValidator(object):
-    """Checks that a string is a valid hexadecimal color code.
+    """
+    Checks that a string is a valid hexadecimal color code.
     """
 
     def __init__(self, name='hex_color_code_check', title='', description=''):
+        """
+        Sets some data.
+
+        :param name: name of validator
+        :type name: str
+        :param title: title of validator
+        :type title: str
+        :param description: description of validator
+        :type description: str
+        """
+
         self.name = name
         self.title = title or name
         self.description = description
 
     def __call__(self, value, *args, **kwargs):
+        """
+        Validates given value.
+
+        :param value: value to validate
+        :type value: str
+        :return: True, if validation succeeds, otherwise error message
+        :rtype: bool or str
+        """
+
         instance = kwargs.get('instance', None)
         value = unicode(value, "utf8")
 

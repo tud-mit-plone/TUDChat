@@ -19,7 +19,12 @@ def endDateIndexer(object, **kw):
 
 def generate_chat_id(obj, event):
     """
-    Generates chat_id for chat sessions if chat_id is 0 or if a chat session was copied
+    Generates chat id for new chat sessions if chat id is 0 or if a chat session was copied.
+
+    :param obj: chat session, which was created or copied
+    :type obj: tud.addons.chat.content.chat_session.ChatSession
+    :param event: triggered event (used to detect a copy action)
+    :type event: Products.Archetypes.event.ObjectInitializedEvent or OFS.event.ObjectClonedEvent
     """
     chat = obj.getParentNode()
 
@@ -41,7 +46,12 @@ def generate_chat_id(obj, event):
 
 def removed_handler(obj, event):
     """
-    Deletes actions of removed chat in action table
+    Deletes all actions of removed session in action table.
+
+    :param obj: chat session, which will be deleted
+    :type obj: tud.addons.chat.content.chat_session.ChatSession
+    :param event: triggered event
+    :type event: zope.lifecycleevent.ObjectRemovedEvent
     """
     chat_id = obj.getField('chat_id').get(obj)
     chat = obj.getParentNode()
@@ -56,10 +66,10 @@ def action_succeeded_handler(obj, event):
 
     :param obj: respective chat session
     :type obj: tud.addons.chat.content.chat_session.ChatSession
-    :param event: event object with information about workflow transition
+    :param event: triggered event with information about workflow transition
     :type event: Products.CMFCore.WorkflowCore.ActionSucceededEvent
-    :return: always True
-    :rtype: bool
+    :return: True, if session was archived, otherwise None
+    :rtype: bool or None
     """
     if event.action == 'archive':
         chat = obj.getParentNode()
@@ -107,9 +117,23 @@ class StartEndDateValidator(object):
     """
 
     def __init__(self, context):
+        """
+        Sets context.
+
+        :param context: chat session
+        :type context: tud.addons.chat.content.chat_session.ChatSession
+        """
         self.context = context
 
     def __call__(self, request):
+        """
+        Validates date parts of given request.
+
+        :param request: request with form data
+        :type request: ZPublisher.HTTPRequest.HTTPRequest
+        :return: field names associated with error messages, if at least one error exists, otherwise None
+        :rtype: dict or None
+        """
         start_date = request.form.get('start_date', None)
         end_date = request.form.get('end_date', None)
 

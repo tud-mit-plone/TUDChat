@@ -7,19 +7,44 @@ from tud.addons.chat.interfaces import IChatSession
 from tud.addons.chat import chatMessageFactory as _
 
 class ChatView(BrowserView):
-    """Default chat view
+    """
+    Default chat view
     """
 
     def getTitle(self):
+        """
+        Returns chat title.
+
+        :return: title of chat
+        :rtype: str
+        """
         return self.context.getField('title').get(self.context)
 
     def getIntroduction(self):
+        """
+        Returns chat introduction.
+
+        :return: introduction of chat
+        :rtype: str
+        """
         return self.context.getField('introduction').get(self.context)
 
     def getWhisperOption(self):
+        """
+        Returns configured whisper option.
+
+        :return: whisper option ('on', 'restricted' or 'off')
+        :rtype: str
+        """
         return self.context.getField('whisper').get(self.context)
 
     def getShowOldMessagesOptions(self):
+        """
+        Returns settings which define how many messages are shown when entering a chat session and how old these messages can be.
+
+        :return: maximum count of old messages and maximum age of these messages
+        :rtype: dict
+        """
         return {'count' : self.context.getField('oldMessagesCount').get(self.context),
                 'minutes' : self.context.getField('oldMessagesMinutes').get(self.context)}
 
@@ -27,7 +52,7 @@ class ChatView(BrowserView):
         """
         Generates a list of all active chat sessions.
 
-        :return: list of chat session objects
+        :return: chat sessions
         :rtype: list[tud.addons.chat.content.chat_session.ChatSession]
         """
         catalog = getToolByName(self.context, 'portal_catalog')
@@ -44,7 +69,7 @@ class ChatView(BrowserView):
         """
         Generates a list of all chat sessions which were planned.
 
-        :return: list of chat session objects
+        :return: chat sessions
         :rtype: list[tud.addons.chat.content.chat_session.ChatSession]
         """
         catalog = getToolByName(self.context, 'portal_catalog')
@@ -60,6 +85,14 @@ class ChatView(BrowserView):
         return [brain.getObject() for brain in catalog(query)]
 
     def getPortalMessage(self):
+        """
+        Returns different portal messages depending on flags in user session.
+        If no flag exists, no message will be returned.
+        In case of message delivery the corresponding flag will be removed.
+
+        :return: portal message, if at least one corresponding flag exists in user session, otherwise None
+        :rtype: str or None
+        """
         session = self.request.SESSION
 
         if session.has_key("chat_kick_message"):
@@ -92,20 +125,40 @@ class ChatView(BrowserView):
         return None
 
 class ChatSessionsView(BrowserView):
-    """Chat sessions view
+    """
+    Chat sessions view
     """
 
     def getSessions(self):
-        """ Returns all chat sessions """
+        """
+        Returns all chat sessions.
+
+        :return: chat sessions
+        :rtype: OFS.ZDOM.NodeList
+        """
         return self.context.getChildNodes()
 
     def getState(self, obj):
-        """ Returns current workflow state of given object """
+        """
+        Returns current workflow state of given session.
+
+        :param obj: chat session
+        :type obj: tud.addons.chat.content.chat_session.ChatSession
+        :return: workflow state ('editable' or 'archived')
+        :rtype: str
+        """
         wftool = getToolByName(self, 'portal_workflow')
         return wftool.getInfoFor(obj, 'review_state')
 
     def getStateTitle(self, obj):
-        """ Returns current workflow state title of given object """
+        """
+        Returns translated title of current workflow state of given session.
+
+        :param obj: chat session
+        :type obj: tud.addons.chat.content.chat_session.ChatSession
+        :return: translated title of workflow state
+        :rtype: str
+        """
         wftool = getToolByName(self, 'portal_workflow')
         state = wftool.getInfoFor(obj, 'review_state')
         workflows = wftool.getWorkflowsFor(obj)

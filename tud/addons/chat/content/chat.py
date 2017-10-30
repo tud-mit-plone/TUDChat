@@ -216,8 +216,8 @@ schemata.finalizeATCTSchema(ChatSchema, folderish=False, moveDiscussion=False)
 
 @implementer(IChat)
 class Chat(base.ATCTFolder):
-    """Chat content type
-
+    """
+    Chat content type
     """
 
     meta_type = 'Chat'
@@ -229,12 +229,14 @@ class Chat(base.ATCTFolder):
     schema = ChatSchema
 
     def manage_cutObjects(self, *args, **kwargs):
-        """Forbid moving chat sessions
+        """
+        Forbids moving chat sessions.
         """
         raise CopyError()
 
     def canSetDefaultPage(self):
-        """Forbid default page selection
+        """
+        Forbids default page selection.
 
         :return: False
         :rtype: bool
@@ -276,6 +278,12 @@ class Chat(base.ATCTFolder):
             REQUEST.set('post_validated', True)
 
     def getDatabaseAdapters(self):
+        """
+        Returns display list with available database adapters.
+
+        :return: available database adapters
+        :rtype: Products.Archetypes.utils.DisplayList
+        """
         values = tuple((adapter[0], adapter[0],) for adapter in getAdapters((self,), IDatabaseObject))
         return DisplayList(values)
 

@@ -103,8 +103,8 @@ schemata.finalizeATCTSchema(ChatSessionSchema, folderish=False, moveDiscussion=F
 
 @implementer(IChatSession)
 class ChatSession(base.ATCTContent):
-    """Chat session content type
-
+    """
+    Chat session content type
     """
 
     meta_type = 'ChatSession'
