@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <object name="portal_css">
     <stylesheet
-            id="++resource++tud.addons.chat/tud_chat.css"
+            id="++resource++tud.addons.chat/tud.addons.chat.min.css"
             remove="true"
     />
     <stylesheet
-            id="++resource++tud.addons.chat/tud_chat_admin.css"
+            id="++resource++tud.addons.chat/tud.addons.chat.admin.min.css"
             remove="true"
     />
 </object>

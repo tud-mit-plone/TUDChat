@@ -23,6 +23,12 @@
 
         // initialize once the document is "ready"
         $(function() {
+
+            // make shure that a chat is present
+            if(!$("#chat").length) {
+                return;
+            }
+
             // extract options and locale from DOM
             options = $.extend({}, options, $('#chat').data());
             locale  = $("html").attr("lang");
@@ -30,7 +36,7 @@
             publicVars.ajaxUrl = options.ajaxUrl;
 
             // init with jsi18n (either from mockup or jarn)
-            if(typeof(require) == "function" && require.defined("mockup-i18n")) {
+            if(typeof(require) == "function" && require.specified("mockup-i18n")) {
                 require(['mockup-i18n'], function(I18N) {
                     var i18n = new I18N();
                     init(i18n);

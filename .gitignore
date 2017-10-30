@@ -8,6 +8,10 @@
 *.egg-info
 *.EGG-INFO
 
+###Resources compilation artifacts###
+/tud/addons/chat/static/*-compiled.js
+/tud/addons/chat/static/*-compiled.css
+
 ###Eclipse###
 *.project
 *.pydevproject

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <object name="portal_css">
     <stylesheet
-            id="++resource++tud.addons.chat/tud_chat.css"
+            id="++resource++tud.addons.chat/tud.addons.chat.min.css"
             enabled="1"
             expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') or here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChat')"
             conditionalcomment=""
@@ -13,7 +13,7 @@
             applyPrefix="True"
     />
     <stylesheet
-            id="++resource++tud.addons.chat/tud_chat_admin.css"
+            id="++resource++tud.addons.chat/tud.addons.chat.admin.min.css"
             enabled="1"
             expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') and not here.portal_membership.isAnonymousUser()"
             conditionalcomment=""
