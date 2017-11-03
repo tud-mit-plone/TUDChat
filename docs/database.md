@@ -1,27 +1,27 @@
 # Database
 
-## Default database adapter (mysql)
-This document describes the database interaction using the delivered "mysql" database adapter.
+## Default database adapter (MySQL)
+This document describes the database interaction using the delivered "MySQL" database adapter.
 
-On chat object creation a table with the configured prefix will be added, if it does not exist. In this table all message-related actions are stored.
+On chat object creation, a table with the configured prefix will be added if it does not exist. In this table, all message-related actions are stored.
 The following columns will be used:
 
 Column           | Description
 ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 id               | Unique action id
 chat_id          | Association to the corresponding chat session
-date             | Time of action
-user             | Name of action invoker
+date             | Time of the action
+user             | Nickname of the sender
 action           | Action type (new message, new message sent by a moderator, message edited by a moderator, message deleted by a moderator)
 content          | Message content (edited message content for edit action; empty for delete action)
 target           | Id of referenced message (only for editing and deleting)
 whisper_target   | Name of private message recipient
 
 
-In addition to creating tables, the adapter performs a number of other tasks, such as retrieving actions. Because of the task complexity for getting actions a detailed explanation of this process follows.
-The action retrieval is realized by a complex sql query. To get a user specific result the sql query needs five parameters:
-*  chat_id: Id of chat session (show only actions of this session)
-*  last_action: Maximum action id for this chat session in last request (only newer actions will be received)
+In addition to creating tables, the adapter performs a number of other tasks, such as retrieving actions. Because of the task complexity for getting actions, a detailed explanation of this process follows.
+The action retrieval is realized by a complex SQL query. To get a user specific result, the SQL query needs five parameters:
+*  chat_id: Id of chat the session (to get actions of this session only)
+*  last_action: Maximum action id for this chat session in the last request (only newer actions will be received)
 *  start_action: Smallest relevant action id (is defined in registration process; if an action references another action with a smaller id then referencing action is ignored)
 *  start_action_whisper: Maximum action id when entering chat session (don't show whispered messages with smaller ids)
 *  user: Name of requesting user (needed to get whispered messages)
