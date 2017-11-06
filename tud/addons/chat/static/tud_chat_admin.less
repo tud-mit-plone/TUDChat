@@ -20,10 +20,9 @@
     opacity: 1.0;
 }
 
-button#chatMsgSubmit {
-    min-width: calc(20% - 25px);
-    max-width: calc(67% - 25px);
-    vertical-align: top;
+#chatMsgTarget ~ button#chatMsgSubmit {
+    min-width: calc(~"20% - 25px");
+    max-width: calc(~"67% - 25px");
 }
 
 #chatMsgMoreButtons {
@@ -31,10 +30,11 @@ button#chatMsgSubmit {
     vertical-align: top;
     display: none;
     margin-left: -0.2em;
+    width: 25px;
 }
 
 #chatMsgMoreButtons .moreButtonsExpand {
-    width: 25px;
+    width: 100%;
     padding-right: 0;
     padding-left: 0;
 }
