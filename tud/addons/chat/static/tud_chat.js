@@ -271,176 +271,181 @@
             }
             updateCheckBlock = true;
 
-            $.post(options.ajaxUrl, {'method': 'getActions'}, function(data){
-                lastUpdate = new Date();
+            $.ajax({
+                type: "POST",
+                url:    options.ajaxUrl,
+                data:   {'method': 'getActions'},
+                global: false,
+                success: function(data){
+                    lastUpdate = new Date();
 
-                if(!$("#chatMsgSubmit[isSending]").length) {
-                    $("#chatMsgSubmit").removeAttr("disabled");
-                }
-                $("#chat .serverError:visible").fadeOut(400);
+                    if(!$("#chatMsgSubmit[isSending]").length) {
+                        $("#chatMsgSubmit").removeAttr("disabled");
+                    }
+                    $("#chat .serverError:visible").fadeOut(400);
 
-                // Status
-                if (data.status.code == 1) { // Not authorized
-                    stopUpdateChecker();
-                    goHierarchieUp();
+                    // Status
+                    if (data.status.code == 1) { // Not authorized
+                        stopUpdateChecker();
+                        goHierarchieUp();
+                        return;
+                    }
+                    if (data.status.code == 2) { // Kicked
+                        stopUpdateChecker();
+                        goHierarchieUp();
+                        return;
+                    }
+
+                    if (data.status.code == 3) { // Banned
+                        stopUpdateChecker();
+                        goHierarchieUp();
+                        return;
+                    }
+
+                    if (data.status.code == 5) { // Warned
+                        $.notification.warn(_('warning') + "<br/><br/> <em>" + data.status.message+"</em>", false, [{"name" :_('button_ok'),
+                            "click":function(){
+                                $.notification.close($(this).closest(".notification").attr("id"));
+                            }},
+                        ]);
+                    }
+
+                    if (data.status.code > 5) // != OK
                     return;
-                }
-                if (data.status.code == 2) { // Kicked
-                    stopUpdateChecker();
-                    goHierarchieUp();
-                    return;
-                }
 
-                if (data.status.code == 3) { // Banned
-                    stopUpdateChecker();
-                    goHierarchieUp();
-                    return;
-                }
+                    // handle user information
+                    if(typeof(data.users)!="undefined"){
 
-                if (data.status.code == 5) { // Warned
-                    $.notification.warn(_('warning') + "<br/><br/> <em>" + data.status.message+"</em>", false, [{"name" :_('button_ok'),
-                        "click":function(){
-                            $.notification.close($(this).closest(".notification").attr("id"));
-                        }},
-                    ]);
-                }
+                        // new users
+                        if(typeof(data.users['new'])!="undefined"){
 
-                if (data.status.code > 5) // != OK
-                return;
-
-                // handle user information
-                if(typeof(data.users)!="undefined"){
-
-                    // new users
-                    if(typeof(data.users['new'])!="undefined"){
-
-                        var sortByRoleAndName = function(object1, object2){
-                            // Compare two objects by their 'role' and 'name' properties lexicographically
-                            return [!object1.is_admin, object1.name] >= [!object2.is_admin, object2.name] ? 1 : -1;
-                        }
-                        var users = data.users['new'].sort(sortByRoleAndName);
-
-                        for(var i in users) {
-                            var username    = users[i].name,
-                                role        = users[i]['is_admin'] ? 'admin' : 'user',
-                                added       = false,
-                                $element    = $(printNewUser(username, role))
-                                    .attr({"data-uname": username, "title": (role == 'admin' ? _('user_is_moderator', {user: username}) : "") });
-
-                            $("#userContainer").children().each(function(){ // Enumerate all existing names and insert alphabetically
-                                var otherRole = $(this).hasClass('adminrole'),
-                                    otherUsername = $(this).text();
-                                if ([!otherRole, otherUsername] >= [role != 'admin', username]) {
-                                    $(this).before($element)
-                                    added = true;
-                                    return false;
-                                }
-                            });
-
-                            if (!added) {
-                                $("#userContainer").append($element);
+                            var sortByRoleAndName = function(object1, object2){
+                                // Compare two objects by their 'role' and 'name' properties lexicographically
+                                return [!object1.is_admin, object1.name] >= [!object2.is_admin, object2.name] ? 1 : -1;
                             }
-                        };
+                            var users = data.users['new'].sort(sortByRoleAndName);
 
-                        // Notification: User has entered the room
-                        if (!firstGetActions){
-                            // get list of usernames
-                            var usernames = $(users).map(function(){ return $(this).attr("name"); }).get();
+                            for(var i in users) {
+                                var username    = users[i].name,
+                                    role        = users[i]['is_admin'] ? 'admin' : 'user',
+                                    added       = false,
+                                    $element    = $(printNewUser(username, role))
+                                        .attr({"data-uname": username, "title": (role == 'admin' ? _('user_is_moderator', {user: username}) : "") });
 
-                            if (usernames.length == 1)
-                            $("#chatContent").append(
-                                $("<div class='chat-info'/>")
-                                .html( _('user_enters_room', {user: "<span class='username'>"+usernames+"</span>"}) )
-                            );
-                            else if (usernames.length != 0) {
-                                last_user = usernames.pop();
+                                $("#userContainer").children().each(function(){ // Enumerate all existing names and insert alphabetically
+                                    var otherRole = $(this).hasClass('adminrole'),
+                                        otherUsername = $(this).text();
+                                    if ([!otherRole, otherUsername] >= [role != 'admin', username]) {
+                                        $(this).before($element)
+                                        added = true;
+                                        return false;
+                                    }
+                                });
+
+                                if (!added) {
+                                    $("#userContainer").append($element);
+                                }
+                            };
+
+                            // Notification: User has entered the room
+                            if (!firstGetActions){
+                                // get list of usernames
+                                var usernames = $(users).map(function(){ return $(this).attr("name"); }).get();
+
+                                if (usernames.length == 1)
                                 $("#chatContent").append(
-                                    $("<div class='chat-info'>")
-                                    .html( _('users_enter_room', {users: "<span class='username'>"+usernames.join(', ')+"</span>", last_user: "<span class='username'>"+last_user+"</span>"}) )
+                                    $("<div class='chat-info'/>")
+                                    .html( _('user_enters_room', {user: "<span class='username'>"+usernames+"</span>"}) )
+                                );
+                                else if (usernames.length != 0) {
+                                    last_user = usernames.pop();
+                                    $("#chatContent").append(
+                                        $("<div class='chat-info'>")
+                                        .html( _('users_enter_room', {users: "<span class='username'>"+usernames.join(', ')+"</span>", last_user: "<span class='username'>"+last_user+"</span>"}) )
+                                    );
+                                }
+                            }
+                        }
+
+                        // users who left the room
+                        if(typeof(data.users['to_delete'])!="undefined"){
+                            users = data.users.to_delete.sort();
+                            for(var i in users) {
+                                $("#chat .chatUser[data-uname='"+users[i]+"']").remove();
+                                $("#chat a.username[data-uname='"+users[i]+"']").replaceWith(
+                                    $("<span/>")
+                                        .addClass( $("#chat a.username[data-uname='"+users[i]+"']").attr("class") )
+                                        .append(users[i])
                                 );
                             }
+                            // Notification: User has left the room
+                            if (!firstGetActions){
+                                if (users.length == 1)
+                                $("#chatContent").append("<div class='chat-info'>" + _('user_leaves_room', {user: "<span class='username'>"+users[0]+"</span>"}) + "</div>");
+                                else if (users.length != 0) {
+                                    last_user = users.pop();
+                                    $("#chatContent").append("<div class='chat-info'>" + _('users_leave_room', {users: "<span class='username'>"+users.join(', ')+"</span>", last_user: "<span class='username'>"+last_user+"</span>"}) + "</div>");
+                                }
+                            }
+                        }
+
+                        // Update the chat user counter
+                        var newUserNum = $("#userContainer").children().length;
+                        if(newUserNum != $("#userCount").text() ) {
+                            $("#userCount").text( newUserNum );
                         }
                     }
 
-                    // users who left the room
-                    if(typeof(data.users['to_delete'])!="undefined"){
-                        users = data.users.to_delete.sort();
-                        for(var i in users) {
-                            $("#chat .chatUser[data-uname='"+users[i]+"']").remove();
-                            $("#chat a.username[data-uname='"+users[i]+"']").replaceWith(
-                                $("<span/>")
-                                    .addClass( $("#chat a.username[data-uname='"+users[i]+"']").attr("class") )
-                                    .append(users[i])
-                            );
+                    // handle message data
+                    if(typeof(data.messages)!="undefined"){
+
+                        // new messages
+                        if(typeof(data.messages['new'])!="undefined"){
+                            var message = data.messages['new'];
+                            for(var i in data.messages['new']) {
+                                var mDate = new Date(message[i].date*1000).setSeconds(0, 0);
+                                if( options.dateFrequency == "message" || (options.dateFrequency == "minute" && mDate - dateLastMinute >= 60) ) {
+                                    dateLastMinute = mDate;
+                                    $("#chatContent").append("<div class='chat-info'><span class='chatdate' data-time='"+message[i].date+"'></span></div>");
+                                }
+                                $("#chatContent").append(printMessage(message[i]));
+                            }
                         }
-                        // Notification: User has left the room
-                        if (!firstGetActions){
-                            if (users.length == 1)
-                            $("#chatContent").append("<div class='chat-info'>" + _('user_leaves_room', {user: "<span class='username'>"+users[0]+"</span>"}) + "</div>");
-                            else if (users.length != 0) {
-                                last_user = users.pop();
-                                $("#chatContent").append("<div class='chat-info'>" + _('users_leave_room', {users: "<span class='username'>"+users.join(', ')+"</span>", last_user: "<span class='username'>"+last_user+"</span>"}) + "</div>");
+
+                        // edited messages
+                        if(typeof(data.messages.to_edit)!="undefined"){
+                            var messages = data.messages.to_edit;
+                            for(var i in messages){
+                                $("#chatEntry"+messages[i].id).html(printMessage(messages[i]));
+                            }
+                        }
+
+                        // deleted messages
+                        if(typeof(data.messages.to_delete)!="undefined"){
+                            var messages = data.messages.to_delete;
+                            for(var i in messages){
+                                $("#chatEntry"+messages[i].id).html(printMessage(messages[i]));
                             }
                         }
                     }
 
-                    // Update the chat user counter
-                    var newUserNum = $("#userContainer").children().length;
-                    if(newUserNum != $("#userCount").text() ) {
-                        $("#userCount").text( newUserNum );
-                    }
-                }
+                    // we potentially added new times, format them
+                    formatTimes(true);
 
-                // handle message data
-                if(typeof(data.messages)!="undefined"){
-
-                    // new messages
-                    if(typeof(data.messages['new'])!="undefined"){
-                        var message = data.messages['new'];
-                        for(var i in data.messages['new']) {
-                            var mDate = new Date(message[i].date*1000).setSeconds(0, 0);
-                            if( options.dateFrequency == "message" || (options.dateFrequency == "minute" && mDate - dateLastMinute >= 60) ) {
-                                dateLastMinute = mDate;
-                                $("#chatContent").append("<div class='chat-info'><span class='chatdate' data-time='"+message[i].date+"'></span></div>");
-                            }
-                            $("#chatContent").append(printMessage(message[i]));
-                        }
+                    if(firstGetActions && options.welcomeMessage){
+                        var $message = $("<div id='welcomeMessage' class='chat-info'></div>").text(options.welcomeMessage);
+                        $("#chatContent").append($message);
                     }
 
-                    // edited messages
-                    if(typeof(data.messages.to_edit)!="undefined"){
-                        var messages = data.messages.to_edit;
-                        for(var i in messages){
-                            $("#chatEntry"+messages[i].id).html(printMessage(messages[i]));
-                        }
+                    firstGetActions = false;
+                    updateCheckBlock = false;
+
+                    if (!scrollBlock) {
+                        performScrollMode();
                     }
 
-                    // deleted messages
-                    if(typeof(data.messages.to_delete)!="undefined"){
-                        var messages = data.messages.to_delete;
-                        for(var i in messages){
-                            console.log(messages[i]);
-                            $("#chatEntry"+messages[i].id).html(printMessage(messages[i]));
-                        }
-                    }
+                    // end of ajax success handling
                 }
-
-                // we potentially added new times, format them
-                formatTimes(true);
-
-                if(firstGetActions && options.welcomeMessage){
-                    var $message = $("<div id='welcomeMessage' class='chat-info'></div>").text(options.welcomeMessage);
-                    $("#chatContent").append($message);
-                }
-
-                firstGetActions = false;
-                updateCheckBlock = false;
-
-                if (!scrollBlock) {
-                    performScrollMode();
-                }
-
-                // end of ajax success handling
             })
             .fail(function() {
                 updateCheckBlock = false;

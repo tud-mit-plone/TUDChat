@@ -5,6 +5,10 @@
             remove="true"
     />
     <stylesheet
+            id="++resource++tud.addons.chat/plone4-icons/tud-chat-plone4-icons-embedded.css"
+            remove="true"
+    />
+    <stylesheet
             id="++resource++tud.addons.chat/tud.addons.chat.admin.min.css"
             remove="true"
     />
