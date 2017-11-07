@@ -631,10 +631,12 @@
                 $('#chatMsgForm').prepend($targetContent);
 
                 // add some padding at the top of the textarea
-                var targetContentHeight = $targetContent.outerHeight();
+                var targetContentHeight = $targetContent.outerHeight(true);
+
                 var chatMsgValuePaddingTop = $chatMsgValue.css("padding-top");
                 $chatMsgValue.data("padding-top", chatMsgValuePaddingTop);
-                $chatMsgValue.css("padding-top", "calc(" + chatMsgValuePaddingTop + " + " + chatMsgValuePaddingTop + " + " + targetContentHeight + "px)").trigger("keyup").focus();
+
+                $chatMsgValue.css("padding-top", targetContentHeight + "px").trigger("keyup").focus();
 
                 // show the admin-buttons (if they exist)
                 $("#chatMsgMoreButtons").css("display", "inline-block");
@@ -672,7 +674,10 @@
                 textInputOffset = $textInput[0].offsetHeight - $textInput[0].clientHeight;
             $textInput
                 .on('keyup', function() {
-                    $(this).css('height', '').css('height', this.scrollHeight + textInputOffset);
+                    var $this = $(this);
+                    var msgTargetHeight = $("#chatMsgTarget:visible").outerHeight(true) || 0;
+                    var ownPadding = $this.outerHeight() - $this.height() - msgTargetHeight;
+                    $this.css('height', '').height(this.scrollHeight + textInputOffset - ownPadding - msgTargetHeight);
                 })
                 .keydown(function (e) {
                     var key = e.keyCode;
