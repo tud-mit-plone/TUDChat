@@ -53,7 +53,7 @@ The following crontab template could be used (it is advisable to use an instance
 ```
 
 After these steps you can start your instance and install the chat product.
-Before you can add chat objects in Plone, you have to add a database object (database object must be located in a sub-path of the chat objects, e.g. your site root):
+Before you can add chat objects in Plone, you have to add a database object (inside the ZODB the database object must be located above the chat objects, e.g. your site root):
 *   Open the zope management interface at the position you want to add the object in your browser.
 *   Add an object of type "Z MySQL Database Connection":
   *  Enter an id (which is later needed for configuration of chat objects)
