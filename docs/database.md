@@ -19,7 +19,7 @@ whisper_target   | Name of private message recipient
 
 
 In addition to creating tables, the adapter performs a number of other tasks, such as retrieving actions. Because of the task complexity for getting actions, a detailed explanation of this process follows.
-The action retrieval is realized by a complex SQL query. To get a user specific result, the SQL query needs five parameters:
+The action retrieval is realized by a single complex SQL query. To get a user specific result, the SQL query needs five parameters:
 *  chat_id: Id of chat the session (to get actions of this session only)
 *  last_action: Maximum action id for this chat session in the last request (only newer actions will be received)
 *  start_action: Smallest relevant action id (is defined in registration process; if an action references another action with a smaller id then referencing action is ignored)
@@ -30,7 +30,7 @@ The query itself is a union of 5 subqueries:
 1. At first all public messages, which were not retrieved in the last request, will be requested. Only messages that are not referenced by another action (edit or delete) will be retrieved.
 2. In the second query all new private messages (given user has to be sender or recipient) will be retrieved.
 3. The third query determines actions for edited and deleted messages. If the same message is referenced by multiple actions only the newest action is in the result. Because of two joins information about the referencing and the referenced action will be available. Only actions, which reference already transmitted messages, will be in the result.
-4. The fourth query acts similar to the third query. The difference is that modify and delete actions for messages, which the client not know, will be retrieved. This split is caused by different handling on client side. Actions of this block have to be handled as new messages, because they don't reference an existing message. This block is relevant on page reloads for example.
+4. The fourth query acts similar to the third query. The difference is that modify and delete actions for messages, which the client does not know, will be retrieved. This split is caused by the different handling on client side. Actions of this block have to be handled as new messages, because they don't reference an existing message. This block is relevant on page reloads for example.
 5. The last part determines the maximum action id of this session. This id is later used as 'last_action' parameter.
 
 At the end the result of the union is ordered by id. The result has the following columns:

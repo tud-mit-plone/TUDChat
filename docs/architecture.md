@@ -7,7 +7,7 @@ This product introduces two new content types: "Chat" and "ChatSession".
 The chat object is a container object for chat sessions. All sessions use the database configured in the chat object. Multiple chat objects can use the same database. To prohibit conflicts you have to define a unique table prefix for each chat object.
 
 ### Default view
-The default view shows information about data protection depending on the configuration if at least one open chat session exists. Furthermore, this view provides the chat login form. If more than one chat session is active, the user can choose one to take part in. If sessions have been planned, these sessions are listed at the bottom.
+The default view provides the chat login form. If more than one chat session is active, the user can choose one to take part in. If sessions have been planned, these sessions are listed at the bottom. Furthermore, this view shows information about data protection depending on the configuration if at least one open chat session exists.
 
 ### Chat session management view
 This view lists all chat sessions with session specific information. If the session is editable, an edit link is shown. For archived chat sessions, links to their chat logs are provided.
@@ -16,13 +16,13 @@ This view lists all chat sessions with session specific information. If the sess
 This object realizes the web chat. You can configure session specific options like start and end time. It is also possible to define a limit for the number of participants and to set a password for the session.
 
 ### Default view
-To access this the default view, the visitor has to sign in with a nickname on the default chat view. Otherwise he will be redirected to the chat object. The template of the default view defines some data, which are needed by the JavaScript files.
+To access the default view, a visitor has to sign in with a nickname on the default chat view. Otherwise he will be redirected to the chat object. The template of the default view defines some data, which are needed by the JavaScript files.
 
 ### Ajax view
-This view represents the JavaScript communication endpoint. To communicate with this endpoint you have to specify the get parameter 'method' with your requested method. The call method of this view searches for the requested method, which has to be prefixed with 'ajax', and calls it with the given parameters. The result of the method will be transmitted to the client in JSON format.
+This view represents the JavaScript communication endpoint. To communicate with this endpoint you have to specify with the get parameter 'method' your requested method. The call method of this browser view searches for the requested method, which has to be prefixed with 'ajax' and calls it with the given parameters. The result of the method will be transmitted to the client in JSON format.
 
-This view is also responsible for the user management. Therefore, a user specific and a shared storage are needed.
-The following information is stored in the user session:
+This view is also responsible for the user management. Therefore, a user specific and a shared storage is needed.
+The following information are stored in the user session:
 
 Name                   | Type   | Content
 ---------------------- | ------ | ---------------------------------------------------------------------------
@@ -33,7 +33,7 @@ last_action            | int    | Id of the last action that was sent to this cl
 user_list              | list   | List of users known to the client
 chat_room_check        | int    | Timestamp used for check if the chat session is still active
 
-The following information is stored in the shared cache:
+The following information are stored in the shared cache:
 
 Name                 | Type   | Content
 -------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -44,14 +44,14 @@ banned_chat_users    | dict   | Dictionary with all users marked for banning
 check_timestamp      | int    | Timestamp used to check for inactive users
 
 The shared "chat_users" dictionary contains the following information for each user:
-*  date: Timestamp needed to check for inactive users (will be update by many user actions)
-*  last_message_sent: Timestamp of last sent message (needed to enforce configured delay between two messages)
+*  date: Timestamp needed to check for inactive users (will be updated by many user actions)
+*  last_message_sent: Timestamp of the last sent message (needed to enforce configured delay between two messages)
 *  is_admin: True if the user is a moderator otherwise False
 
-The dictionaries "kicked_chat_users", "warned_chat_users" and "banned_chat_users" store user names associated with messages. In case of kicked and banned users the message is optional.
+The dictionaries "kicked_chat_users", "warned_chat_users" and "banned_chat_users" store user names associated with the messages. In case of kicked and banned users the message is optional.
 
 #### Ajax method 'getActions'
-To stay informed on the current state and new messages, the ajax method 'getActions' is used. This method is called periodically by the client. The time interval can be configured via the chat object.
+To stay informed about the current state and new messages, the ajax method 'getActions' is used. This method is called periodically by the client. The time interval can be configured via the chat object.
 The function can be roughly divided into two phases. First some pre-checks have to be done:
 *  Check if user is banned
 *  Check if user is registered
