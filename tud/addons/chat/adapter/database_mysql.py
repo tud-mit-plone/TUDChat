@@ -27,7 +27,7 @@ class SQL(ZSQL):
         :param template: sql statement
         :type template: str
         """
-        self.id=str(id)
+        self.id = str(id)
         self.manage_edit(title, connection_id, arguments, template)
         self.max_rows_ = 0
 
@@ -247,7 +247,7 @@ class DatabaseMySQL():
         prefix = chat.getField('database_prefix').get(chat)
         self.sql_methods = TUDChatSqlMethods(sql_connector_id, prefix)
 
-        #set acquisition context for sql methods
+        # set acquisition context for sql methods
         for query_name, query in self.sql_methods.__dict__.items():
             setattr(self.sql_methods, query_name, query.__of__(self.chat))
 
@@ -263,9 +263,9 @@ class DatabaseMySQL():
         try:
             zmysql = getattr(self.chat, sql_connector_id)
             if not isinstance(zmysql, Connection):
-                raise ValueError(_(u'validation_object_is_not_zmysql_object', default = u'The chosen object is not a ZMySQL object.'))
+                raise ValueError(_(u'validation_object_is_not_zmysql_object', default=u'The chosen object is not a ZMySQL object.'))
         except AttributeError:
-            raise ValueError(_(u'validation_object_not_found', default = u'No object with this ID was found in any subpath.'))
+            raise ValueError(_(u'validation_object_not_found', default=u'No object with this ID was found in any subpath.'))
 
     def prefixInUse(self, REQUEST):
         """
@@ -292,7 +292,7 @@ class DatabaseMySQL():
         :return: True, if action table was created, otherwise False
         :rtype: bool
         """
-        if len(self.sql_methods.tableCheck().dictionaries())<1:
+        if len(self.sql_methods.tableCheck().dictionaries()) < 1:
             self.sql_methods.createTableChatAction()
             return True
         else:
@@ -319,14 +319,14 @@ class DatabaseMySQL():
         :return: largest action id
         :rtype: int
         """
-        result = self.sql_methods.getLastChatAction(chat_id = chat_id)
+        result = self.sql_methods.getLastChatAction(chat_id=chat_id)
         last_action = result.tuples()[0][0]
         if last_action is None:
             last_action = 0
 
         return last_action
 
-    def getStartAction(self, chat_id, old_messages_count = 0, old_messages_minutes = 0):
+    def getStartAction(self, chat_id, old_messages_count=0, old_messages_minutes=0):
         """
         Determines id of first relevant action. This id is important, for example, when entering chat session.
         If count of old messages is 0 then last action represents the start action id. The parameter for the message age is ignored in this case.
@@ -344,14 +344,14 @@ class DatabaseMySQL():
         """
         if old_messages_count != 0:
             if old_messages_minutes == 0:
-                result = self.sql_methods.getStartAction(chat_id = chat_id, old_messages_count = old_messages_count)
+                result = self.sql_methods.getStartAction(chat_id=chat_id, old_messages_count=old_messages_count)
             else:
-                result = self.sql_methods.getStartActionTimeLimit(chat_id = chat_id, old_messages_count = old_messages_count, old_messages_minutes = old_messages_minutes)
+                result = self.sql_methods.getStartActionTimeLimit(chat_id=chat_id, old_messages_count=old_messages_count, old_messages_minutes=old_messages_minutes)
             action = result.tuples()[0][0]
             if action is None:
                 start_action = None
             else:
-                result = self.sql_methods.getPreviousAction(action_id = action)
+                result = self.sql_methods.getPreviousAction(action_id=action)
                 if result.tuples()[0][0] is None:
                     start_action = 0
                 else:
@@ -364,7 +364,7 @@ class DatabaseMySQL():
 
         return start_action
 
-    def getActions(self, chat_id, last_action, start_action, start_action_whisper, user, limit = 0):
+    def getActions(self, chat_id, last_action, start_action, start_action_whisper, user, limit=0):
         """
         Returns list of new actions since last request.
         A detailed description can be found in database documentation.
@@ -384,11 +384,11 @@ class DatabaseMySQL():
         :return: actions
         :rtype: list[dict]
         """
-        results = self.sql_methods.getActions(chat_id = chat_id,
-                                                last_action = last_action,
-                                                start_action = start_action,
-                                                start_action_whisper = start_action_whisper,
-                                                user = user)
+        results = self.sql_methods.getActions(chat_id=chat_id,
+                                                last_action=last_action,
+                                                start_action=start_action,
+                                                start_action_whisper=start_action_whisper,
+                                                user=user)
         if results:
             results = self.dictFromSql(results, names=["id", "action", "date", "user", "message", "target", "a_action", "a_name", "u_action", "whisper_target"])
             if limit:
@@ -408,13 +408,13 @@ class DatabaseMySQL():
         :return: raw actions
         :rtype: list[dict]
         """
-        results = self.sql_methods.getRawActionContents(chat_id = chat_id)
+        results = self.sql_methods.getRawActionContents(chat_id=chat_id)
         if results:
             return self.dictFromSql(results, names=["id", "content"])
         else:
             return []
 
-    def sendAction(self, chat_id, user, action, content = "", target = None, whisper_target = None):
+    def sendAction(self, chat_id, user, action, content="", target=None, whisper_target=None):
         """
         Adds specified action to the database.
 
@@ -433,12 +433,12 @@ class DatabaseMySQL():
         :return: id of added action
         :rtype: int
         """
-        newid = self.sql_methods.sendAction(chat_id = chat_id,
-                                    user = user,
-                                    action = action,
-                                    content = content,
-                                    target = target,
-                                    whisper_target = whisper_target)
+        newid = self.sql_methods.sendAction(chat_id=chat_id,
+                                    user=user,
+                                    action=action,
+                                    content=content,
+                                    target=target,
+                                    whisper_target=whisper_target)
         return int(self.dictFromSql(newid, names=('newid',))[0]['newid'])
 
     def getUsersBySessionId(self, chat_id):
@@ -471,7 +471,7 @@ class DatabaseMySQL():
         :return: always True
         :rtype: bool
         """
-        self.sql_methods.updateUserName(chat_id = chat_id, old_name = old_name, new_name = new_name)
+        self.sql_methods.updateUserName(chat_id=chat_id, old_name=old_name, new_name=new_name)
         return True
 
     def updateActionContent(self, action_id, new_content):
@@ -488,7 +488,7 @@ class DatabaseMySQL():
         :return: always True
         :rtype: bool
         """
-        self.sql_methods.updateActionContent(action_id = action_id, new_content = new_content)
+        self.sql_methods.updateActionContent(action_id=action_id, new_content=new_content)
         return True
 
     def deleteActions(self, chat_id):
@@ -501,7 +501,7 @@ class DatabaseMySQL():
         :return: always True
         :rtype: bool
         """
-        self.sql_methods.deleteActions(chat_id = chat_id)
+        self.sql_methods.deleteActions(chat_id=chat_id)
         return True
 
     def dictFromSql(self, results=(), names=()):

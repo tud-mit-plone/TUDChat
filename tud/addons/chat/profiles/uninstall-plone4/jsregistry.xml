@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <object name="portal_javascripts">
     <javascript id="++resource++tud.addons.chat/tud_chat.js"
-            remove="true" />
+            remove="True" />
 
     <javascript id="++resource++tud.addons.chat/hyperlink.js"
-            remove="true" />
+            remove="True" />
 
     <javascript id="++resource++tud.addons.chat/jquery.notification.js"
-            remove="true" />
+            remove="True" />
 
     <javascript id="++resource++tud.addons.chat/jquery.scroll.js"
-            remove="true" />
+            remove="True" />
 
     <javascript id="++resource++tud.addons.chat/tud_chat_admin.js"
-            remove="true" />
+            remove="True" />
 </object>

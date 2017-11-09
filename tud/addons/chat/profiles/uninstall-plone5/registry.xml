@@ -2,38 +2,38 @@
 <registry>
     <records prefix="plone.resources/tud.addons.chat"
         interface='Products.CMFPlone.interfaces.IResourceRegistry'
-        remove="true">
+        remove="True">
     </records>
 
     <records prefix="plone.resources/tud.addons.chat.scroll"
         interface='Products.CMFPlone.interfaces.IResourceRegistry'
-        remove="true">
+        remove="True">
     </records>
 
     <records prefix="plone.resources/tud.addons.chat.notification"
         interface='Products.CMFPlone.interfaces.IResourceRegistry'
-        remove="true">
+        remove="True">
     </records>
 
     <records prefix="plone.resources/tud.addons.chat.hyperlink"
         interface='Products.CMFPlone.interfaces.IResourceRegistry'
-        remove="true">
+        remove="True">
     </records>
 
     <records prefix="plone.bundles/tud.addons.chat"
         interface='Products.CMFPlone.interfaces.IBundleRegistry'
-        remove="true">
+        remove="True">
     </records>
 
 
     <records prefix="plone.resources/tud.addons.chat.admin"
         interface='Products.CMFPlone.interfaces.IResourceRegistry'
-        remove="true">
+        remove="True">
     </records>
 
     <records prefix="plone.bundles/tud.addons.chat.admin"
         interface='Products.CMFPlone.interfaces.IBundleRegistry'
-        remove="true">
+        remove="True">
     </records>
 
 </registry>

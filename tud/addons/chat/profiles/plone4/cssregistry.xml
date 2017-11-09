@@ -3,7 +3,7 @@
     <stylesheet
             id="++resource++tud.addons.chat/tud.addons.chat.min.css"
             enabled="1"
-            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') or here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChat')"
+            expression="python: context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') or context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChat')"
             conditionalcomment=""
             media=""
             rel="stylesheet"
@@ -15,7 +15,7 @@
     <stylesheet
             id="++resource++tud.addons.chat/plone4-icons/tud-chat-plone4-icons-embedded.css"
             enabled="1"
-            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') or here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChat')"
+            expression="python: context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') or context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChat')"
             conditionalcomment=""
             media=""
             rel="stylesheet"
@@ -27,7 +27,7 @@
     <stylesheet
             id="++resource++tud.addons.chat/tud.addons.chat.admin.min.css"
             enabled="1"
-            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') and not here.portal_membership.isAnonymousUser()"
+            expression="python: context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') and not context.portal_membership.isAnonymousUser()"
             conditionalcomment=""
             media=""
             rel="stylesheet"

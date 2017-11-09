@@ -5,7 +5,7 @@
             compression="safe"
             cookable="True"
             enabled="True"
-            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession')"
+            expression="python: context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession')"
             inline="False"
             insert-after="*"/>
 
@@ -14,7 +14,7 @@
             compression="safe"
             cookable="True"
             enabled="True"
-            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession')"
+            expression="python: context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession')"
             inline="False"
             insert-before="++resource++tud.addons.chat/tud_chat.js" />
 
@@ -23,7 +23,7 @@
             compression="safe"
             cookable="True"
             enabled="True"
-            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession')"
+            expression="python: context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession')"
             inline="False"
             insert-before="++resource++tud.addons.chat/tud_chat.js" />
 
@@ -32,7 +32,7 @@
             compression="safe"
             cookable="True"
             enabled="True"
-            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession')"
+            expression="python: context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession')"
             inline="False"
             insert-before="++resource++tud.addons.chat/tud_chat.js" />
 
@@ -41,7 +41,7 @@
             compression="safe"
             cookable="True"
             enabled="True"
-            expression="python: here.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') and not here.portal_membership.isAnonymousUser()"
+            expression="python: context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') and not context.portal_membership.isAnonymousUser()"
             inline="False"
             insert-after="++resource++tud.addons.chat/tud_chat.js" />
 </object>
