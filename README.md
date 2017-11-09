@@ -1,24 +1,24 @@
 # tud.addons.chat
 
 ## Introduction
-This repository contains tud.addons.chat, which is a chat AddOn for [Plone](https://plone.org/). It allows you to setup time restricted chat sessions, which can be moderated by privileged Plone users.
+This repository contains tud.addons.chat, which is a chat Add-On for [Plone](https://plone.org/). It allows you to setup time restricted chat sessions, which can be moderated by privileged Plone users.
 
 Features:
 *  Password protection for chat sessions
-*  User limitation for chat sessions
+*  User count limit for chat sessions
 *  Whisper messages
 *  Show recent messages after entering a chat session
 *  Chat session welcome message
 *  Anonymized chat log
 *  Moderation of chat sessions
-  *  Kick and ban users with optional message
+  *  Kick and ban users with an optional message
   *  Warn users with a message
   *  Edit and delete chat messages
 
 
 ## How to install
 To use this product with the default database engine you have to install a [MySQL](https://www.mysql.com/) server.
-After database server installation create a database for chat purposes.
+After the database server installation create a new database.
 
 In order to install this product, copy the product files to the "src" directory and add the product in the buildout configuration:
 ```
@@ -53,8 +53,8 @@ The following crontab template could be used (it is advisable to use an instance
 ```
 
 After these steps you can start your instance and install the chat product.
-Before you can add chat objects in Plone, you have to add a database object (inside the ZODB the database object must be located above the chat objects, e.g. your site root):
-*   Open the zope management interface at the position you want to add the object in your browser.
+Before you can add chat objects in Plone, you have to add a database connection object (inside the ZODB the database object must be located above the chat objects, e.g. your site root):
+*   Open the Zope Management Interface at the position you want to add the object in your browser.
 *   Add an object of type "Z MySQL Database Connection":
   *  Enter an id (which is later needed for configuration of chat objects)
   *  Enter the "Database Connection String", which contains all data needed for the database communication
@@ -86,8 +86,8 @@ To define your custom configuration you can set the following environment variab
 
 ## Documentation
 To learn more about the product you can read the following documents:
-*  [database](./docs/database.md)
-*  [architecture](./docs/architecture.md)
+*  [database.md](./docs/database.md)
+*  [architecture.md](./docs/architecture.md)
 
 ## Credits
 We use icons from Bdate Kaspar/Franziska Sponsel:
