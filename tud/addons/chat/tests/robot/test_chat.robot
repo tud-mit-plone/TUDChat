@@ -43,7 +43,7 @@ Test Add-menu
 
 Test Chat Creation
     Create Chat  Test-Chat
-    Set Textarea Field  introduction  Welcome to this chat!
+    Set Textarea Field  _introduction  Welcome to this chat!
     Save Edit Form
     Page Should Contain  Welcome to this chat!
 
@@ -71,7 +71,7 @@ Test Showing No Past Session
 Test Showing Current Session With Password
     ${location} =  Add Chat  Test-Chat
     Create Chat Session  Session-1  ${DATE_PAST_1}  ${DATE_FUTURE_1}
-    Set Text Field  password  secret
+    Set Text Field  _password  secret
     Save Edit Form
     Check That A Session Is Active
     Check That Password Field Is Visible
@@ -79,7 +79,7 @@ Test Showing Current Session With Password
 Test Session Preconditions
     ${location} =  Add Chat  Test-Chat
     Create Chat Session  Session-1  ${DATE_PAST_1}  ${DATE_FUTURE_1}
-    Set Text Field  password  secret
+    Set Text Field  _password  secret
     Save Edit Form
     Go To  ${location}
     Try Chat Login And Check For Error  privacy

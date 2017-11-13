@@ -71,8 +71,7 @@
 
 <body metal:fill-slot="main"
       tal:define="toLocalizedTime nocall:context/@@plone/toLocalizedTime;
-                  session_info view/getSessionInformation;
-                  chat_id session_info/chat_id;
+                  chat_id context/chat_id;
                   log python: view.getLogs();"
       tal:condition="python: context_state.workflow_state() == 'archived'">
     <h1 i18n:translate="log">Chat Log</h1>
@@ -84,21 +83,21 @@
         </tr>
         <tr>
           <td i18n:translate="log_session_chat_id">Chat ID</td>
-          <td tal:content="session_info/chat_id"></td>
+          <td tal:content="context/chat_id"></td>
         </tr>
         <tr>
           <td i18n:translate="log_session_name">Name</td>
-          <td tal:content="session_info/title"></td>
+          <td tal:content="context/title"></td>
         </tr>
         <tr>
           <td i18n:translate="log_session_description">Description</td>
-          <td tal:content="session_info/description"></td>
+          <td tal:content="context/description"></td>
         </tr>
         <tr>
           <td i18n:translate="log_session_password">Password</td>
           <td>
-            <tal:value condition="session_info/password" replace="session_info/password" />
-            <tal:Altvalue condition="not:session_info/password">
+            <tal:value condition="context/password" replace="context/password" />
+            <tal:Altvalue condition="not:context/password">
               <span class="info" i18n:translate="log_session_no_password">No password</span>
             </tal:Altvalue>
           </td>
@@ -106,20 +105,20 @@
         <tr>
           <td i18n:translate="log_session_user_limit">User limit</td>
           <td>
-            <tal:value condition="session_info/max_users" replace="session_info/max_users" />
-            <tal:Altvalue condition="not:session_info/max_users">
+            <tal:value condition="context/max_users" replace="context/max_users" />
+            <tal:Altvalue condition="not:context/max_users">
               <span class="info" i18n:translate="log_session_no_limit">unlimited</span>
             </tal:Altvalue>
           </td>
         </tr>
         <tr>
           <td i18n:translate="log_session_start">Begin</td>
-          <td tal:define="chat_start session_info/start_date"
+          <td tal:define="chat_start context/start_date"
               tal:content="python:toLocalizedTime(chat_start, 'date_format_long')"></td>
         </tr>
         <tr>
           <td i18n:translate="log_session_end">End</td>
-          <td tal:define="chat_end session_info/end_date"
+          <td tal:define="chat_end context/end_date"
               tal:content="python:toLocalizedTime(chat_end, 'date_format_long')"></td>
         </tr>
     </table>

@@ -41,7 +41,7 @@ WHISPER_OPTIONS = DisplayList((
     ))
 
 ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
-    TextField('introduction',
+    TextField('_introduction',
         required           = False,
         searchable         = False,
         schemata           = 'default',
@@ -51,7 +51,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'chat_introduction_desc', default = u'This text will be displayed at chat session selection.')
         )
     ),
-    StringField('database_adapter',
+    StringField('_database_adapter',
         required           = True,
         default            = 'mysql',
         vocabulary         = 'getDatabaseAdapters',
@@ -63,7 +63,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             format       = "select",
         )
     ),
-    StringField("connector_id",
+    StringField("_connector_id",
         required           = True,
         searchable         = False,
         primary            = False,
@@ -76,7 +76,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'chat_database_desc', default = u'Please enter the ID of the ZMySQL object. The object must be located in a sub-path of the chat object.')
         )
     ),
-    StringField("database_prefix",
+    StringField("_database_prefix",
         required           = True,
         searchable         = False,
         primary            = False,
@@ -89,7 +89,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'chat_database_prefix_desc', default = u'Please enter a prefix for tables in the database, e.g. institutionname')
         )
     ),
-    StringField('date_frequency',
+    StringField('_date_frequency',
         required           = True,
         default            = 'minute',
         vocabulary         = DATE_FREQUENCIES,
@@ -99,7 +99,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             format       = "select",
         )
     ),
-    StringField('adminColor',
+    StringField('_adminColor',
         required           = True,
         default            = '#ff0000',
         validators         = (HexColorCodeValidator(), ),
@@ -109,7 +109,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'chat_admin_color_desc', default = u'Username and messages of moderators will be marked with this color. The input must be made as HTML color code (e.g. #ff0000)')
         )
     ),
-    IntegerField('timeout',
+    IntegerField('_timeout',
         required           = True,
         default            = 15,
         validators         = (MinMaxValidator('min_5_check', minimum = 5), ),
@@ -119,7 +119,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'chat_timeout_desc', default = u'If a participant has not communicated with the server during this time period, he or she will be removed automatically.')
         )
     ),
-    IntegerField('refreshRate',
+    IntegerField('_refreshRate',
         required           = True,
         default            = 2,
         validators         = (MinMaxValidator('min_1_check', minimum = 1), ),
@@ -129,7 +129,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'chat_refresh_rate_desc', default = u'Specifies how often the chat display is updated.')
         )
     ),
-    IntegerField('maxMessageLength',
+    IntegerField('_maxMessageLength',
         required           = True,
         default            = 0,
         validators         = (MinMaxValidator('min_0_check', minimum = 0), ),
@@ -138,7 +138,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'chat_max_message_length_desc', default = u'Maximum number of characters that a single chat message can consist of. Enter 0, if you do not want to restrict the message length.')
         )
     ),
-    IntegerField('blockTime',
+    IntegerField('_blockTime',
         required           = True,
         default            = 1,
         validators         = (MinMaxValidator('min_0_check', minimum = 0), ),
@@ -147,7 +147,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'chat_block_time_desc', default = u'Minimum time period between two messages from a user.')
         )
     ),
-    StringField('banStrategy',
+    StringField('_banStrategy',
         required           = True,
         default            = 'COOKIE',
         vocabulary         = BAN_STRATEGIES,
@@ -159,7 +159,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             format       = "select"
         )
     ),
-    IntegerField('oldMessagesCount',
+    IntegerField('_oldMessagesCount',
         required           = True,
         default            = 20,
         validators         = (MinMaxValidator('min_0_check', minimum = 0), ),
@@ -168,7 +168,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'chat_old_messages_count_desc', default = u'Specifies the maximum number of recent messages displayed to a new participant when entering the chat session. Enter 0, if no recent messages should be shown.')
         )
     ),
-    IntegerField('oldMessagesMinutes',
+    IntegerField('_oldMessagesMinutes',
         required           = True,
         default            = 0,
         validators         = (MinMaxValidator('min_0_check', minimum = 0), ),
@@ -177,7 +177,7 @@ ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'chat_old_messages_minutes_desc', default = u'Specifies the maximum age of recent messages so that they will still be shown. Enter 0, if you want recent messages to be displayed regardless of their age. This setting is only used if the number of recent messages to be displayed is greater than 0.')
         )
     ),
-    StringField('whisper',
+    StringField('_whisper',
         required           = True,
         default            = 'on',
         vocabulary         = WHISPER_OPTIONS,
@@ -228,6 +228,21 @@ class Chat(base.ATCTFolder):
     #: Archetype schema
     schema = ChatSchema
 
+    introduction = atapi.ATFieldProperty('_introduction')
+    database_adapter = atapi.ATFieldProperty('_database_adapter')
+    connector_id = atapi.ATFieldProperty('_connector_id')
+    database_prefix = atapi.ATFieldProperty('_database_prefix')
+    date_frequency = atapi.ATFieldProperty('_date_frequency')
+    adminColor = atapi.ATFieldProperty('_adminColor')
+    timeout = atapi.ATFieldProperty('_timeout')
+    refreshRate = atapi.ATFieldProperty('_refreshRate')
+    maxMessageLength = atapi.ATFieldProperty('_maxMessageLength')
+    blockTime = atapi.ATFieldProperty('_blockTime')
+    banStrategy = atapi.ATFieldProperty('_banStrategy')
+    oldMessagesCount = atapi.ATFieldProperty('_oldMessagesCount')
+    oldMessagesMinutes = atapi.ATFieldProperty('_oldMessagesMinutes')
+    whisper = atapi.ATFieldProperty('_whisper')
+
     def manage_cutObjects(self, *args, **kwargs):
         """
         Forbids moving chat sessions.
@@ -264,7 +279,7 @@ class Chat(base.ATCTFolder):
             adapter_name = REQUEST.get('database_adapter')
             connector_id = REQUEST.get('connector_id')
             database_prefix_new = REQUEST.get('database_prefix')
-            database_prefix_old = self.getField('database_prefix').get(self)
+            database_prefix_old = self.database_prefix
             if checkPermission('tud.addons.chat.ManageChat', self) and connector_id and not errors:
                 dbo = getAdapter(self, IDatabaseObject, adapter_name)
                 try:

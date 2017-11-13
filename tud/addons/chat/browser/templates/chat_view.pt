@@ -67,11 +67,10 @@
     </dl>
 </div>
 
-<h1 class="documentFirstHeading" tal:content="view/getTitle"> Title of chat </h1>
+<h1 class="documentFirstHeading" tal:content="context/title"> Title of chat </h1>
 
-<p tal:define="introduction view/getIntroduction"
-   tal:condition="introduction">
-    <tal:block repeat="line introduction/splitlines">
+<p tal:condition="context/introduction">
+    <tal:block repeat="line python:context.introduction.splitlines()">
         <tal:block replace="line"></tal:block>
         <br tal:condition="not: repeat/line/end">
     </tal:block>
@@ -79,45 +78,43 @@
 
 <tal:block condition="active_sessions">
     <h2 i18n:translate="data_protection_information">Data protection information</h2>
-    <p tal:define="whisper view/getWhisperOption;
-                   old_messages view/getShowOldMessagesOptions;"
-       class="chat_explanation" i18n:translate="data_protection_information_text">
+    <p class="chat_explanation" i18n:translate="data_protection_information_text">
         The chat sessions are limited in time and are moderated.
         When you send a message in the chat, all participants can see your chosen username and your message.
         <tal:block i18n:name="old_messages_information">
-            <tal:block condition="python: old_messages['count'] == 1">
-                <tal:block condition="python: old_messages['minutes'] == 0"
+            <tal:block condition="python: context.oldMessagesCount == 1">
+                <tal:block condition="python: context.oldMessagesMinutes == 0"
                            i18n:translate="data_protection_old_messages_one">
                     Please also note that new members of the chat session will see the last message.
                 </tal:block>
-                <tal:block condition="python: old_messages['minutes'] == 1"
+                <tal:block condition="python: context.oldMessagesMinutes == 1"
                            i18n:translate="data_protection_old_messages_one_minutes_one">
                     Please also note that new members of the chat session will see the last message if it is not older than 1 minute.
                 </tal:block>
-                <tal:block condition="python: old_messages['minutes'] > 1"
+                <tal:block condition="python: context.oldMessagesMinutes > 1"
                            i18n:translate="data_protection_old_messages_one_minutes_many">
-                    Please also note that new members of the chat session will see the last message if it is not older than <tal:block tal:content="old_messages/minutes" i18n:name="minutes"></tal:block> minutes.
+                    Please also note that new members of the chat session will see the last message if it is not older than <tal:block tal:content="context/oldMessagesMinutes" i18n:name="minutes"></tal:block> minutes.
                 </tal:block>
             </tal:block>
-            <tal:block condition="python: old_messages['count'] > 1">
-                <tal:block condition="python: old_messages['minutes'] == 0"
+            <tal:block condition="python: context.oldMessagesCount > 1">
+                <tal:block condition="python: context.oldMessagesMinutes == 0"
                            i18n:translate="data_protection_old_messages_many">
-                    Please also note that new members of the chat session will see the last <tal:block content="old_messages/count" i18n:name="messages"></tal:block> messages.
+                    Please also note that new members of the chat session will see the last <tal:block content="context/oldMessagesCount" i18n:name="messages"></tal:block> messages.
                 </tal:block>
-                <tal:block condition="python: old_messages['minutes'] == 1"
+                <tal:block condition="python: context.oldMessagesMinutes == 1"
                            i18n:translate="data_protection_old_messages_many_minutes_one">
-                    Please also note that new members of the chat session will see the last <tal:block content="old_messages/count" i18n:name="messages"></tal:block> messages if they are not older than 1 minute.
+                    Please also note that new members of the chat session will see the last <tal:block content="context/oldMessagesCount" i18n:name="messages"></tal:block> messages if they are not older than 1 minute.
                 </tal:block>
-                <tal:block condition="python: old_messages['minutes'] > 1"
+                <tal:block condition="python: context.oldMessagesMinutes > 1"
                            i18n:translate="data_protection_old_messages_many_minutes_many">
-                    Please also note that new members of the chat session will see the last <tal:block content="old_messages/count" i18n:name="messages"></tal:block> messages if they are not older than <tal:block tal:content="old_messages/minutes" i18n:name="minutes"></tal:block> minutes.
+                    Please also note that new members of the chat session will see the last <tal:block content="context/oldMessagesCount" i18n:name="messages"></tal:block> messages if they are not older than <tal:block tal:content="context/oldMessagesMinutes" i18n:name="minutes"></tal:block> minutes.
                 </tal:block>
             </tal:block>
         </tal:block>
         <tal:block i18n:name="whisper_information">
-            <tal:block condition="python: whisper == 'off'" i18n:translate="data_protection_whisper_off">In this chat no private messages can be sent.</tal:block>
-            <tal:block condition="python: whisper == 'restricted'" i18n:translate="data_protection_whisper_restricted">In this chat you can send private messages that are visible only to you and the moderator being addressed.</tal:block>
-            <tal:block condition="python: whisper == 'on'" i18n:translate="data_protection_whisper_on">In this chat you can send private messages that are only visible to you and the recipient.</tal:block>
+            <tal:block condition="python: context.whisper == 'off'" i18n:translate="data_protection_whisper_off">In this chat no private messages can be sent.</tal:block>
+            <tal:block condition="python: context.whisper == 'restricted'" i18n:translate="data_protection_whisper_restricted">In this chat you can send private messages that are visible only to you and the moderator being addressed.</tal:block>
+            <tal:block condition="python: context.whisper == 'on'" i18n:translate="data_protection_whisper_on">In this chat you can send private messages that are only visible to you and the recipient.</tal:block>
         </tal:block>
         If you wish to transmit confidential information, please use the e-mail contact data on the websites.
         The messages are stored anonymously together with a time stamp beyond the chat time. Please note that personal information in the chat messages cannot be anonymized. An evaluation of the chat sessions by the moderators is made exclusively for the improvement of the offers. Three months after the chat session expires, the data will be automatically deleted.
@@ -127,7 +124,7 @@
 <tal:block condition="python:active_sessions is not None">
 
     <form id="login" class="chat_login" action="" tal:condition="active_sessions">
-        <script language="javascript" tal:content="python: 'var password_channels = [' + ','.join(['\'{}\''.format(str(session.absolute_url())) for session in active_sessions if session.getField('password').get(session) != '']) + '];'"></script>
+        <script language="javascript" tal:content="python: 'var password_channels = [' + ','.join(['\'{}\''.format(str(session.absolute_url())) for session in active_sessions if session.password != '']) + '];'"></script>
         <div>
           <label for="chatroom" i18n:translate="chat_session">Chat session</label>
           <tal:block condition="python: len(active_sessions) > 1">

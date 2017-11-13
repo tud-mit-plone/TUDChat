@@ -82,23 +82,9 @@ class ChatSessionBaseView(BrowserView):
         if dbo != marker:
             return dbo
         else:
-            dbo = getAdapter(chat, IDatabaseObject, chat.getField('database_adapter').get(chat))
+            dbo = getAdapter(chat, IDatabaseObject, chat.database_adapter)
             chat._v_db_adapter = dbo
             return dbo
-
-    def getSessionInformation(self):
-        """
-        Returns following information about chat session: title, description, chat id (used in database), password, maximum users, start date, end date and session url
-
-        :return: chat session information
-        :rtype: dict
-        """
-        result = {}
-        for field in ('title', 'description', 'chat_id', 'password', 'max_users', 'start_date', 'end_date',):
-            result[field] = self.context.getField(field).get(self.context)
-        result['url'] = self.context.absolute_url()
-
-        return result
 
     def isAdmin(self):
         """
@@ -143,8 +129,8 @@ class ChatSessionBaseView(BrowserView):
         :return: True, if session is active, otherwise False
         :rtype: bool
         """
-        chat_start = self.context.getField('start_date').get(self.context)
-        chat_end = self.context.getField('end_date').get(self.context)
+        chat_start = self.context.start_date
+        chat_end = self.context.end_date
         now = DateTime()
         return now > chat_start and now < chat_end
 
@@ -267,7 +253,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         The check will only be performed, if the last check was more than 5 seconds ago.
         """
         chat = self.context.getParentNode()
-        timeout = chat.getField('timeout').get(chat)
+        timeout = chat.timeout
 
         now = DateTime().timeTime()
         if now - self.cache['check_timestamp'] > 5: # Perform this check every 5 seconds
@@ -285,7 +271,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         """
         #ip_address = self.getIp(self.request)
         chat = self.context.getParentNode()
-        ban_strategy = chat.getField('banStrategy').get(chat)
+        ban_strategy = chat.banStrategy
 
         session = self.request.SESSION
         user_properties=session.get('user_properties')
@@ -328,7 +314,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         """
         #ip_address = self.getIp(self.request)
         chat = self.context.getParentNode()
-        ban_strategy = chat.getField('banStrategy').get(chat)
+        ban_strategy = chat.banStrategy
 
         if BanStrategy.COOKIE in ban_strategy:
             # Retrieve information from given cookies or just recently set cookies
@@ -526,17 +512,17 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         context = self.context
         chat = context.getParentNode()
 
-        chat_id = context.getField('chat_id').get(context)
+        chat_id = context.chat_id
         user = user.strip()
 
         if agreement == "false":
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_privacy', default = u'You will not be able to enter the chat without agreeing the privacy notice.'))}}
 
-        chat_password = context.getField('password').get(context)
+        chat_password = context.password
         if chat_password and chat_password != password:
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_password', default = u'The entered password is not correct.'))}}
 
-        chat_max_users = context.getField('max_users').get(context)
+        chat_max_users = context.max_users
         if chat_max_users and chat_max_users <= len(self.cache['chat_users']):
             return {'status': {'code':UserStatus.LOGIN_ERROR, 'message':self.context.translate(_(u'login_err_max_users', default = u'The user limit for this chat session has been reached.'))}}
 
@@ -562,8 +548,8 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return {'status': {'code': UserStatus.LOGIN_ERROR, 'message': message}}
 
         session = self.request.SESSION
-        old_messages_count = chat.getField('oldMessagesCount').get(chat)
-        old_messages_minutes = chat.getField('oldMessagesMinutes').get(chat)
+        old_messages_count = chat.oldMessagesCount
+        old_messages_minutes = chat.oldMessagesMinutes
         start_action_id = self._dbo.getStartAction(chat_id, old_messages_count, old_messages_minutes)
         start_action_whisper_id = self._dbo.getLastAction(chat_id)
         self.checkForInactiveUsers()
@@ -627,7 +613,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         user_properties = session.get('user_properties')
         old_user_properties = user_properties.copy()
         user = user_properties.get('name')
-        chat_id = context.getField('chat_id').get(context)
+        chat_id = context.chat_id
 
         if user in self.cache['warned_chat_users']:
             warning = self.cache['warned_chat_users'][user]['warning']
@@ -733,18 +719,18 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         chat = self.context.getParentNode()
 
         now = DateTime().timeTime()
-        chat_id = self.context.getField('chat_id').get(self.context)
+        chat_id = self.context.chat_id
         user = session.get('user_properties').get('name')
 
         chat_users = self.cache['chat_users']
 
-        block_time = chat.getField('blockTime').get(chat)
-        max_message_length = chat.getField('maxMessageLength').get(chat)
+        block_time = chat.blockTime
+        max_message_length = chat.maxMessageLength
 
         self.userHeartbeat()
 
         if target_user is not None:
-            whisper = chat.getField('whisper').get(chat)
+            whisper = chat.whisper
 
             if whisper == 'off':
                 return
@@ -790,7 +776,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
         self.userHeartbeat()
         if not message:
             return
-        self._dbo.sendAction(chat_id = self.context.getField('chat_id').get(self.context),
+        self._dbo.sendAction(chat_id = self.context.chat_id,
                                     user = session.get('user_properties').get('name'),
                                     action = 'mod_edit_message',
                                     content = self.html_escape(message),
@@ -810,7 +796,7 @@ class ChatSessionAjaxView(ChatSessionBaseView):
             return
         self.userHeartbeat()
 
-        self._dbo.sendAction(chat_id = self.context.getField('chat_id').get(self.context),
+        self._dbo.sendAction(chat_id = self.context.chat_id,
                                     user = session.get('user_properties').get('name'),
                                     action = 'mod_delete_message',
                                     target = message_id)
@@ -916,51 +902,6 @@ class ChatSessionView(ChatSessionBaseView):
 
             return
 
-    def getChatInformation(self):
-        """
-        Returns following general chat information: refresh rate, block time, maximum message length, url of chat
-
-        :return: chat information
-        :rtype: dict
-        """
-        chat = self.context.getParentNode()
-
-        result = {}
-        for field in ('refreshRate', 'blockTime', 'maxMessageLength',):
-            result[field] = chat.getField(field).get(chat)
-        result['url'] = chat.absolute_url()
-
-        return result
-
-    def getWelcomeMessage(self):
-        """
-        Returns configured welcome message, if it exists.
-
-        :return: welcome message, if it is defined, otherwise None
-        :rtype: str or None
-        """
-        return self.context.getField('welcome_message').get(self.context) or None
-
-    def getWhisperOption(self):
-        """
-        Returns configured whisper option of chat object.
-
-        :return: whisper option ('on', 'restricted' or 'off')
-        :rtype: str
-        """
-        chat = self.context.getParentNode()
-        return chat.getField('whisper').get(chat)
-
-    def getDateFrequencyOption(self):
-        """
-        Returns configured date frequency option of chat object. This option decides how often timestamps have to be shown in chat session window.
-
-        :return: date frequency option ('message', 'minute' or 'off')
-        :rtype: str
-        """
-        chat = self.context.getParentNode()
-        return chat.getField('date_frequency').get(chat)
-
 class ChatSessionLogView(ChatSessionBaseView):
     """
     Chat session log view
@@ -977,5 +918,5 @@ class ChatSessionLogView(ChatSessionBaseView):
         :return: message list with following information for every message: id, action, date, user, message, target, a_action, a_name
         :rtype: list[dict]
         """
-        chat_id = self.context.getField('chat_id').get(self.context)
+        chat_id = self.context.chat_id
         return self._dbo.getActions(chat_id, 0, 0, 0, '')[:-1]

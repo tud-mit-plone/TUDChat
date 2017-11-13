@@ -11,43 +11,6 @@ class ChatView(BrowserView):
     Default chat view
     """
 
-    def getTitle(self):
-        """
-        Returns chat title.
-
-        :return: title of chat
-        :rtype: str
-        """
-        return self.context.getField('title').get(self.context)
-
-    def getIntroduction(self):
-        """
-        Returns chat introduction.
-
-        :return: introduction of chat
-        :rtype: str
-        """
-        return self.context.getField('introduction').get(self.context)
-
-    def getWhisperOption(self):
-        """
-        Returns configured whisper option.
-
-        :return: whisper option ('on', 'restricted' or 'off')
-        :rtype: str
-        """
-        return self.context.getField('whisper').get(self.context)
-
-    def getShowOldMessagesOptions(self):
-        """
-        Returns settings which define how many messages are shown when entering a chat session and how old these messages can be.
-
-        :return: maximum count of old messages and maximum age of these messages
-        :rtype: dict
-        """
-        return {'count' : self.context.getField('oldMessagesCount').get(self.context),
-                'minutes' : self.context.getField('oldMessagesMinutes').get(self.context)}
-
     def getActiveChatSessions(self):
         """
         Generates a list of all active chat sessions.

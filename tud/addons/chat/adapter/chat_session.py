@@ -31,17 +31,17 @@ def generate_chat_id(obj, event):
     if not IChat.providedBy(chat):
         return
 
-    dbo = getAdapter(chat, IDatabaseObject, chat.getField('database_adapter').get(chat))
+    dbo = getAdapter(chat, IDatabaseObject, chat.database_adapter)
 
-    if obj.getField('chat_id').get(obj) != 0 and not IObjectClonedEvent.providedBy(event):
+    if obj.chat_id != 0 and not IObjectClonedEvent.providedBy(event):
         return
 
-    max_id_content = max([int(session.getField('chat_id').get(session)) for session in chat.getChildNodes()])
+    max_id_content = max([int(session.chat_id) for session in chat.getChildNodes()])
     max_id_table = dbo.getMaxSessionId()
     max_id = max((max_id_content, max_id_table,))
     new_id = max_id + 1
 
-    obj.getField('chat_id').set(obj, new_id)
+    obj.chat_id = new_id
     return True
 
 def removed_handler(obj, event):
@@ -53,10 +53,10 @@ def removed_handler(obj, event):
     :param event: triggered event
     :type event: zope.lifecycleevent.ObjectRemovedEvent
     """
-    chat_id = obj.getField('chat_id').get(obj)
+    chat_id = obj.chat_id
     chat = obj.getParentNode()
 
-    dbo = getAdapter(chat, IDatabaseObject, chat.getField('database_adapter').get(chat))
+    dbo = getAdapter(chat, IDatabaseObject, chat.database_adapter)
     dbo.deleteActions(chat_id)
 
 def action_succeeded_handler(obj, event):
@@ -73,14 +73,14 @@ def action_succeeded_handler(obj, event):
     """
     if event.action == 'archive':
         chat = obj.getParentNode()
-        chat_id = obj.getField('chat_id').get(obj)
+        chat_id = obj.chat_id
 
-        dbo = getAdapter(chat, IDatabaseObject, chat.getField('database_adapter').get(chat))
+        dbo = getAdapter(chat, IDatabaseObject, chat.database_adapter)
 
         now = DateTime().timeTime()
 
         #archive only chat sessions that are closed for more than five minutes
-        if obj.getField('end_date').get(obj) < now - 300:
+        if obj.end_date < now - 300:
             users = [user['user'] for user in dbo.getUsersBySessionId(chat_id)]
             #replace long user names before short user names
             #this is import for user names that containing other user names (for example: "Max" and "Max Mustermann")

@@ -16,7 +16,7 @@ def edited_handler(obj, event):
     if IContainerModifiedEvent.providedBy(event):
         return
 
-    adapter_name = obj.getField('database_adapter').get(obj)
+    adapter_name = obj.database_adapter
 
     db_adapter = getAdapter(obj, interface=IDatabaseObject, name=adapter_name)
     obj._v_db_adapter = db_adapter
