@@ -16,7 +16,7 @@ from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManager import setSecurityPolicy
 from Products.CMFCore.tests.base.security import PermissiveSecurityPolicy, OmnipotentUser
 from Products.CMFCore.utils import getToolByName
-from Testing.makerequest import makerequest
+import Testing
 from ZODB.POSException import ConflictError
 from plone import api
 
@@ -24,7 +24,12 @@ from tud.addons.chat.interfaces import IChatSession
 
 def dir_arg(path):
     """
-        Check if given path exists and if it is a directory
+    Checks if given path exists and if it is a directory.
+
+    :param path: path to check
+    :type path: str
+    :return: given path, if it exists and it is a directory
+    :rtype: str
     """
     if not os.path.exists(path):
         msg = "{!r} doesn't exist".format(path)
@@ -35,6 +40,14 @@ def dir_arg(path):
     return path
 
 def main(app):
+    """
+    Executes chat specific tasks.
+    Before execution is performed arguments will be parsed, logging will be initialized, new security manager will be set and plone site will be prepared.
+    If a conflict error occurs during chat task execution, all chat tasks will rerun.
+
+    :param app: zope application root
+    :type app: OFS.Application.Application
+    """
     arg_parser = argparse.ArgumentParser(description=u"chat cron")
     arg_parser.add_argument('-c', '--script', required=True, help='script name')
     arg_parser.add_argument('-s', '--site', required=True, metavar='SITE', help='name of the Plone site')
@@ -67,7 +80,7 @@ def main(app):
     _policy=PermissiveSecurityPolicy()
     _oldpolicy=setSecurityPolicy(_policy)
     newSecurityManager(None, OmnipotentUser().__of__(app.acl_users))
-    app = makerequest(app)
+    app = Testing.makerequest.makerequest(app)
 
     # Get Plone site object from Zope application server root
     if options.site not in app:
@@ -103,8 +116,14 @@ def main(app):
 
 def archiveClosedChatSessions(site, logger, do):
     """
-        This function starts in all closed and not archived chat sessions a workflow transition which obfuscates user names. Only chat sessions that have been closed for more than 5 minutes will be affected.
-        The count of archived chat sessions will be returned.
+    This function starts in all closed and not archived chat sessions a workflow transition which obfuscates user names. Only chat sessions that have been closed for more than 5 minutes will be affected.
+
+    :param logger: provides logging functionality
+    :type logger: logging.Logger
+    :param do: True, if changes should be persisted, otherwise False
+    :type do: bool
+    :return: count of archived chat sessions
+    :rtype: str
     """
     catalog = getToolByName(site, 'portal_catalog')
     query = {
@@ -129,8 +148,14 @@ def archiveClosedChatSessions(site, logger, do):
 
 def deleteOldChatSessions(site, logger, do):
     """
-        This function deletes chat sessions that have been closed for at least 3 months.
-        The count of deleted chat sessions will be returned.
+    This function deletes chat sessions that have been closed for at least 3 months.
+
+    :param logger: provides logging functionality
+    :type logger: logging.Logger
+    :param do: True, if changes should be persisted, otherwise False
+    :type do: bool
+    :return: count of deleted chat sessions
+    :rtype: str
     """
     catalog = getToolByName(site, 'portal_catalog')
     query = {

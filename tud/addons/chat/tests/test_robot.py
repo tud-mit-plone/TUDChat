@@ -8,6 +8,12 @@ from tud.addons.chat.testing import ROBOT_TESTING
 
 
 def test_suite():
+    """
+    Sets up test suite.
+
+    :return: test suite
+    :rtype: unittest.suite.TestSuite
+    """
     suite = unittest.TestSuite()
     current_dir = os.path.abspath(os.path.dirname(__file__))
     robot_dir = os.path.join(current_dir, 'robot')

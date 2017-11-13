@@ -7,10 +7,6 @@ Suite Teardown  Teardown Suite
 
 Test Teardown  Teardown Test
 
-*** Variables ***
-
-${PRIMARY_LANG}  en
-
 *** Keywords ***
 
 Setup Suite
@@ -47,7 +43,7 @@ Test Add-menu
 
 Test Chat Creation
     Create Chat  Test-Chat
-    Set Multilanguage Textarea Field  ${PRIMARY_LANG}  introduction  Welcome to this chat!
+    Set Textarea Field  introduction  Welcome to this chat!
     Save Edit Form
     Page Should Contain  Welcome to this chat!
 

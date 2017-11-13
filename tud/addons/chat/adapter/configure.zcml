@@ -1,6 +1,13 @@
 <configure
     xmlns="http://namespaces.zope.org/zope">
 
+    <adapter
+        provides="tud.addons.chat.interfaces.IDatabaseObject"
+        for="tud.addons.chat.interfaces.IChat"
+        name="mysql"
+        factory=".database_mysql.DatabaseMySQL"
+      />
+
     <subscriber
         for="tud.addons.chat.interfaces.IChat
              zope.lifecycleevent.IObjectModifiedEvent"

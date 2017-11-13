@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<object name="portal_css">
+    <stylesheet
+            id="++resource++tud.addons.chat/tud.addons.chat.min.css"
+            remove="True"
+    />
+    <stylesheet
+            id="++resource++tud.addons.chat/plone4-icons/tud-chat-plone4-icons-embedded.css"
+            remove="True"
+    />
+    <stylesheet
+            id="++resource++tud.addons.chat/tud.addons.chat.admin.min.css"
+            remove="True"
+    />
+</object>

@@ -5,23 +5,7 @@
 <head>
   <title>Chat</title>
 
-<metal:block metal:fill-slot="javascript_head_slot">
-    <script language="javascript" src="jquery.ba-dotimeout.min.js"></script>
-    <script language="javascript" src="hyperlink.js"></script>
-    <script language="javascript" src="jquery.notification.js"></script>
-    <script language="javascript" src="jquery.scroll.js"></script>
-    <script language="javascript" tal:condition="view/isAdmin" src="tud_chat_admin.js"></script>
-    <script language="javascript" tal:condition="not: view/isAdmin" src="tud_chat_user.js"></script>
-    <script language="javascript" src="tud_chat.js"></script>
-
-    <script type="text/javascript" tal:define="chat_info view/getChatInformation"
-                                   tal:content="structure string:var refreshRate = ${chat_info/refreshRate} * 1000; var blockTime = ${chat_info/blockTime} * 1000; var ownUsername = '${request/SESSION/user_properties/name|nothing}'; var ajax_url = '${context/absolute_url}/@@chatajax'; var maxMessageLength = ${chat_info/maxMessageLength}">
-    </script>
-</metal:block>
-
 <metal:block metal:fill-slot="style_slot">
-    <link rel="stylesheet" type="text/css" href="tud_chat.css" />
-    <link rel="stylesheet" type="text/css" tal:condition="view/isAdmin" href="tud_chat_admin.css" />
     <link rel="stylesheet" type="text/css" tal:attributes="href string:${context/absolute_url}/tud_chat_additional.css" />
 </metal:block>
 
@@ -45,9 +29,22 @@
             </p>
         </tal:block>
     </tal:block>
-    <div id="chat" tal:attributes="data-welcome_message view/getWelcomeMessage;
-                                   data-whisper whisper;
-                                   data-date_frequency view/getDateFrequencyOption">
+    <div id="chat" tal:define="chat_info view/getChatInformation"
+                   tal:attributes="data-refresh-rate        python: chat_info['refreshRate'] * 1000;
+                                   data-block-time          python: chat_info['blockTime'] * 1000;
+                                   data-own-user-name       request/SESSION/user_properties/name|nothing;
+                                   data-ajax-url            string:${context/absolute_url}/@@chatajax;
+                                   data-max-message-length  chat_info/maxMessageLength|nothing;
+                                   data-welcome-message     view/getWelcomeMessage;
+                                   data-whisper             whisper;
+                                   data-date-frequency      view/getDateFrequencyOption;
+                                   data-admin               python: view.isAdmin() or None">
+        <div class="serverError">
+            <div>
+                <div i18n:translate="server_no_reponse">The server doesn't respond.</div>
+                <div i18n:translate="please_wait">Please wait a moment!</div>
+            </div>
+        </div>
         <div id="chatContent">
         </div>
         <div id="chatMsg">
@@ -68,9 +65,9 @@
                         i18n:translate="session_button_send_message">Submit</button>
                 <span id='chatMsgMoreButtons' tal:condition="view/isAdmin"><button class='moreButtonsExpand icon-down'></button>
                     <span class="buttonsWrapper">
-                        <button data-method="warnUser" class='chatMsgMoreButton' i18n:translate="session_button_warn">Warn</button>
-                        <button data-method="kickUser" class='chatMsgMoreButton' i18n:translate="session_button_kick">Kick</button>
-                        <button data-method="banUser" class='chatMsgMoreButton' i18n:translate="session_button_ban">Ban</button>
+                        <button data-method="warnUser" type="submit" i18n:translate="session_button_warn">Warn</button>
+                        <button data-method="kickUser" type="submit" i18n:translate="session_button_kick">Kick</button>
+                        <button data-method="banUser" type="submit" i18n:translate="session_button_ban">Ban</button>
                     </span>
                 </span>
             </form>

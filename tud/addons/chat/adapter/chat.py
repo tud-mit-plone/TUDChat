@@ -1,25 +1,23 @@
-import logging
-
 from zope.container.interfaces import IContainerModifiedEvent
+from zope.component import getAdapter
 
-from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
-
-logger = logging.getLogger('tud.addons.chat')
+from tud.addons.chat.interfaces import IDatabaseObject
 
 def edited_handler(obj, event):
+    """
+    Invokes creation of non-existing tables after saving chat object.
+
+    :param obj: chat, which was modified
+    :type obj: tud.addons.chat.content.chat.Chat
+    :param event: triggered event (used to ignore events which have been triggered by sub-objects)
+    :type event: Products.Archetypes.event.ObjectEditedEvent or zope.container.contained.ContainerModifiedEvent
+    """
     # ignore addition, removal and reordering of sub-objects
     if IContainerModifiedEvent.providedBy(event):
         return
 
-    connector_id = obj.getField('connector_id').get(obj)
-    database_prefix = obj.getField('database_prefix').get(obj)
+    adapter_name = obj.getField('database_adapter').get(obj)
 
-    obj.chat_storage = TUDChatSqlStorage(connector_id, database_prefix)
-    obj.chat_storage.createTables()
-
-    if obj.own_database_prefixes.get(connector_id):
-        obj.own_database_prefixes[connector_id].add(database_prefix)
-    else:
-        obj.own_database_prefixes[connector_id] = set([database_prefix])
-
-    logger.info("TUDChat: connector_id = %s" % (connector_id,))
+    db_adapter = getAdapter(obj, interface=IDatabaseObject, name=adapter_name)
+    obj._v_db_adapter = db_adapter
+    obj._v_db_adapter.createTables()

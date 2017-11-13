@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<registry>
+    <records prefix="plone.resources/tud.addons.chat"
+             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+        <value key="js">++resource++tud.addons.chat/tud_chat.js</value>
+        <value key="css">
+            <element>++resource++tud.addons.chat/tud_chat.less</element>
+        </value>
+        <value key="deps">jquery,mockup-i18n</value>
+    </records>
+
+    <records prefix="plone.resources/tud.addons.chat.scroll"
+             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+        <value key="js">++resource++tud.addons.chat/jquery.scroll.js</value>
+        <value key="deps">jquery</value>
+    </records>
+
+    <records prefix="plone.resources/tud.addons.chat.notification"
+             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+        <value key="js">++resource++tud.addons.chat/jquery.notification.js</value>
+        <value key="deps">jquery</value>
+    </records>
+
+    <records prefix="plone.resources/tud.addons.chat.hyperlink"
+             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+        <value key="js">++resource++tud.addons.chat/hyperlink.js</value>
+        <value key="deps">jquery</value>
+    </records>
+
+    <records prefix="plone.bundles/tud.addons.chat"
+             interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+        <value key="jscompilation">++resource++tud.addons.chat/tud.addons.chat.min.js</value>
+        <value key="csscompilation">++resource++tud.addons.chat/tud.addons.chat.min.css</value>
+        <value key="last_compilation">2017-01-01 00:00:00</value>
+        <value key="resources">
+            <element>tud.addons.chat.notification</element>
+            <element>tud.addons.chat.scroll</element>
+            <element>tud.addons.chat.hyperlink</element>
+            <element>tud.addons.chat</element>
+        </value>
+        <value key="enabled">True</value>
+        <value key="compile">True</value>
+        <value key="depends">plone</value>
+        <value key="expression">python: context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') or context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChat')</value>
+    </records>
+
+
+    <records prefix="plone.resources/tud.addons.chat.admin"
+             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+        <value key="js">++resource++tud.addons.chat/tud_chat_admin.js</value>
+        <value key="css">
+            <element>++resource++tud.addons.chat/tud_chat_admin.less</element>
+        </value>
+    </records>
+
+    <records prefix="plone.bundles/tud.addons.chat.admin"
+             interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+        <value key="jscompilation">++resource++tud.addons.chat/tud.addons.chat.admin.min.js</value>
+        <value key="csscompilation">++resource++tud.addons.chat/tud.addons.chat.admin.min.css</value>
+        <value key="last_compilation">2017-01-01 00:00:00</value>
+        <value key="resources">
+            <element>tud.addons.chat.admin</element>
+        </value>
+        <value key="enabled">True</value>
+        <value key="compile">True</value>
+        <value key="depends">plone</value>
+        <value key="expression">python: context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') and not context.portal_membership.isAnonymousUser()</value>
+    </records>
+</registry>
