@@ -920,3 +920,19 @@ class ChatSessionLogView(ChatSessionBaseView):
         """
         chat_id = self.context.chat_id
         return self._dbo.getActions(chat_id, 0, 0, 0, '')[:-1]
+
+    def canArchive(self):
+        """
+        Checks if chat session is closed for more than five minutes.
+        This check is used as precondition for the workflow transition 'archive'.
+
+        :return: True, if session is closed for more than five minutes, otherwise False
+        :rtype: bool
+        """
+        now = DateTime().timeTime()
+        end_date = self.context.end_date
+
+        if end_date < now - 300:
+            return True
+        else:
+            return False

@@ -61,8 +61,7 @@ def removed_handler(obj, event):
 
 def action_succeeded_handler(obj, event):
     """
-    Obfuscates user names of message senders and in messages.
-    Only a chat session that is not already archived and that is closed for more than five minutes will be processed.
+    Obfuscates user names of message senders and in messages on transition 'archive'.
 
     :param obj: respective chat session
     :type obj: tud.addons.chat.content.chat_session.ChatSession
@@ -77,37 +76,31 @@ def action_succeeded_handler(obj, event):
 
         dbo = getAdapter(chat, IDatabaseObject, chat.database_adapter)
 
-        now = DateTime().timeTime()
+        users = [user['user'] for user in dbo.getUsersBySessionId(chat_id)]
+        #replace long user names before short user names
+        #this is import for user names that containing other user names (for example: "Max" and "Max Mustermann")
+        users.sort(cmp = lambda a, b: len(a)-len(b), reverse = True)
+        actions = dbo.getRawActionContents(chat_id)
+        i = 0
 
-        #archive only chat sessions that are closed for more than five minutes
-        if obj.end_date < now - 300:
-            users = [user['user'] for user in dbo.getUsersBySessionId(chat_id)]
-            #replace long user names before short user names
-            #this is import for user names that containing other user names (for example: "Max" and "Max Mustermann")
-            users.sort(cmp = lambda a, b: len(a)-len(b), reverse = True)
-            actions = dbo.getRawActionContents(chat_id)
-            i = 0
+        #obfuscate user names
+        for user in users:
+            old_name = user
 
-            #obfuscate user names
-            for user in users:
-                old_name = user
-
+            i += 1
+            new_name = obj.translate(_(u'log_user', default = u'User ${user}', mapping = {u'user' : str(i)}))
+            while new_name in users:
                 i += 1
                 new_name = obj.translate(_(u'log_user', default = u'User ${user}', mapping = {u'user' : str(i)}))
-                while new_name in users:
-                    i += 1
-                    new_name = obj.translate(_(u'log_user', default = u'User ${user}', mapping = {u'user' : str(i)}))
 
-                dbo.updateUserName(chat_id, old_name, new_name)
+            dbo.updateUserName(chat_id, old_name, new_name)
 
-                old_name = re.compile(re.escape(old_name), re.IGNORECASE)
-                for action in actions:
-                    action['content'] = old_name.sub(new_name, action['content'])
-
+            old_name = re.compile(re.escape(old_name), re.IGNORECASE)
             for action in actions:
-                dbo.updateActionContent(action['id'], action['content'])
-        else:
-            raise Exception("Chat session has to be closed for more than 5 minutes!")
+                action['content'] = old_name.sub(new_name, action['content'])
+
+        for action in actions:
+            dbo.updateActionContent(action['id'], action['content'])
 
         return True
 

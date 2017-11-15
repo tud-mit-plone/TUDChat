@@ -42,6 +42,7 @@
             category="workflow" icon="">Archive</action>
         <guard>
             <guard-permission>Manage portal</guard-permission>
+            <guard-expression>here/@@log/canArchive</guard-expression>
         </guard>
     </transition>
     <transition transition_id="reactivate"
