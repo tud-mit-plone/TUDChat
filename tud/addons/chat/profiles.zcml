@@ -59,4 +59,6 @@
             post_handler    = "tud.addons.chat.setuphandlers.uninstall"
             />
 
+    <utility factory=".setuphandlers.HiddenProfiles" name="tud.addons.chat" />
+
 </configure>
