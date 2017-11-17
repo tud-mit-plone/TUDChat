@@ -1,8 +1,8 @@
 <configure
         xmlns               = "http://namespaces.zope.org/zope"
         xmlns:five          = "http://namespaces.zope.org/five"
-        xmlns:genericsetup  = "http://namespaces.zope.org/genericsetup"
         xmlns:cmf           = "http://namespaces.zope.org/cmf"
+        xmlns:browser       = "http://namespaces.zope.org/browser"
         xmlns:i18n          = "http://namespaces.zope.org/i18n"
         i18n_domain         = "tud.addons.chat">
 
@@ -12,8 +12,8 @@
 
     <i18n:registerTranslations directory="locales" />
 
-    <include package="raptus.multilanguagefields" />
     <include package="collective.beaker" />
+    <include package="jarn.jsi18n" />
 
     <include file="permissions.zcml"/>
     <include package=".adapter"/>
@@ -26,13 +26,11 @@
             recursive       = "True"
             />
 
-    <!-- Register the installation GenericSetup extension profile -->
-    <genericsetup:registerProfile
-            name            = "default"
-            title           = "tud.addons.chat"
-            directory       = "profiles/default"
-            description     = "TUD addon that provides a chat system"
-            provides        = "Products.GenericSetup.interfaces.EXTENSION"
+    <browser:resourceDirectory
+            name="tud.addons.chat"
+            directory="static"
             />
+
+    <include file="profiles.zcml" />
 
 </configure>

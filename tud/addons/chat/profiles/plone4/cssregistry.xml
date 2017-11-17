@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<object name="portal_css">
+    <stylesheet
+            id="++resource++tud.addons.chat/tud.addons.chat.min.css"
+            enabled="1"
+            expression="python: context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') or context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChat')"
+            conditionalcomment=""
+            media=""
+            rel="stylesheet"
+            rendering="link"
+            insert-before="*"
+            cookable="True"
+            applyPrefix="True"
+    />
+    <stylesheet
+            id="++resource++tud.addons.chat/plone4-icons/tud-chat-plone4-icons-embedded.css"
+            enabled="1"
+            expression="python: context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') or context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChat')"
+            conditionalcomment=""
+            media=""
+            rel="stylesheet"
+            rendering="link"
+            insert-after="++resource++tud.addons.chat/tud.addons.chat.min.css"
+            cookable="True"
+            applyPrefix="True"
+    />
+    <stylesheet
+            id="++resource++tud.addons.chat/tud.addons.chat.admin.min.css"
+            enabled="1"
+            expression="python: context.restrictedTraverse('@@plone_interface_info').provides('tud.addons.chat.interfaces.IChatSession') and not context.portal_membership.isAnonymousUser()"
+            conditionalcomment=""
+            media=""
+            rel="stylesheet"
+            rendering="link"
+            insert-before="*"
+            cookable="True"
+            applyPrefix="True"
+    />
+</object>

@@ -27,23 +27,22 @@ REMOTE_LIBRARY_BUNDLE_FIXTURE = RemoteLibraryLayer(
 )
 
 class TudAddonsChatLayer(BeakerConfigLayer, PloneSandboxLayer):
+    """
+    This class describes the test layer used for robot tests.
+    """
+
     defaultBases = (PLONE_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
-        """Set up Zope.
-
-        This is the most appropriate place to load ZCML or install Zope 2-
-        style products, using the `plone.testing.z2.installProduct` helper.
-
-        :param app: the Zope application root.
-        :param configurationContext: the ZCML configuration context.
-        :return:
         """
+        Sets up zope.
+        This is the most appropriate place to load ZCML or install Zope 2-style products, using the `plone.testing.z2.installProduct` helper.
 
-        import raptus.multilanguagefields
-        self.loadZCML(package=raptus.multilanguagefields, context=configurationContext)
-        z2.installProduct(app, 'raptus.multilanguagefields')
-
+        :param app: zope application root
+        :type app: OFS.Application.Application
+        :param configurationContext: zcml configuration context
+        :type configurationContext: plone.testing.zca.NamedConfigurationMachine
+        """
         z2.installProduct(app, 'Products.ZMySQLDA')
 
         import tud.addons.chat
@@ -58,15 +57,19 @@ class TudAddonsChatLayer(BeakerConfigLayer, PloneSandboxLayer):
         setupCoreSessions(app)
 
     def setUpPloneSite(self, portal):
-        """Set up the Plone site.
+        """
+        Sets up the plone site.
+        Provided no exception is raised, changes to the given site will be committed.
 
-        :param portal: the Plone site. Provided no exception is raised, changes
-        to this site will be committed.
-        :return:
+        :param portal: plone site
+        :type portal: Products.CMFPlone.Portal.PloneSite
         """
         self.applyProfile(portal, 'tud.addons.chat:default')
 
     def setUp(self):
+        """
+        Sets up beaker config layer and plone sandbox layer.
+        """
         BeakerConfigLayer.setUp()
         PloneSandboxLayer.setUp(self)
 

@@ -1,0 +1,64 @@
+.adminActions {
+    display: inline;
+}
+
+.adminActions > a{
+    text-decoration: none;
+    opacity: 0.5;
+    border-bottom:none;
+    height:20px;
+    width:22px;
+    padding:0px 4px 3px 4px;
+    display:inline-block;
+}
+
+.adminActions a:hover {
+    background-color:transparent;
+}
+
+.adminActions > a:hover{
+    opacity: 1.0;
+}
+
+#chatMsgTarget ~ button#chatMsgSubmit {
+    min-width: calc(~"20% - 25px");
+    max-width: calc(~"67% - 25px");
+}
+
+#chatMsgMoreButtons {
+    position: relative;
+    vertical-align: top;
+    display: none;
+    margin-left: -0.2em;
+    width: 25px;
+}
+
+#chatMsgMoreButtons .moreButtonsExpand {
+    width: 100%;
+    padding-right: 0;
+    padding-left: 0;
+}
+
+#chatMsgMoreButtons .buttonsWrapper {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    text-align: right;
+    width: 300px;
+    display: none;
+}
+#chatMsgMoreButtons .buttonsWrapper button {
+    display: inline-block;
+}
+
+a.edit {
+    background-image: url('++resource++tud.addons.chat/img/pen.png');
+    background-repeat:
+    no-repeat; background-position: center center;
+}
+
+a.delete {
+    background-image: url('++resource++tud.addons.chat/img/false.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+}

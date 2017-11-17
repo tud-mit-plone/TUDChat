@@ -26,15 +26,16 @@ setup(name='tud.addons.chat',
       install_requires=[
           'setuptools',
           'plone.api',
-          'raptus.multilanguagefields>=1.1b10',
+          'Products.Archetypes',
+          'Products.ATContentTypes',
+          'Products.GenericSetup',
           'Products.ZMySQLDA',
-          'simplejson',
           'collective.beaker',
-          'python-dateutil',
-          'jarn.jsi18n'
+          'python-dateutil'
           # -*- Extra requirements: -*-
       ],
-      extras_require={'test': ['plone.app.robotframework']},
+      extras_require={'test': ['plone.app.robotframework'],
+                      'plone4' : ['jarn.jsi18n']},
       entry_points="""
       # -*- Entry points: -*-
 

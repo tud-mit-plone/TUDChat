@@ -1,35 +1,26 @@
-# Python imports
-import logging
-
 from OFS.CopySupport import CopyError
 
 # Zope imports
-from AccessControl import ClassSecurityInfo
 from zope.interface import implementer
 from zope.security import checkPermission
+from zope.component import getAdapters, getAdapter
 
 # CMF imports
 from Products.CMFCore.utils import getToolByName
-from Products.CMFCore import permissions
 
 from Products.Archetypes import atapi
 from Products.ATContentTypes.content import base, schemata
 from Products.Archetypes.atapi import Schema
-from Products.Archetypes.atapi import StringField, IntegerField
-from Products.Archetypes.public import StringWidget, SelectionWidget, IntegerWidget
+from Products.Archetypes.atapi import StringField, TextField, IntegerField
+from Products.Archetypes.public import StringWidget, TextAreaWidget, SelectionWidget, IntegerWidget
 from Products.Archetypes.public import DisplayList
-from Products.ZMySQLDA.DA import Connection
-
-from raptus.multilanguagefields import fields as MultiLanguageFields
-from raptus.multilanguagefields import widgets as MultiLanguageWidgets
+from plone import api
 
 from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
 
 from tud.addons.chat import chatMessageFactory as _
-from tud.addons.chat.interfaces import IChat
+from tud.addons.chat.interfaces import IChat, IDatabaseObject
 from tud.addons.chat.validators import MinMaxValidator, HexColorCodeValidator
-
-logger = logging.getLogger('tud.addons.chat')
 
 DATE_FREQUENCIES = DisplayList((
     ('off', _(u'chat_date_frequency_disabled', default = u'disabled')),
@@ -50,14 +41,26 @@ WHISPER_OPTIONS = DisplayList((
     ))
 
 ChatSchema = schemata.ATContentTypeSchema.copy() + Schema((
-    MultiLanguageFields.TextField('introduction',
+    TextField('introduction',
         required           = False,
         searchable         = False,
         schemata           = 'default',
         default            = '',
-        widget            = MultiLanguageWidgets.TextAreaWidget(
+        widget            = TextAreaWidget(
             label        = _(u'chat_introduction_label', default = u'Welcoming text'),
             description  = _(u'chat_introduction_desc', default = u'This text will be displayed at chat session selection.')
+        )
+    ),
+    StringField('database_adapter',
+        required           = True,
+        default            = 'mysql',
+        vocabulary         = 'getDatabaseAdapters',
+        read_permission    = 'tud.addons.chat: Manage Chat',
+        write_permission   = 'tud.addons.chat: Manage Chat',
+        widget            = SelectionWidget(
+            label        = _(u'chat_database_adapter_label', default = u'Database adapter'),
+            description  = _(u'chat_database_adapter_desc', default = u'Adapter that manages the chat session data persistence'),
+            format       = "select",
         )
     ),
     StringField("connector_id",
@@ -213,8 +216,8 @@ schemata.finalizeATCTSchema(ChatSchema, folderish=False, moveDiscussion=False)
 
 @implementer(IChat)
 class Chat(base.ATCTFolder):
-    """Chat content type
-
+    """
+    Chat content type
     """
 
     meta_type = 'Chat'
@@ -225,23 +228,15 @@ class Chat(base.ATCTFolder):
     #: Archetype schema
     schema = ChatSchema
 
-    security = ClassSecurityInfo()
-
-    chat_storage = None
-
-    ## @brief class constructor which prepares the database connection
-    #  @param oid the identifier of the chat object
-    def __init__(self, oid, **kwargs):
-        super(Chat, self).__init__(oid, **kwargs)
-        self.own_database_prefixes = {}
-
     def manage_cutObjects(self, *args, **kwargs):
-        """Forbid moving chat sessions
+        """
+        Forbids moving chat sessions.
         """
         raise CopyError()
 
     def canSetDefaultPage(self):
-        """Forbid default page selection
+        """
+        Forbids default page selection.
 
         :return: False
         :rtype: bool
@@ -254,67 +249,42 @@ class Chat(base.ATCTFolder):
 
     # override the default actions
 
-    ## @brief check and apply admin settings
-    #  @param error list of errors
     def post_validate(self, REQUEST, errors):
         """
-        This function checks the edit form values in context.
-        It's called after the field validation passes.
+        Checks edit form values in context. It's called after field validation.
+        This method delegates validation for database connection to configured database adapter.
+        If the configured prefix is in use, a warning is shown.
+
+        :param REQUEST: request with form data
+        :type REQUEST: ZPublisher.HTTPRequest.HTTPRequest
+        :param errors: list of field errors, which can be modified if needed
+        :type errors: list
         """
         if not REQUEST.get('post_validated'):
+            adapter_name = REQUEST.get('database_adapter')
             connector_id = REQUEST.get('connector_id')
-            database_prefix = REQUEST.get('database_prefix')
+            database_prefix_new = REQUEST.get('database_prefix')
+            database_prefix_old = self.getField('database_prefix').get(self)
             if checkPermission('tud.addons.chat.ManageChat', self) and connector_id and not errors:
+                dbo = getAdapter(self, IDatabaseObject, adapter_name)
                 try:
-                    zmysql = getattr(self, connector_id)
-                    if not isinstance(zmysql, Connection):
-                        errors['connector_id'] = _(u'validation_object_is_not_zmysql_object', default = u'The chosen object is not a ZMySQL object.')
-                        zmysql = None
-                except AttributeError:
-                    errors['connector_id'] = _(u'validation_object_not_found', default = u'No object with this ID was found in any subpath.')
-                    zmysql = None
+                    dbo.validate(REQUEST)
 
-                if zmysql:
-                    dbc = zmysql()
-                    tables = [table['table_name'] for table in dbc.tables() if table['table_type'] == 'table']
-                    used_prefixes = [table[:-7].encode('utf-8') for table in tables if table.endswith(u'_action')]
-                    if database_prefix in used_prefixes and not database_prefix in self.own_database_prefixes.get(connector_id, {}): # check if the prefix is free or is it an already used prefix
-                        errors['database_prefix'] = _(u'validation_prefix_in_use', default= u'The chosen prefix is already in use in this database. Please choose another prefix.')
+                    if database_prefix_old != database_prefix_new and dbo.prefixInUse(REQUEST):
+                        api.portal.show_message(_(u'warning_prefix_in_use', default= u'The chosen prefix is already in use in this database. If you don\'t want use the already used prefix, please change it!'), REQUEST, 'warning')
+
+                except ValueError as e:
+                    errors['connector_id'] = e.args[0]
             REQUEST.set('post_validated', True)
 
-    security.declarePublic("show_id")
-
-
-    def show_id(self,):
+    def getDatabaseAdapters(self):
         """
-        Determine whether to show an id in an edit form
+        Returns display list with available database adapters.
 
-        show_id() used to be in a Python Script, but was removed from Plone 2.5,
-        so we had to add the method here for compatability
+        :return: available database adapters
+        :rtype: Products.Archetypes.utils.DisplayList
         """
-
-        if getToolByName(self, 'plone_utils').isIDAutoGenerated(self.REQUEST.get('id', None) or self.getId()):
-            return not (self.portal_factory.isTemporary(self) or self.CreationDate() == self.ModificationDate())
-        return
-
-    security.declareProtected(permissions.View, "addPrefix")
-    ## @brief this function adds a prefix to a given database
-    #  @param db str database connector id
-    #  @param prefix str prefix of the database
-    def addPrefix(self, db, prefix, REQUEST = None):
-        """ Add the prefix to the list of own db prefixes. """
-        if not self.isAdmin(REQUEST):
-            return
-
-        already_exist = False
-        if self.own_database_prefixes.get(db):
-            already_exist = prefix in self.own_database_prefixes[db]
-            self.own_database_prefixes[db].add(prefix)
-        else:
-            self.own_database_prefixes[db] = set([prefix])
-
-        self._p_changed = 1
-
-        return str(not already_exist)
+        values = tuple((adapter[0], adapter[0],) for adapter in getAdapters((self,), IDatabaseObject))
+        return DisplayList(values)
 
 atapi.registerType(Chat, 'tud.addons.chat')

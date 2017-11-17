@@ -35,7 +35,7 @@ Clear Database
 
 Create Chat
     [Arguments]  ${title}
-    Create Multilanguage Content  chat
+    Create Content  chat
     Set Text Field  title  ${title}
     Set Text Field  connector_id  ${DB_ID}
     Set Text Field  database_prefix  ${DB_PREFIX}
@@ -48,7 +48,7 @@ Add Chat
 
 Create Chat Session
     [Arguments]  ${title}  ${start}  ${end}
-    Create Multilanguage Content  chatsession
+    Create Content  chatsession
     Set Text Field  title  ${title}
     Set Date Field  start_date  ${start}
     Set Date Field  end_date  ${end}
@@ -59,15 +59,13 @@ Add Chat Session
     ${location} =  Save Edit Form
     [Return]  ${location}
 
-Create Multilanguage Content
-    [Arguments]  ${content_type}  ${language}=  ${title}=
+Create Content
+    [Arguments]  ${content_type}  ${title}=
     Open add new menu
     Click Link  css=#plone-contentmenu-factories a.contenttype-${content_type}
 
-    Return From Keyword If  "${language}" == "" or "${title}" == ""
-
     Page Should Contain Element  css=#archetypes-fieldname-title input
-    Set Multilanguage Text Field  ${language}  title   ${title}
+    Set Text Field  title   ${title}
 
 Save Edit Form
     Click button  name=form.button.save
@@ -82,19 +80,11 @@ Set Text Field
     Page Should Contain Element  css=#archetypes-fieldname-${fieldname} input
     Input Text  ${fieldname}  ${content}
 
-Set Multilanguage Text Field
-    [Documentation]  Enter content into a given text field.
-    [Arguments]  ${language}  ${fieldname}  ${content}
-    Page Should Contain Element  css=#archetypes-fieldname-${fieldname} input
-    Click Link  css=#fieldsetlegend-${fieldname}-${language}
-    Input Text  ${fieldname}___${language}___  ${content}
-
-Set Multilanguage Textarea Field
+Set Textarea Field
     [Documentation]  Enter content into a given textarea
-    [Arguments]  ${language}  ${fieldname}  ${content}
+    [Arguments]  ${fieldname}  ${content}
     Page Should Contain Element  css=#archetypes-fieldname-${fieldname} textarea
-    Run Keyword And Ignore Error  Click Link  css=#fieldsetlegend-${fieldname}-${language}
-    Input Text  ${fieldname}___${language}___  ${content}
+    Input Text  ${fieldname}  ${content}
 
 Set Date Field
     [Arguments]  ${fieldname}  ${date}

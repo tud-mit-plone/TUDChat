@@ -9,10 +9,6 @@ from DateTime import DateTime
 # Products imports
 from Products.ZSQLMethods.SQL import SQL as ZSQL
 
-import logging
-logger = logging.getLogger('tud.addons.chat-sql')
-
-
 class SQL(ZSQL):
 
     def __init__(self, id, title, connection_id, arguments, template):

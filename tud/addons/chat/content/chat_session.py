@@ -1,31 +1,23 @@
-# Python imports
-import logging
-
 # Zope imports
 from zope.interface import implementer
 
 from Products.Archetypes import atapi
 from Products.ATContentTypes.content import base, schemata
 from Products.Archetypes.atapi import Schema
-from Products.Archetypes.atapi import StringField, IntegerField, DateTimeField
-from Products.Archetypes.public import StringWidget, IntegerWidget, CalendarWidget
-
-from raptus.multilanguagefields import fields as MultiLanguageFields
-from raptus.multilanguagefields import widgets as MultiLanguageWidgets
+from Products.Archetypes.atapi import StringField, TextField, IntegerField, DateTimeField
+from Products.Archetypes.public import StringWidget, TextAreaWidget, IntegerWidget, CalendarWidget
 
 from tud.addons.chat import chatMessageFactory as _
 from tud.addons.chat.interfaces import IChatSession
 from tud.addons.chat.validators import LengthValidator, MinMaxValidator
 
-logger = logging.getLogger('tud.addons.chat')
-
 ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
-    MultiLanguageFields.TextField('description',
+    TextField('description',
         required           = False,
         searchable         = False,
         schemata           = 'default',
         default            = '',
-        widget            = MultiLanguageWidgets.TextAreaWidget(
+        widget            = TextAreaWidget(
             label        = _(u'session_description_label', default = u'Description'),
             description  = _(u'session_description_desc', default = u'Displayed above chat window.')
         )
@@ -46,10 +38,10 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'session_end_date_desc', default = u'Date and time when the chat session end.')
         )
     ),
-    MultiLanguageFields.StringField('welcome_message',
+    StringField('welcome_message',
         required           = False,
         default            = '',
-        widget             = MultiLanguageWidgets.StringWidget(
+        widget             = StringWidget(
             label        = _(u'session_welcome_message_label', default = u'Welcome message'),
             description  = _(u'session_welcome_message_desc', default = u'This message is displayed to each participant after entering chat session.')
         )
@@ -111,8 +103,8 @@ schemata.finalizeATCTSchema(ChatSessionSchema, folderish=False, moveDiscussion=F
 
 @implementer(IChatSession)
 class ChatSession(base.ATCTContent):
-    """Chat session content type
-
+    """
+    Chat session content type
     """
 
     meta_type = 'ChatSession'
@@ -122,9 +114,5 @@ class ChatSession(base.ATCTContent):
 
     #: Archetype schema
     schema = ChatSessionSchema
-
-    def getChatStorage(self):
-        chat = self.getParentNode()
-        return chat.chat_storage
 
 atapi.registerType(ChatSession, 'tud.addons.chat')
