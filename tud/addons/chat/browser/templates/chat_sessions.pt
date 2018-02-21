@@ -64,7 +64,7 @@
         <span tal:replace="python: view.getStateTitle(session)"/>
       </td>
       <td>
-        <span tal:replace="session/title"/>
+        <span tal:replace="session/Title"/>
       </td>
       <td tal:define="password session/password|nothing">
         <tal:value condition="password" replace="password" />
