@@ -138,13 +138,13 @@
                         <option tal:condition="python: room != session_id"
                                 tal:attributes="value session/absolute_url"
                                 class="chat_option"
-                                tal:content="session/title">
+                                tal:content="session/Title">
                             Chat session name
                         </option>
                         <option tal:condition="python: room == session_id"
                                 tal:attributes="value session/absolute_url"
                                 class="chat_option"
-                                tal:content="session/title"
+                                tal:content="session/Title"
                                 selected>
                             Chat session name
                         </option>
@@ -153,7 +153,7 @@
             </select>
           </tal:block>
           <tal:block condition="python: len(active_sessions) == 1" tal:define="session python:active_sessions[0]">
-            <input type="hidden" name="chatroom" tal:attributes="value session/absolute_url" /> <span class="chat_option" tal:content="session/title" />
+            <input type="hidden" name="chatroom" tal:attributes="value session/absolute_url" /> <span class="chat_option" tal:content="session/Title" />
           </tal:block>
         </div>
 
@@ -199,7 +199,7 @@
             </thead>
             <tbody>
                 <tr tal:repeat="session next_sessions">
-                    <td tal:content="session/title"></td>
+                    <td tal:content="session/Title"></td>
                     <td tal:define="session_start session/start_date;"
                         tal:content="python: toLocalizedTime(session_start, 'date_format_long')"></td>
                     <td tal:define="session_end session/end_date;"
