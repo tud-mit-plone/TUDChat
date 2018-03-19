@@ -251,35 +251,37 @@ class DatabaseMySQL():
         for query_name, query in self.sql_methods.__dict__.items():
             setattr(self.sql_methods, query_name, query.__of__(self.chat))
 
-    def validate(self, REQUEST):
+    @staticmethod
+    def validate(context, data):
         """
-        Validates connector id, which is given via request.
+        Validates connector id.
         An error is raised if no object with given id could be found or if object found has wrong type.
 
-        :param REQUEST: request with form data
-        :type REQUEST: ZPublisher.HTTPRequest.HTTPRequest
+        :param data: connector id
+        :type data: dict
         """
-        sql_connector_id = REQUEST.get('_connector_id', '')
+        sql_connector_id = data.get('connector_id', '')
         try:
-            zmysql = getattr(self.chat, sql_connector_id)
+            zmysql = getattr(context, sql_connector_id)
             if not isinstance(zmysql, Connection):
                 raise ValueError(_(u'validation_object_is_not_zmysql_object', default=u'The chosen object is not a ZMySQL object.'))
         except AttributeError:
             raise ValueError(_(u'validation_object_not_found', default=u'No object with this ID was found in any subpath.'))
 
-    def prefixInUse(self, REQUEST):
+    @staticmethod
+    def prefixInUse(context, data):
         """
-        Checks if prefix (received from request) is in use in the database.
+        Checks if prefix is in use in the database.
 
-        :param REQUEST: request with form data
-        :type REQUEST: ZPublisher.HTTPRequest.HTTPRequest
+        :param data: connector id and database prefix
+        :type data: dict
         :return: True, if prefix is in use, otherwise False
         :rtype: bool
         """
-        sql_connector_id = REQUEST.get('_connector_id', '')
-        prefix = REQUEST.get('_database_prefix', '')
+        sql_connector_id = data.get('connector_id', '')
+        prefix = data.get('database_prefix', '')
 
-        zmysql = getattr(self.chat, sql_connector_id)
+        zmysql = getattr(context, sql_connector_id)
         dbc = zmysql()
         tables = [table['table_name'] for table in dbc.tables() if table['table_type'] == 'table']
         used_prefixes = [table[:-7].encode('utf-8') for table in tables if table.endswith(u'_action')]

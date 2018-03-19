@@ -124,7 +124,7 @@
 <tal:block condition="python:active_sessions is not None">
 
     <form id="login" class="chat_login" action="" tal:condition="active_sessions">
-        <script language="javascript" tal:content="python: 'var password_channels = [' + ','.join(['\'{}\''.format(str(session.absolute_url())) for session in active_sessions if session.password != '']) + '];'"></script>
+        <script language="javascript" tal:content="python: 'var password_channels = [' + ','.join(['\'{}\''.format(str(session.absolute_url())) for session in active_sessions if session.password]) + '];'"></script>
         <div>
           <label for="chatroom" i18n:translate="chat_session">Chat session</label>
           <tal:block condition="python: len(active_sessions) > 1">

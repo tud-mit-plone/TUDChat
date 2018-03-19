@@ -1,9 +1,14 @@
 from datetime import datetime, timedelta
 
+from zope.component import getAdapter
+from zope.security import checkPermission
+
 from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
+from plone.dexterity.browser import add, edit
+from plone import api
 
-from tud.addons.chat.interfaces import IChatSession
+from tud.addons.chat.interfaces import IChatSession, IDatabaseObject
 from tud.addons.chat import chatMessageFactory as _
 
 class ChatView(BrowserView):
@@ -129,3 +134,64 @@ class ChatSessionsView(BrowserView):
             for wf in workflows:
                 if state in wf.states:
                     return self.context.translate(wf.states[state].title or state)
+
+class AddForm(add.DefaultAddForm):
+    """
+    Add form for dexterity chat objects
+    """
+
+    def createAndAdd(self, data):
+        """
+        Creates chat object and adds it to the container.
+        If the configured prefix is in use, a warning is shown.
+        The table creation step is also done here, because the "edited_handler" will not run for dexterity objects.
+
+        :param data: validated form data
+        :type data: dict
+        :return: created chat object
+        :rtype: plone.dexterity.content.Container
+        """
+        obj = super(AddForm, self).createAndAdd(data)
+        adapter_name = obj.database_adapter
+
+        dbo = getAdapter(getattr(self.context, obj.id), interface=IDatabaseObject, name=adapter_name)
+        obj._v_db_adapter = dbo
+
+        if obj._v_db_adapter.prefixInUse(self.context, {"connector_id": obj.connector_id, "database_prefix": obj.database_prefix}):
+            api.portal.show_message(_(u'warning_prefix_in_use', default= u'The chosen prefix is already in use in this database. If you don\'t want use the already used prefix, please change it!'), self.request, 'warning')
+
+        obj._v_db_adapter.createTables()
+
+        return obj
+
+class AddView(add.DefaultAddView):
+    """
+    Add view for dexterity chat objects
+    """
+
+    form = AddForm
+
+class EditForm(edit.DefaultEditForm):
+    """
+    Edit form for dexterity chat objects
+    """
+
+    def applyChanges(self, data):
+        """
+        Applies changed fields to the chat object.
+        If the configured prefix has changed and if the new prefix is in use, a warning is shown.
+
+        :param data: validated form data
+        :type data: dict
+        :return: schema associated with changed fields
+        :rtype: dict
+        """
+
+        if checkPermission('tud.addons.chat.ManageChat', self.context):
+            dbo = getAdapter(self.context, IDatabaseObject, self.context.database_adapter)
+            database_prefix_old = self.context.database_prefix
+            database_prefix_new = data["database_prefix"]
+            if database_prefix_old != database_prefix_new and dbo.prefixInUse(self.context, {"connector_id": self.context.connector_id, "database_prefix": database_prefix_new}):
+                api.portal.show_message(_(u'warning_prefix_in_use', default= u'The chosen prefix is already in use in this database. If you don\'t want use the already used prefix, please change it!'), self.request, 'warning')
+
+        return super(EditForm, self).applyChanges(data)

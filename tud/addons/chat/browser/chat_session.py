@@ -3,9 +3,11 @@ import re
 import json
 import urllib
 import inspect
+from datetime import datetime
 
 from zope.component import getUtility, getAdapter
 from zope.security import checkPermission
+from DateTime.interfaces import IDateTime
 from DateTime import DateTime
 
 from Products.Five import BrowserView
@@ -131,7 +133,12 @@ class ChatSessionBaseView(BrowserView):
         """
         chat_start = self.context.start_date
         chat_end = self.context.end_date
-        now = DateTime()
+
+        if IDateTime.providedBy(chat_start):
+            now = DateTime()
+        else:
+            now = datetime.now()
+
         return now > chat_start and now < chat_end
 
 class ChatSessionAjaxView(ChatSessionBaseView):
@@ -931,6 +938,8 @@ class ChatSessionLogView(ChatSessionBaseView):
         """
         now = DateTime().timeTime()
         end_date = self.context.end_date
+        if not IDateTime.providedBy(end_date):
+            end_date = DateTime(end_date)
 
         if end_date < now - 300:
             return True

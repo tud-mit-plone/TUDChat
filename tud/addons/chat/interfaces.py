@@ -1,4 +1,5 @@
 from plone.theme.interfaces import IDefaultPloneLayer
+from plone.supermodel import model
 
 from zope.interface import Interface
 
@@ -61,3 +62,13 @@ class IDatabaseObject(Interface):
 
     def deleteActions(chat_id):
         pass
+
+class IChatModel(model.Schema, IChat):
+    """Model for chat objects
+    """
+    model.load('models/Chat.xml')
+
+class IChatSessionModel(model.Schema, IChatSession):
+    """Model for chat session objects
+    """
+    model.load('models/ChatSession.xml')

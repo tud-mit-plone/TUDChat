@@ -283,9 +283,9 @@ class Chat(base.ATCTFolder):
             if checkPermission('tud.addons.chat.ManageChat', self) and connector_id and not errors:
                 dbo = getAdapter(self, IDatabaseObject, adapter_name)
                 try:
-                    dbo.validate(REQUEST)
+                    dbo.validate(self, {"connector_id" : connector_id})
 
-                    if database_prefix_old != database_prefix_new and dbo.prefixInUse(REQUEST):
+                    if database_prefix_old != database_prefix_new and dbo.prefixInUse(self, {"connector_id": connector_id, "database_prefix": database_prefix_new}):
                         api.portal.show_message(_(u'warning_prefix_in_use', default= u'The chosen prefix is already in use in this database. If you don\'t want use the already used prefix, please change it!'), REQUEST, 'warning')
 
                 except ValueError as e:

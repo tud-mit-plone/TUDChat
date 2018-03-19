@@ -1,0 +1,134 @@
+<model xmlns:form="http://namespaces.plone.org/supermodel/form"
+       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+       xmlns:lingua="http://namespaces.plone.org/supermodel/lingua"
+       xmlns:marshal="http://namespaces.plone.org/supermodel/marshal"
+       xmlns:security="http://namespaces.plone.org/supermodel/security"
+       xmlns:users="http://namespaces.plone.org/supermodel/users"
+       xmlns="http://namespaces.plone.org/supermodel/schema"
+       i18n:domain="tud.addons.chat">
+  <schema>
+    <field name="title"
+           type="zope.schema.TextLine">
+      <description/>
+      <title>Title</title>
+    </field>
+    <field name="introduction"
+           type="zope.schema.Text">
+      <title i18n:translate="chat_introduction_label">Welcoming text</title>
+      <description i18n:translate="chat_introduction_desc">This text will be displayed at chat session selection.</description>
+      <required>False</required>
+    </field>
+    <field name="database_adapter"
+           type="zope.schema.Choice"
+           security:read-permission="tud.addons.chat.ManageChat"
+           security:write-permission="tud.addons.chat.ManageChat">
+      <title i18n:translate="chat_database_adapter_label">Database adapter</title>
+      <description i18n:translate="chat_database_adapter_desc">Adapter that manages the chat session data persistence</description>
+      <required>True</required>
+      <source>tud.addons.chat.dexterity.getDatabaseAdapters</source>
+      <default>mysql</default>
+    </field>
+    <field name="connector_id"
+           type="zope.schema.TextLine"
+           form:validator="tud.addons.chat.dexterity.DatabaseConnectionValidator"
+           security:read-permission="tud.addons.chat.ManageChat"
+           security:write-permission="tud.addons.chat.ManageChat">
+      <title i18n:translate="chat_database_label">database</title>
+      <description i18n:translate="chat_database_desc">Please enter the ID of the ZMySQL object. The object must be located in a sub-path of the chat object.</description>
+      <required>True</required>
+    </field>
+    <field name="database_prefix"
+           type="zope.schema.TextLine"
+           security:read-permission="tud.addons.chat.ManageChat"
+           security:write-permission="tud.addons.chat.ManageChat">
+      <title i18n:translate="chat_database_prefix_label">database prefix</title>
+      <description i18n:translate="chat_database_prefix_desc">Please enter a prefix for tables in the database, e.g. institutionname</description>
+      <required>True</required>
+    </field>
+    <field name="date_frequency"
+           type="zope.schema.Choice">
+      <title i18n:translate="chat_date_frequency_label">Time stamp in chat</title>
+      <description i18n:translate="chat_date_frequency_desc">If you want a time stamp for each message, choose 'at every message'. If you choose 'maximum once per minute', the time is given maximally once per minute. If no time is to be given before messages, choose 'disabled'.</description>
+      <required>True</required>
+      <source>tud.addons.chat.dexterity.DATE_FREQUENCIES</source>
+      <default>minute</default>
+    </field>
+    <field name="adminColor"
+           type="zope.schema.TextLine"
+           form:validator="tud.addons.chat.dexterity.HexColorCodeValidator"
+           security:write-permission="tud.addons.chat.ManageChat">
+      <title i18n:translate="chat_admin_color_label">Marking color for chat moderators</title>
+      <description i18n:translate="chat_admin_color_desc">Username and messages of moderators will be marked with this color. The input must be made as HTML color code (e.g. #ff0000)</description>
+      <required>True</required>
+      <default>#ff0000</default>
+    </field>
+    <field name="timeout"
+           type="zope.schema.Int"
+           security:write-permission="tud.addons.chat.ManageChat">
+      <title i18n:translate="chat_timeout_label">Socket timeout (in seconds)</title>
+      <description i18n:translate="chat_timeout_desc">If a participant has not communicated with the server during this time period, he or she will be removed automatically.</description>
+      <required>True</required>
+      <default>15</default>
+      <min>5</min>
+    </field>
+    <field name="refreshRate"
+           type="zope.schema.Int"
+           security:write-permission="tud.addons.chat.ManageChat">
+      <title i18n:translate="chat_refresh_rate_label">Refresh rate (in seconds)</title>
+      <description i18n:translate="chat_refresh_rate_desc">Specifies how often the chat display is updated.</description>
+      <required>True</required>
+      <default>2</default>
+      <min>1</min>
+    </field>
+    <field name="maxMessageLength"
+           type="zope.schema.Int">
+      <title i18n:translate="chat_max_message_length_label">Maximum message length</title>
+      <description i18n:translate="chat_max_message_length_desc">Maximum number of characters that a single chat message can consist of. Enter 0, if you do not want to restrict the message length.</description>
+      <required>True</required>
+      <default>0</default>
+      <min>0</min>
+    </field>
+    <field name="blockTime"
+           type="zope.schema.Int">
+      <title i18n:translate="chat_block_time_label">Waiting time between messages (in seconds)</title>
+      <description i18n:translate="chat_block_time_desc">Minimum time period between two messages from a user.</description>
+      <required>True</required>
+      <default>1</default>
+      <min>0</min>
+    </field>
+    <field name="banStrategy"
+           type="zope.schema.Choice"
+           security:write-permission="tud.addons.chat.ManageChat"
+           form:omitted="true">
+      <title i18n:translate="chat_ban_strategy_label">Ban strategy</title>
+      <description i18n:translate="chat_ban_strategy_desc">Method to mark a user, which is permanently banned from the chat.</description>
+      <required>True</required>
+      <default>COOKIE</default>
+      <source>tud.addons.chat.dexterity.BAN_STRATEGIES</source>
+    </field>
+    <field name="oldMessagesCount"
+           type="zope.schema.Int">
+      <title i18n:translate="chat_old_messages_count_label">Number of recent messages when entering a chat session</title>
+      <description i18n:translate="chat_old_messages_count_desc">Specifies the maximum number of recent messages displayed to a new participant when entering the chat session. Enter 0, if no recent messages should be shown.</description>
+      <required>True</required>
+      <default>20</default>
+      <min>0</min>
+    </field>
+    <field name="oldMessagesMinutes"
+           type="zope.schema.Int">
+      <title i18n:translate="chat_old_messages_minutes_label">Age of recent messages on entering a chat session (in minutes)</title>
+      <description i18n:translate="chat_old_messages_minutes_desc">Specifies the maximum age of recent messages so that they will still be shown. Enter 0, if you want recent messages to be displayed regardless of their age. This setting is only used if the number of recent messages to be displayed is greater than 0.</description>
+      <required>True</required>
+      <default>0</default>
+      <min>0</min>
+    </field>
+    <field name="whisper"
+           type="zope.schema.Choice">
+      <title i18n:translate="chat_whisper_label">Whisper</title>
+      <description i18n:translate="chat_whisper_desc">When whispering, a private message is sent that only the sender and the recipient can see. If the mode 'only with moderators' is chosen, participants can only whisper with moderators, but not among themselves</description>
+      <required>True</required>
+      <default>on</default>
+      <source>tud.addons.chat.dexterity.WHISPER_OPTIONS</source>
+    </field>
+  </schema>
+</model>

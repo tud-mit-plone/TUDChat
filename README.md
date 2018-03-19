@@ -2,6 +2,7 @@
 
 ## Introduction
 This repository contains tud.addons.chat, which is a chat Add-On for [Plone](https://plone.org/). It allows you to setup time restricted chat sessions, which can be moderated by privileged Plone users.
+The product can be used either with archetypes content types or with dexterity content types.
 
 Features:
 *  Password protection for chat sessions
@@ -52,7 +53,7 @@ The following crontab template could be used (it is advisable to use an instance
 0 4 * * * ${installdir}/bin/${instance_bin} run ${installdir}/src/tud.addons.chat/tud/addons/chat/cron.py --do --site ${site_id} > /dev/null
 ```
 
-After these steps you can start your instance and install the chat product.
+After these steps you can start your instance and install the chat product. For the installation are an archetypes and a dexterity profile available.
 Before you can add chat objects in Plone, you have to add a database connection object (inside the ZODB the database object must be located above the chat objects, e.g. your site root):
 *   Open the Zope Management Interface at the position you want to add the object in your browser.
 *   Add an object of type "Z MySQL Database Connection":
@@ -83,6 +84,8 @@ To define your custom configuration you can set the following environment variab
 *  DB_USER
 *  DB_PASSWORD
 *  DB_NAME
+
+Currently no tests exist for dexterity content types.
 
 ## Documentation
 To learn more about the product you can read the following documents:

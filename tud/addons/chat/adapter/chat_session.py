@@ -2,9 +2,11 @@ import re
 
 from zope.component import getAdapter
 from DateTime import DateTime
+from zope.lifecycleevent.interfaces import IObjectAddedEvent
 
 from OFS.interfaces import IObjectClonedEvent
 from plone.indexer.decorator import indexer
+from plone.dexterity.interfaces import IDexterityContent
 
 from tud.addons.chat.interfaces import IChat, IChatSession, IDatabaseObject
 from tud.addons.chat import chatMessageFactory as _
@@ -24,8 +26,11 @@ def generate_chat_id(obj, event):
     :param obj: chat session, which was created or copied
     :type obj: tud.addons.chat.content.chat_session.ChatSession
     :param event: triggered event (used to detect a copy action)
-    :type event: Products.Archetypes.event.ObjectInitializedEvent or OFS.event.ObjectClonedEvent
+    :type event: Products.Archetypes.event.ObjectInitializedEvent or OFS.event.ObjectClonedEvent or zope.lifecycleevent.ObjectAddedEvent
     """
+    if IObjectAddedEvent.providedBy(event) and not IDexterityContent.providedBy(obj):
+        return
+
     chat = obj.getParentNode()
 
     if not IChat.providedBy(chat):
