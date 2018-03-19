@@ -259,7 +259,7 @@ class DatabaseMySQL():
         :param REQUEST: request with form data
         :type REQUEST: ZPublisher.HTTPRequest.HTTPRequest
         """
-        sql_connector_id = REQUEST.get('connector_id', '')
+        sql_connector_id = REQUEST.get('_connector_id', '')
         try:
             zmysql = getattr(self.chat, sql_connector_id)
             if not isinstance(zmysql, Connection):
@@ -276,8 +276,8 @@ class DatabaseMySQL():
         :return: True, if prefix is in use, otherwise False
         :rtype: bool
         """
-        sql_connector_id = REQUEST.get('connector_id', '')
-        prefix = REQUEST.get('database_prefix', '')
+        sql_connector_id = REQUEST.get('_connector_id', '')
+        prefix = REQUEST.get('_database_prefix', '')
 
         zmysql = getattr(self.chat, sql_connector_id)
         dbc = zmysql()

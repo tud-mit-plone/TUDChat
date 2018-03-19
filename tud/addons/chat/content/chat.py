@@ -276,9 +276,9 @@ class Chat(base.ATCTFolder):
         :type errors: list
         """
         if not REQUEST.get('post_validated'):
-            adapter_name = REQUEST.get('database_adapter')
-            connector_id = REQUEST.get('connector_id')
-            database_prefix_new = REQUEST.get('database_prefix')
+            adapter_name = REQUEST.get('_database_adapter')
+            connector_id = REQUEST.get('_connector_id')
+            database_prefix_new = REQUEST.get('_database_prefix')
             database_prefix_old = self.database_prefix
             if checkPermission('tud.addons.chat.ManageChat', self) and connector_id and not errors:
                 dbo = getAdapter(self, IDatabaseObject, adapter_name)
@@ -289,7 +289,7 @@ class Chat(base.ATCTFolder):
                         api.portal.show_message(_(u'warning_prefix_in_use', default= u'The chosen prefix is already in use in this database. If you don\'t want use the already used prefix, please change it!'), REQUEST, 'warning')
 
                 except ValueError as e:
-                    errors['connector_id'] = e.args[0]
+                    errors['_connector_id'] = e.args[0]
             REQUEST.set('post_validated', True)
 
     def getDatabaseAdapters(self):

@@ -128,26 +128,26 @@ class StartEndDateValidator(object):
         :return: field names associated with error messages, if at least one error exists, otherwise None
         :rtype: dict or None
         """
-        start_date = request.form.get('start_date', None)
-        end_date = request.form.get('end_date', None)
+        start_date = request.form.get('_start_date', None)
+        end_date = request.form.get('_end_date', None)
 
         errors = {}
 
         try:
             start = DateTime(start_date)
         except:
-            errors['start_date'] = self.context.translate(_(u'validation_start_date_format_err', default = u'Start of the chat has no valid date format.'))
+            errors['_start_date'] = self.context.translate(_(u'validation_start_date_format_err', default = u'Start of the chat has no valid date format.'))
 
         try:
             end = DateTime(end_date)
         except:
-            errors['end_date'] = self.context.translate(_(u'validation_end_date_format_err', default = u'End of the chat has no valid date format.'))
+            errors['_end_date'] = self.context.translate(_(u'validation_end_date_format_err', default = u'End of the chat has no valid date format.'))
 
         if 'start_date' in errors or 'end_date' in errors:
             # No point in validating bad input
             return errors
 
         if start > end:
-            errors['end_date'] = self.context.translate(_(u'validation_end_before_start', default = u'Start of the chat must be before its end.'))
+            errors['_end_date'] = self.context.translate(_(u'validation_end_before_start', default = u'Start of the chat must be before its end.'))
 
         return errors and errors or None
