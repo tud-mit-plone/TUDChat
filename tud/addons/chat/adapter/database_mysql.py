@@ -243,8 +243,8 @@ class DatabaseMySQL():
         """
         self.chat = chat
 
-        sql_connector_id = chat.connector_id
-        prefix = chat.database_prefix
+        sql_connector_id = hasattr(chat, "connector_id") and chat.connector_id or chat._connector_id
+        prefix = hasattr(chat, "database_prefix") and chat.database_prefix or chat._database_prefix
         self.sql_methods = TUDChatSqlMethods(sql_connector_id, prefix)
 
         # set acquisition context for sql methods

@@ -53,10 +53,11 @@ def removed_handler(obj, event):
     :param event: triggered event
     :type event: zope.lifecycleevent.ObjectRemovedEvent
     """
-    chat_id = obj.chat_id
+    chat_id = hasattr(obj, "chat_id") and obj.chat_id or obj._chat_id
     chat = obj.getParentNode()
 
-    dbo = getAdapter(chat, IDatabaseObject, chat.database_adapter)
+    database_adapter = hasattr(chat, "database_adapter") and chat.database_adapter or chat._database_adapter
+    dbo = getAdapter(chat, IDatabaseObject, database_adapter)
     dbo.deleteActions(chat_id)
 
 def action_succeeded_handler(obj, event):
