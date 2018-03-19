@@ -48,8 +48,10 @@ $( document ).ready(function() {
                         $.notification.clear();
                     }
                 },
-                {"name" : TudChat._('button_abort'), "click": $.notification.clear()
-                },
+                {"name" : TudChat._('button_abort'), "click": function() {
+                    $.notification.clear();
+                }
+                }
             ]
         );
         e.preventDefault();
