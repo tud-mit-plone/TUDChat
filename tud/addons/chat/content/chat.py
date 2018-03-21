@@ -16,8 +16,6 @@ from Products.Archetypes.public import StringWidget, TextAreaWidget, SelectionWi
 from Products.Archetypes.public import DisplayList
 from plone import api
 
-from tud.addons.chat.core.TUDChatSqlStorage import TUDChatSqlStorage
-
 from tud.addons.chat import chatMessageFactory as _
 from tud.addons.chat.interfaces import IChat, IDatabaseObject
 from tud.addons.chat.validators import MinMaxValidator, HexColorCodeValidator

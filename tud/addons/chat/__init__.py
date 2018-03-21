@@ -14,7 +14,6 @@ from Products.Archetypes.public import process_types, listTypes
 
 # Product import
 from tud.addons.chat.config import *
-from tud.addons.chat.core import *
 
 chatMessageFactory = MessageFactory('tud.addons.chat')
 
