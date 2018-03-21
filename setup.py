@@ -26,8 +26,6 @@ setup(name='tud.addons.chat',
       install_requires=[
           'setuptools',
           'plone.api',
-          'Products.Archetypes',
-          'Products.ATContentTypes',
           'Products.GenericSetup',
           'Products.ZMySQLDA',
           'collective.beaker',

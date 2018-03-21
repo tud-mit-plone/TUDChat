@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import transaction
 from zope.component.hooks import setSite
+from zope import interface
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManager import setSecurityPolicy
 from Products.CMFCore.tests.base.security import PermissiveSecurityPolicy, OmnipotentUser
@@ -20,7 +21,7 @@ import Testing
 from ZODB.POSException import ConflictError
 from plone import api
 
-from tud.addons.chat.interfaces import IChatSession
+from tud.addons.chat.interfaces import IChatSession, IAddonInstalled
 
 def dir_arg(path):
     """
@@ -81,6 +82,7 @@ def main(app):
     _oldpolicy=setSecurityPolicy(_policy)
     newSecurityManager(None, OmnipotentUser().__of__(app.acl_users))
     app = Testing.makerequest.makerequest(app)
+    interface.alsoProvides(app.REQUEST, IAddonInstalled) # layer is needed to use browser views
 
     # Get Plone site object from Zope application server root
     if options.site not in app:

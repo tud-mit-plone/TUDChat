@@ -50,4 +50,10 @@
         factory=".chat_session.StartEndDateValidator"
         />
 
+    <subscriber
+        for="tud.addons.chat.interfaces.IChatSession
+             zope.lifecycleevent.interfaces.IObjectAddedEvent"
+        handler=".chat_session.generate_chat_id"
+        />
+
 </configure>

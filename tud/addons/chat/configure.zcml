@@ -19,6 +19,8 @@
     <include package=".adapter"/>
     <include package=".content"/>
     <include package=".browser"/>
+    <include package=".dexterity"/>
+    <include package=".archetypes"/>
 
     <cmf:registerDirectory
             name            = "skins"

@@ -1,0 +1,66 @@
+<model xmlns:form="http://namespaces.plone.org/supermodel/form"
+       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+       xmlns:lingua="http://namespaces.plone.org/supermodel/lingua"
+       xmlns:marshal="http://namespaces.plone.org/supermodel/marshal"
+       xmlns:security="http://namespaces.plone.org/supermodel/security"
+       xmlns:users="http://namespaces.plone.org/supermodel/users"
+       xmlns="http://namespaces.plone.org/supermodel/schema"
+       i18n:domain="tud.addons.chat">
+  <schema>
+    <field name="title"
+           type="zope.schema.TextLine">
+      <description/>
+      <title>Title</title>
+    </field>
+    <field name="description"
+           type="zope.schema.Text">
+      <title i18n:translate="session_description_label">Description</title>
+      <description i18n:translate="session_description_desc">Displayed above chat window.</description>
+      <required>False</required>
+    </field>
+    <field name="start_date"
+           type="zope.schema.Datetime">
+      <title i18n:translate="session_start_date_label">Begin</title>
+      <description i18n:translate="session_start_date_desc">Date and time when the chat session begins.</description>
+      <required>True</required>
+    </field>
+    <field name="end_date"
+           type="zope.schema.Datetime"
+           form:validator="tud.addons.chat.dexterity.StartEndDateValidator">
+      <title i18n:translate="session_end_date_label">End</title>
+      <description i18n:translate="session_end_date_desc">Date and time when the chat session end.</description>
+      <required>True</required>
+    </field>
+    <field name="welcome_message"
+           type="zope.schema.TextLine">
+      <title i18n:translate="session_welcome_message_label">Welcome message</title>
+      <description i18n:translate="session_welcome_message_desc">This message is displayed to each participant after entering chat session.</description>
+      <required>False</required>
+    </field>
+    <field name="password"
+           type="zope.schema.TextLine">
+      <title i18n:translate="session_password_label">Password</title>
+      <description i18n:translate="session_password_desc">Enter a password if you want to restrict access.</description>
+      <required>False</required>
+      <max_length>30</max_length>
+    </field>
+    <field name="max_users"
+           type="zope.schema.Int">
+      <title i18n:translate="session_max_users_label">Maximum number of participants</title>
+      <description i18n:translate="session_max_users_desc">Enter the maximum number of participants for this chat session if you want to limit it. If you enter 0, there is no restriction.</description>
+      <required>True</required>
+      <default>0</default>
+      <min>0</min>
+    </field>
+    <field name="chat_id"
+           type="zope.schema.Int"
+           security:read-permission="tud.addons.chat.ManageChat"
+           security:write-permission="tud.addons.chat.ManageChat">
+      <title i18n:translate="session_chat_id_label">Chat ID</title>
+      <description i18n:translate="session_chat_id_desc">Unique database ID for this chat session. If you want to generate the ID, enter 0 (this works only during creation).</description>
+      <required>True</required>
+      <default>0</default>
+      <min>0</min>
+    </field>
+  </schema>
+</model>

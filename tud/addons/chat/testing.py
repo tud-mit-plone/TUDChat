@@ -64,7 +64,7 @@ class TudAddonsChatLayer(BeakerConfigLayer, PloneSandboxLayer):
         :param portal: plone site
         :type portal: Products.CMFPlone.Portal.PloneSite
         """
-        self.applyProfile(portal, 'tud.addons.chat:default')
+        self.applyProfile(portal, 'tud.addons.chat.archetypes:archetypes')
 
     def setUp(self):
         """

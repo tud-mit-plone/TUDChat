@@ -3,7 +3,7 @@
         xmlns:browser="http://namespaces.zope.org/browser">
 
     <browser:page
-             for         = "tud.addons.chat.content.chat.Chat"
+             for         = "tud.addons.chat.interfaces.IChat"
              name        = "view"
              class       = ".chat.ChatView"
              template    = "templates/chat_view.pt"
@@ -11,7 +11,7 @@
              permission  = "zope2.View"
      />
      <browser:page
-             for         = "tud.addons.chat.content.chat.Chat"
+             for         = "tud.addons.chat.interfaces.IChat"
              name        = "chat_sessions"
              class       = ".chat.ChatSessionsView"
              template    = "templates/chat_sessions.pt"
@@ -20,7 +20,7 @@
      />
 
      <browser:page
-             for         = "tud.addons.chat.content.chat_session.ChatSession"
+             for         = "tud.addons.chat.interfaces.IChatSession"
              name        = "view"
              class       = ".chat_session.ChatSessionView"
              template    = "templates/chat_session_view.pt"
@@ -28,19 +28,42 @@
              permission  = "zope2.View"
      />
      <browser:page
-             for         = "tud.addons.chat.content.chat_session.ChatSession"
+             for         = "tud.addons.chat.interfaces.IChatSession"
              name        = "chatajax"
              class       = ".chat_session.ChatSessionAjaxView"
              layer       = "tud.addons.chat.interfaces.IAddonInstalled"
              permission  = "zope2.View"
      />
      <browser:page
-             for         = "tud.addons.chat.content.chat_session.ChatSession"
+             for         = "tud.addons.chat.interfaces.IChatSession"
              name        = "log"
              class       = ".chat_session.ChatSessionLogView"
              template    = "templates/chat_session_log.pt"
              layer       = "tud.addons.chat.interfaces.IAddonInstalled"
              permission  = "zope2.View"
      />
+
+     <adapter
+             for="Products.CMFCore.interfaces.IFolderish
+                  zope.publisher.interfaces.browser.IDefaultBrowserLayer
+                  plone.dexterity.interfaces.IDexterityFTI"
+             provides="zope.publisher.interfaces.browser.IBrowserPage"
+             factory=".chat.AddView"
+             name="Chat"
+     />
+     <class class=".chat.AddView">
+         <require
+             permission="cmf.AddPortalContent"
+             interface="zope.publisher.interfaces.browser.IBrowserPage"
+             />
+     </class>
+
+     <browser:page
+             for         = "tud.addons.chat.interfaces.IChat"
+             name        = "edit"
+             class       = ".chat.EditForm"
+             layer       = "tud.addons.chat.interfaces.IAddonInstalled"
+             permission  = "cmf.ModifyPortalContent"
+      />
 
 </configure>

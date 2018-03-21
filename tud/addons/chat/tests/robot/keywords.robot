@@ -37,8 +37,8 @@ Create Chat
     [Arguments]  ${title}
     Create Content  chat
     Set Text Field  title  ${title}
-    Set Text Field  connector_id  ${DB_ID}
-    Set Text Field  database_prefix  ${DB_PREFIX}
+    Set Text Field  _connector_id  ${DB_ID}
+    Set Text Field  _database_prefix  ${DB_PREFIX}
 
 Add Chat
     [Arguments]  ${title}
@@ -50,8 +50,8 @@ Create Chat Session
     [Arguments]  ${title}  ${start}  ${end}
     Create Content  chatsession
     Set Text Field  title  ${title}
-    Set Date Field  start_date  ${start}
-    Set Date Field  end_date  ${end}
+    Set Date Field  _start_date  ${start}
+    Set Date Field  _end_date  ${end}
 
 Add Chat Session
     [Arguments]  ${title}  ${start}  ${end}

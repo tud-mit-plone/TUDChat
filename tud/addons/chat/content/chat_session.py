@@ -12,7 +12,7 @@ from tud.addons.chat.interfaces import IChatSession
 from tud.addons.chat.validators import LengthValidator, MinMaxValidator
 
 ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
-    TextField('description',
+    TextField('_description',
         required           = False,
         searchable         = False,
         schemata           = 'default',
@@ -22,7 +22,7 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'session_description_desc', default = u'Displayed above chat window.')
         )
     ),
-    DateTimeField('start_date',
+    DateTimeField('_start_date',
         required=True,
         searchable=False,
         widget=CalendarWidget(
@@ -30,7 +30,7 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'session_start_date_desc', default = u'Date and time when the chat session begins.')
         )
     ),
-    DateTimeField('end_date',
+    DateTimeField('_end_date',
         required=True,
         searchable=False,
         widget=CalendarWidget(
@@ -38,7 +38,7 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'session_end_date_desc', default = u'Date and time when the chat session end.')
         )
     ),
-    StringField('welcome_message',
+    StringField('_welcome_message',
         required           = False,
         default            = '',
         widget             = StringWidget(
@@ -46,7 +46,7 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'session_welcome_message_desc', default = u'This message is displayed to each participant after entering chat session.')
         )
     ),
-    StringField('password',
+    StringField('_password',
         required           = False,
         default            = '',
         validators         = (LengthValidator('max_30_check', maximum = 30), ),
@@ -55,7 +55,7 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'session_password_desc', default = u'Enter a password if you want to restrict access.')
         )
     ),
-    IntegerField('max_users',
+    IntegerField('_max_users',
         required           = False,
         default            = 0,
         validators         = MinMaxValidator('min_0_check', minimum = 0),
@@ -64,7 +64,7 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
             description  = _(u'session_max_users_desc', default = u'Enter the maximum number of participants for this chat session if you want to limit it. If you enter 0, there is no restriction.')
         )
     ),
-    IntegerField('chat_id',
+    IntegerField('_chat_id',
         required           = True,
         default            = 0,
         validators         = MinMaxValidator('min_0_check', minimum = 0),
@@ -80,6 +80,7 @@ ChatSessionSchema = schemata.ATContentTypeSchema.copy() + Schema((
 
 fields_to_hide = [
     'creators',
+    'description',
     'effectiveDate',
     'expirationDate',
     'subject',
@@ -114,5 +115,13 @@ class ChatSession(base.ATCTContent):
 
     #: Archetype schema
     schema = ChatSessionSchema
+
+    description = atapi.ATFieldProperty('_description')
+    start_date = atapi.ATFieldProperty('_start_date')
+    end_date = atapi.ATFieldProperty('_end_date')
+    welcome_message = atapi.ATFieldProperty('_welcome_message')
+    password = atapi.ATFieldProperty('_password')
+    max_users = atapi.ATFieldProperty('_max_users')
+    chat_id = atapi.ATFieldProperty('_chat_id')
 
 atapi.registerType(ChatSession, 'tud.addons.chat')

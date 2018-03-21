@@ -1,0 +1,21 @@
+<configure
+        xmlns               = "http://namespaces.zope.org/zope"
+        xmlns:genericsetup  = "http://namespaces.zope.org/genericsetup">
+
+    <genericsetup:registerProfile
+            name            = "dexterity"
+            title           = "tud.addons.chat.dexterity"
+            directory       = "../profiles/dexterity"
+            description     = "Installs the tud.addons.chat add-on [dexterity]"
+            provides        = "Products.GenericSetup.interfaces.EXTENSION"
+            />
+
+    <genericsetup:registerProfile
+            name            = "uninstall"
+            title           = "tud.addons.chat.dexterity (uninstall)"
+            description     = "Uninstalls tud.addons.chat.dexterity"
+            provides        = "Products.GenericSetup.interfaces.EXTENSION"
+            post_handler    = "tud.addons.chat.setuphandlers.uninstall"
+            />
+
+</configure>

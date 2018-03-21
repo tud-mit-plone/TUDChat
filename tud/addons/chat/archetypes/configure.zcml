@@ -1,0 +1,40 @@
+<configure
+        xmlns               = "http://namespaces.zope.org/zope"
+        xmlns:genericsetup  = "http://namespaces.zope.org/genericsetup"
+        xmlns:zcml          = "http://namespaces.zope.org/zcml">
+
+    <genericsetup:registerProfile
+            name            = "archetypes"
+            title           = "tud.addons.chat.archetypes"
+            directory       = "../profiles/archetypes"
+            description     = "Installs the tud.addons.chat add-on [archetypes]"
+            provides        = "Products.GenericSetup.interfaces.EXTENSION"
+            />
+
+    <genericsetup:registerProfile
+            zcml:condition  = "not-have plone-5"
+            name            = "base"
+            title           = "tud.addons.chat.archetypes base profile"
+            directory       = "../profiles/archetypes_plone4"
+            description     = "TUD-Chat archetypes base profile"
+            provides        = "Products.GenericSetup.interfaces.EXTENSION"
+            />
+
+    <genericsetup:registerProfile
+            zcml:condition  = "have plone-5"
+            name            = "base"
+            title           = "tud.addons.chat.archetypes base profile"
+            directory       = "../profiles/archetypes_plone5"
+            description     = "TUD-Chat archetypes base profile"
+            provides        = "Products.GenericSetup.interfaces.EXTENSION"
+            />
+
+    <genericsetup:registerProfile
+            name            = "uninstall"
+            title           = "tud.addons.chat.archetypes (uninstall)"
+            description     = "Uninstalls tud.addons.chat.archetypes"
+            provides        = "Products.GenericSetup.interfaces.EXTENSION"
+            post_handler    = "tud.addons.chat.setuphandlers.uninstall"
+            />
+
+</configure>
